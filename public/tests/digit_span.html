@@ -354,6 +354,19 @@ body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;back
 .btn-nav.btn-stop:hover{background:var(--error);color:#fff}
 #welcomeScreen,#testArea,#resultsCard,#s-participant{position:relative;z-index:10}
 
+
+/* ═══ MOBILE RESPONSIVE ENHANCEMENTS ═══ */
+@media(max-width:600px){
+  body{font-size:14px}
+  .topbar,.tb{padding:10px 14px!important;gap:8px!important}
+  .tb-title,.tb-t{font-size:.85rem!important}
+  .tb-badge{font-size:.5rem!important;padding:3px 8px!important}
+  button,input{font-size:16px!important;-webkit-appearance:none}
+  .main,.wrap,.container{padding-left:14px!important;padding-right:14px!important}
+}
+@media(max-width:400px){
+  .topbar,.tb{flex-wrap:wrap}
+}
 </style>
 <style>
 

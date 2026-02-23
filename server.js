@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test/:name', (req, res) => {
-  const validTests = ['depression_screening', 'trail_making', 'stroop_test', 'digit_span', 'quality_of_life'];
+  const validTests = ['depression_screening', 'trail_making', 'stroop_test', 'digit_span', 'quality_of_life', 'wisc_v', 'wais_v_young', 'wais_v_adult', 'moca'];
   if (!validTests.includes(req.params.name)) return res.status(404).send('Test not found');
   res.sendFile(path.join(__dirname, 'public', 'tests', req.params.name + '.html'));
 });

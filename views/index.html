@@ -1,97 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="ManMulyankan — Free online cognitive and psychological assessment platform for clinicians, researchers, and mental health professionals.">
 <title>ManMulyankan — Cognitive Assessment Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#1e2028;--card:#2a2d35;--border:#363840;--navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--blue:#6b8aff;--blue-d:#5570d9;--blue-glow:rgba(107,138,255,.1);--r:16px;--font:'Outfit',sans-serif}
-body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh;padding:0}
+:root{--bg:#111218;--bg2:#181a22;--card:#1e2130;--card-h:#242840;--border:#2a2e3e;--border-h:#3a3f55;--navy:#eaecf0;--ink:#c0c4d0;--slate:#8990a4;--grey:#5c6278;--blue:#6b8aff;--blue-d:#5570d9;--blue-glow:rgba(107,138,255,.08);--cyan:#5bb8f5;--purple:#b49dff;--red:#f07070;--green:#5ec49a;--yellow:#f0b830;--r:16px;--r-sm:10px;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;line-height:1.6}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");background-size:128px 128px}
 .shapes{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.shapes div{position:absolute;opacity:0;animation:si 2s ease forwards}
-.sc1{top:-80px;right:-60px;width:420px;height:420px;border:3px solid rgba(107,138,255,.4);border-radius:50%;animation:si 1.5s .2s ease forwards,dr 25s ease-in-out infinite!important}
-.ss1{bottom:60px;left:-30px;width:180px;height:180px;border:3px solid rgba(240,184,48,.35);transform:rotate(15deg);animation:si 1.5s .5s ease forwards,sp 40s linear infinite!important}
-.st1{top:40%;right:5%;width:0;height:0;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:120px solid rgba(240,112,112,.25);animation:si 1.5s .8s ease forwards,bb 18s ease-in-out infinite!important}
-@keyframes si{to{opacity:.35}}@keyframes dr{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,20px)}}@keyframes sp{to{transform:rotate(375deg)}}@keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
-body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");background-size:128px 128px}
-.topbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(107,138,255,.1)}
-.tb-logo{width:36px;height:36px;background:var(--blue);border-radius:10px;position:relative;overflow:hidden}
-.tb-logo::before{content:'';position:absolute;top:6px;left:6px;width:10px;height:10px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
-.tb-logo::after{content:'';position:absolute;bottom:5px;right:5px;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid rgba(255,255,255,.6)}
-.tb-t{font-size:.95rem;font-weight:800;color:var(--navy)}.tb-s{font-size:.66rem;color:var(--grey);margin-top:1px}
-.tb-right{margin-left:auto;display:flex;gap:12px;align-items:center}
-.tb-link{font-size:.78rem;color:var(--slate);text-decoration:none;font-weight:600;padding:6px 14px;border:1px solid var(--border);border-radius:8px;transition:all .2s}
-.tb-link:hover{color:var(--blue);border-color:var(--blue)}
-.wrap{position:relative;z-index:10;max-width:960px;margin:0 auto;padding:40px 24px 60px}
-.hero{text-align:center;margin-bottom:48px}
-.hero h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;color:var(--navy);margin-bottom:12px}
-.hero p{color:var(--slate);font-size:.95rem;max-width:600px;margin:0 auto;line-height:1.65}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
-.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:28px 24px;transition:all .25s;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
-.test-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.test-card:hover{border-color:var(--blue);transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.2)}
-.tc-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;color:#fff;font-weight:800}
-.tc-name{font-size:1.05rem;font-weight:800;color:var(--navy)}
-.tc-desc{font-size:.82rem;color:var(--slate);line-height:1.55;flex:1}
-.tc-meta{display:flex;gap:12px;font-size:.7rem;color:var(--grey);font-weight:600}
-.tc-tag{padding:3px 10px;background:rgba(107,138,255,.08);border:1px solid rgba(107,138,255,.15);border-radius:50px;color:var(--blue);font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.c1::before{background:#5bb8f5}.c1 .tc-icon{background:#5bb8f5}
-.c2::before{background:#b49dff}.c2 .tc-icon{background:#b49dff}
-.c3::before{background:#f07070}.c3 .tc-icon{background:#f07070}
-.c4::before{background:#5ec49a}.c4 .tc-icon{background:#5ec49a}
-.c5::before{background:#f0b830}.c5 .tc-icon{background:#f0b830}
+.shapes div{position:absolute;opacity:0;animation:si 2.5s ease forwards}
+.sc1{top:-120px;right:-80px;width:500px;height:500px;border:2px solid rgba(107,138,255,.25);border-radius:50%;animation:si 2s .2s ease forwards,dr 30s ease-in-out infinite!important}
+.sc2{bottom:20%;left:-60px;width:200px;height:200px;border:2px solid rgba(91,184,245,.2);border-radius:50%;animation:si 2s .6s ease forwards,dr2 22s ease-in-out infinite!important}
+.ss1{bottom:10%;right:8%;width:140px;height:140px;border:2px solid rgba(240,184,48,.2);transform:rotate(15deg);animation:si 2s .8s ease forwards,sp 45s linear infinite!important}
+.st1{top:30%;left:5%;width:0;height:0;border-left:50px solid transparent;border-right:50px solid transparent;border-bottom:86px solid rgba(240,112,112,.12);animation:si 2s 1s ease forwards,bb 20s ease-in-out infinite!important}
+.st2{top:60%;right:15%;width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-bottom:52px solid rgba(180,157,255,.12);animation:si 2s 1.2s ease forwards,bb 16s ease-in-out infinite!important}
+@keyframes si{to{opacity:1}}@keyframes dr{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,25px)}}@keyframes dr2{0%,100%{transform:translate(0,0)}50%{transform:translate(15px,-20px)}}@keyframes sp{to{transform:rotate(375deg)}}@keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;gap:14px;padding:14px 32px;background:rgba(17,18,24,.85);backdrop-filter:blur(24px);border-bottom:1px solid rgba(107,138,255,.08);transition:all .3s}
+.topbar.scrolled{padding:10px 32px;box-shadow:0 4px 30px rgba(0,0,0,.3)}
+.tb-logo{width:40px;height:40px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:12px;position:relative;overflow:hidden;flex-shrink:0}
+.tb-logo::before{content:'';position:absolute;top:8px;left:8px;width:12px;height:12px;border:2.5px solid rgba(255,255,255,.8);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:6px;right:6px;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid rgba(255,255,255,.7)}
+.tb-text{display:flex;flex-direction:column}.tb-t{font-size:1rem;font-weight:800;color:var(--navy);letter-spacing:-.02em}.tb-s{font-size:.6rem;color:var(--grey);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.tb-nav{margin-left:auto;display:flex;gap:6px;align-items:center}
+.tb-link{font-size:.78rem;color:var(--slate);text-decoration:none;font-weight:600;padding:8px 16px;border-radius:8px;transition:all .2s}
+.tb-link:hover{color:var(--navy);background:var(--blue-glow)}
+.tb-link.cta{background:var(--blue);color:#fff;font-weight:700}.tb-link.cta:hover{background:var(--blue-d)}
+.hero{position:relative;z-index:10;padding:160px 32px 80px;text-align:center;max-width:900px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;background:var(--blue-glow);border:1px solid rgba(107,138,255,.15);border-radius:50px;font-size:.7rem;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:24px;animation:fadeUp .8s ease}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:clamp(2.4rem,6vw,4rem);font-weight:900;color:#fff;line-height:1.1;margin-bottom:20px;letter-spacing:-.04em;animation:fadeUp .8s .1s ease both}
+.hero h1 span{background:linear-gradient(135deg,var(--blue),var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(.95rem,2vw,1.15rem);color:var(--slate);max-width:640px;margin:0 auto 36px;line-height:1.7;animation:fadeUp .8s .2s ease both}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s .3s ease both}
+.btn-primary{padding:14px 32px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .25s;text-decoration:none;box-shadow:0 4px 20px rgba(107,138,255,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(107,138,255,.4)}
+.btn-secondary{padding:14px 32px;background:transparent;color:var(--navy);border:1.5px solid var(--border);border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .25s;text-decoration:none}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-glow)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.stats-bar{position:relative;z-index:10;display:flex;justify-content:center;gap:48px;padding:32px;margin-bottom:20px;flex-wrap:wrap}
+.stat-item{text-align:center}.stat-num{font-size:2rem;font-weight:900;font-family:var(--mono);background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.stat-label{font-size:.7rem;color:var(--grey);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.section{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:60px 32px}
+.section-label{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--blue);padding:5px 14px;background:var(--blue-glow);border:1px solid rgba(107,138,255,.12);border-radius:50px;margin-bottom:16px}
+.section-title{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:-.03em}
+.section-desc{font-size:.95rem;color:var(--slate);max-width:600px;line-height:1.7;margin-bottom:40px}
+.about{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:40px 32px 60px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.about-content p{color:var(--ink);font-size:.92rem;line-height:1.8;margin-bottom:16px}
+.about-content p strong{color:var(--navy);font-weight:700}
+.about-visual{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.av-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:24px 20px;text-align:center;transition:all .25s}
+.av-card:hover{border-color:var(--blue);transform:translateY(-4px)}
+.av-icon{font-size:1.6rem;margin-bottom:8px}.av-title{font-size:.78rem;font-weight:800;color:var(--navy);margin-bottom:4px}.av-text{font-size:.68rem;color:var(--grey);line-height:1.5}
+.search-wrap{position:relative;margin-bottom:28px;max-width:500px}
+.search-input{width:100%;padding:16px 20px 16px 50px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;color:var(--navy);font-family:var(--font);font-size:.95rem;outline:none;transition:all .25s}
+.search-input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(107,138,255,.1)}
+.search-input::placeholder{color:var(--grey)}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--grey);pointer-events:none}
+.search-icon svg{width:18px;height:18px}
+.tests-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:0;transition:all .3s;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.test-card:hover{border-color:var(--blue);transform:translateY(-6px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.tc-accent{height:3px;width:100%}
+.tc-top{padding:28px 24px 20px;flex:1}
+.tc-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.tc-icon{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-size:1.1rem;color:#fff;font-weight:800;flex-shrink:0}
+.tc-info{flex:1}.tc-name{font-size:1.05rem;font-weight:800;color:var(--navy);margin-bottom:2px}
+.tc-tag{font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:50px}
+.tc-desc{font-size:.82rem;color:var(--slate);line-height:1.6}
+.tc-bottom{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;border-top:1px solid var(--border);background:rgba(255,255,255,.01)}
+.tc-meta{font-size:.7rem;color:var(--grey);font-weight:600;display:flex;gap:16px}
+.tc-arrow{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);display:grid;place-items:center;color:var(--grey);transition:all .2s;font-size:.8rem}
+.test-card:hover .tc-arrow{border-color:var(--blue);color:var(--blue);background:var(--blue-glow)}
+.c1 .tc-accent{background:var(--cyan)}.c1 .tc-icon{background:linear-gradient(135deg,var(--cyan),#3a9dd8)}.c1 .tc-tag{background:rgba(91,184,245,.1);color:var(--cyan)}
+.c2 .tc-accent{background:var(--purple)}.c2 .tc-icon{background:linear-gradient(135deg,var(--purple),#8b72e6)}.c2 .tc-tag{background:rgba(180,157,255,.1);color:var(--purple)}
+.c3 .tc-accent{background:var(--red)}.c3 .tc-icon{background:linear-gradient(135deg,var(--red),#d45050)}.c3 .tc-tag{background:rgba(240,112,112,.1);color:var(--red)}
+.c4 .tc-accent{background:var(--green)}.c4 .tc-icon{background:linear-gradient(135deg,var(--green),#3ea87a)}.c4 .tc-tag{background:rgba(94,196,154,.1);color:var(--green)}
+.c5 .tc-accent{background:var(--yellow)}.c5 .tc-icon{background:linear-gradient(135deg,var(--yellow),#d49a18)}.c5 .tc-tag{background:rgba(240,184,48,.1);color:var(--yellow)}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.how-card{text-align:center;padding:28px 20px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);transition:all .25s}
+.how-card:hover{border-color:var(--blue);transform:translateY(-4px)}
+.how-num{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:10px;display:grid;place-items:center;font-size:.82rem;font-weight:800;color:#fff;margin:0 auto 14px}
+.how-title{font-size:.88rem;font-weight:800;color:var(--navy);margin-bottom:6px}
+.how-text{font-size:.78rem;color:var(--slate);line-height:1.6}
+.contact{position:relative;z-index:10;padding:80px 32px;background:var(--bg2)}
+.contact-inner{max-width:800px;margin:0 auto;text-align:center}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px;text-align:left}
+.contact-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:28px 24px;transition:all .25s}
+.contact-card:hover{border-color:var(--blue)}
+.cc-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--grey);margin-bottom:8px}
+.cc-value{font-size:1rem;font-weight:700;color:var(--navy)}
+.cc-value a{color:var(--blue);text-decoration:none}.cc-value a:hover{text-decoration:underline}
+.cc-sub{font-size:.78rem;color:var(--slate);margin-top:4px}
+.footer{position:relative;z-index:10;padding:32px;text-align:center;border-top:1px solid var(--border)}
+.footer p{font-size:.75rem;color:var(--grey)}.footer a{color:var(--blue);text-decoration:none}.footer a:hover{text-decoration:underline}
+.divider{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 32px}
+.divider hr{border:none;border-top:1px solid var(--border)}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+#noResults{display:none;text-align:center;padding:40px;color:var(--grey);font-size:.9rem}
+
+@media(max-width:768px){
+  .topbar{padding:12px 18px}.tb-s{display:none}.tb-nav{gap:4px}.tb-link{padding:6px 12px;font-size:.72rem}
+  .hero{padding:120px 20px 50px}.hero h1{font-size:2rem}.hero-sub{font-size:.9rem}
+  .hero-actions{flex-direction:column;align-items:center}.btn-primary,.btn-secondary{width:100%;text-align:center}
+  .stats-bar{gap:24px;padding:24px 20px}.stat-num{font-size:1.5rem}
+  .section{padding:40px 20px}.about{padding:40px 20px}
+  .about-grid{grid-template-columns:1fr;gap:24px}
+  .tests-grid{grid-template-columns:1fr}
+  .how-grid{grid-template-columns:1fr 1fr;gap:14px}
+  .contact{padding:50px 20px}.contact-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .hero{padding:110px 16px 40px}.hero h1{font-size:1.7rem}
+  .stats-bar{gap:20px}.stat-num{font-size:1.3rem}
+  .how-grid{grid-template-columns:1fr}.about-visual{grid-template-columns:1fr}
+  .tb-t{font-size:.88rem}
+}
 </style>
 </head>
 <body>
-<div class="shapes"><div class="sc1"></div><div class="ss1"></div><div class="st1"></div></div>
-<div class="topbar">
+<div class="shapes"><div class="sc1"></div><div class="sc2"></div><div class="ss1"></div><div class="st1"></div><div class="st2"></div></div>
+
+<nav class="topbar" id="topbar">
   <div class="tb-logo"></div>
-  <div><div class="tb-t">ManMulyankan</div><div class="tb-s">Cognitive Assessment Platform</div></div>
-  <div class="tb-right"><a class="tb-link" href="/admin">Admin Panel</a></div>
-</div>
-<div class="wrap">
-  <div class="hero">
-    <h2>Cognitive Assessment Suite</h2>
-    <p>Select an assessment below to begin. Each test measures a different aspect of cognitive or psychological functioning. Results are securely stored for clinical review.</p>
+  <div class="tb-text"><div class="tb-t">ManMulyankan</div><div class="tb-s">Cognitive Assessment Platform</div></div>
+  <div class="tb-nav">
+    <a class="tb-link" href="#about">About</a>
+    <a class="tb-link" href="#tests">Tests</a>
+    <a class="tb-link" href="#contact">Contact</a>
+    <a class="tb-link cta" href="/admin">Admin</a>
   </div>
-  <div class="grid">
-    <a class="test-card c1" href="/test/depression_screening">
-      <div class="tc-icon">BDI</div>
-      <div class="tc-name">Depression Screening</div>
-      <div class="tc-desc">Beck Depression Inventory — 21-item self-report measure assessing severity of depressive symptoms across affective, cognitive, and somatic domains.</div>
-      <div class="tc-meta"><span>21 Questions</span><span>~10 min</span></div>
-      <span class="tc-tag">Mood Assessment</span>
-    </a>
-    <a class="test-card c2" href="/test/trail_making">
-      <div class="tc-icon">TMT</div>
-      <div class="tc-name">Trail Making Test</div>
-      <div class="tc-desc">Parts A and B — measures visual attention, processing speed, task switching, and executive functioning through sequential connect-the-dots tasks.</div>
-      <div class="tc-meta"><span>2 Parts</span><span>~5 min</span></div>
-      <span class="tc-tag">Executive Function</span>
-    </a>
-    <a class="test-card c3" href="/test/stroop_test">
-      <div class="tc-icon">SCT</div>
-      <div class="tc-name">Stroop Color Test</div>
-      <div class="tc-desc">Four-set colour-word interference paradigm measuring selective attention, cognitive flexibility, and inhibitory control.</div>
-      <div class="tc-meta"><span>4 Sets x 20 Trials</span><span>~8 min</span></div>
-      <span class="tc-tag">Attention &amp; Inhibition</span>
-    </a>
-    <a class="test-card c4" href="/test/digit_span">
-      <div class="tc-icon">DST</div>
-      <div class="tc-name">Digit Span Test</div>
-      <div class="tc-desc">Forward and backward digit recall — standardised measure of short-term auditory memory and working memory capacity.</div>
-      <div class="tc-meta"><span>2 Sets</span><span>~10 min</span></div>
-      <span class="tc-tag">Working Memory</span>
-    </a>
-    <a class="test-card c5" href="/test/quality_of_life">
-      <div class="tc-icon">QoL</div>
-      <div class="tc-name">Quality of Life</div>
-      <div class="tc-desc">26-item assessment measuring perceived quality of life across Physical Health, Psychological, Social, and Environmental domains.</div>
-      <div class="tc-meta"><span>26 Questions</span><span>~5 min</span></div>
-      <span class="tc-tag">Well-being</span>
-    </a>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge"><span></span> Free &amp; Open Access</div>
+  <h1>Empowering Early Detection Through <span>Digital Assessment</span></h1>
+  <p class="hero-sub">ManMulyankan is a free online platform providing standardised digital cognitive and psychological assessment tools for clinicians, researchers, mental health professionals, and the general public.</p>
+  <div class="hero-actions">
+    <a href="#tests" class="btn-primary">Explore Assessments</a>
+    <a href="#about" class="btn-secondary">Learn More</a>
   </div>
+</section>
+
+<div class="stats-bar reveal">
+  <div class="stat-item"><div class="stat-num">9+</div><div class="stat-label">Assessments</div></div>
+  <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Free Access</div></div>
+  <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">Available</div></div>
+  <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">Data Sold</div></div>
 </div>
+
+<div class="divider"><hr></div>
+
+<section class="about reveal" id="about">
+  <span class="section-label">Our Mission</span>
+  <h2 class="section-title">Why ManMulyankan Exists</h2>
+  <div class="about-grid">
+    <div class="about-content">
+      <p>In a world where mental health concerns often go unnoticed until they become severe, <strong>ManMulyankan bridges the critical gap between awareness and action</strong> by making standardised screening tools freely accessible online.</p>
+      <p>The platform makes validated screening tests easily accessible, allowing anyone to complete them from home in a simple, guided format. Each assessment is transformed from a complex clinical procedure into a clear, intuitive experience — no confusing medical forms, no intimidating clinical environments.</p>
+      <p>The goal is to <strong>promote early recognition</strong> of mental health issues and cognitive difficulties, <strong>reduce stigma</strong> around psychological evaluation, <strong>encourage proactive self-awareness</strong>, and enable timely intervention — because <strong>early detection can save lives</strong>.</p>
+    </div>
+    <div class="about-visual">
+      <div class="av-card"><div class="av-icon">🧠</div><div class="av-title">Early Detection</div><div class="av-text">Catch concerns before they escalate into crises</div></div>
+      <div class="av-card"><div class="av-icon">🔓</div><div class="av-title">Free Access</div><div class="av-text">No cost, no registration, no barriers to screening</div></div>
+      <div class="av-card"><div class="av-icon">🏠</div><div class="av-title">From Home</div><div class="av-text">Complete assessments privately and comfortably</div></div>
+      <div class="av-card"><div class="av-icon">📊</div><div class="av-title">Clinical Grade</div><div class="av-text">Validated tools used by professionals worldwide</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<section class="section reveal">
+  <span class="section-label">How It Works</span>
+  <h2 class="section-title">Simple. Guided. Meaningful.</h2>
+  <p class="section-desc">Complete a full cognitive or psychological screening in just a few minutes — no expertise needed.</p>
+  <div class="how-grid">
+    <div class="how-card"><div class="how-num">1</div><div class="how-title">Choose a Test</div><div class="how-text">Select from our library of validated assessment tools below</div></div>
+    <div class="how-card"><div class="how-num">2</div><div class="how-title">Enter Details</div><div class="how-text">Provide your name and age to personalise your results</div></div>
+    <div class="how-card"><div class="how-num">3</div><div class="how-title">Complete Assessment</div><div class="how-text">Follow the guided questions or interactive tasks at your own pace</div></div>
+    <div class="how-card"><div class="how-num">4</div><div class="how-title">View Results</div><div class="how-text">Receive instant, detailed feedback with clinical interpretation</div></div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<section class="section" id="tests">
+  <span class="section-label">Assessments</span>
+  <h2 class="section-title">Available Tests</h2>
+  <p class="section-desc">Select an assessment to begin. Each test measures a different aspect of cognitive or psychological functioning.</p>
+  <div class="search-wrap">
+    <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+    <input class="search-input" type="text" id="searchTests" placeholder="Search assessments..." oninput="filterTests()">
+  </div>
+  <div class="tests-grid" id="testsGrid">
+    <a class="test-card c1 reveal" href="/test/depression_screening" data-name="depression screening beck bdi mood"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">BDI</div><div class="tc-info"><div class="tc-name">Depression Screening</div><span class="tc-tag">Mood Assessment</span></div></div><div class="tc-desc">21-item self-report measure assessing severity of depressive symptoms across affective, cognitive, and somatic domains.</div></div><div class="tc-bottom"><div class="tc-meta"><span>21 Questions</span><span>~10 min</span></div><div class="tc-arrow">→</div></div></a>
+    <a class="test-card c2 reveal" href="/test/trail_making" data-name="trail making tmt executive function attention speed"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">TMT</div><div class="tc-info"><div class="tc-name">Trail Making Test</div><span class="tc-tag">Executive Function</span></div></div><div class="tc-desc">Parts A and B — measures visual attention, processing speed, task switching, and executive functioning through sequential tasks.</div></div><div class="tc-bottom"><div class="tc-meta"><span>2 Parts</span><span>~5 min</span></div><div class="tc-arrow">→</div></div></a>
+    <a class="test-card c3 reveal" href="/test/stroop_test" data-name="stroop color test attention inhibition cognitive"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">SCT</div><div class="tc-info"><div class="tc-name">Stroop Color Test</div><span class="tc-tag">Attention &amp; Inhibition</span></div></div><div class="tc-desc">Four-set colour-word interference paradigm measuring selective attention, cognitive flexibility, and inhibitory control.</div></div><div class="tc-bottom"><div class="tc-meta"><span>4 Sets × 20 Trials</span><span>~8 min</span></div><div class="tc-arrow">→</div></div></a>
+    <a class="test-card c4 reveal" href="/test/digit_span" data-name="digit span memory working memory wais"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">DST</div><div class="tc-info"><div class="tc-name">Digit Span Test</div><span class="tc-tag">Working Memory</span></div></div><div class="tc-desc">Forward and backward digit recall — standardised measure of short-term auditory memory and working memory capacity.</div></div><div class="tc-bottom"><div class="tc-meta"><span>2 Sets</span><span>~10 min</span></div><div class="tc-arrow">→</div></div></a>
+    <a class="test-card c5 reveal" href="/test/quality_of_life" data-name="quality of life qol well-being wellbeing whoqol"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">QoL</div><div class="tc-info"><div class="tc-name">Quality of Life</div><span class="tc-tag">Well-being</span></div></div><div class="tc-desc">26-item assessment measuring perceived quality of life across Physical Health, Psychological, Social, and Environmental domains.</div></div><div class="tc-bottom"><div class="tc-meta"><span>26 Questions</span><span>~5 min</span></div><div class="tc-arrow">→</div></div></a>
+
+    <a class="test-card c2 reveal" href="/test/wisc_v" data-name="wisc intelligence iq children cognitive age 5 16"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">IQ</div><div class="tc-info"><div class="tc-name">Intelligence Screening (5–16)</div><span class="tc-tag">WISC-V · Children</span></div></div><div class="tc-desc">Adapted cognitive screening for children and adolescents across Verbal Comprehension, Visual Spatial, Fluid Reasoning, Working Memory, and Processing Speed.</div></div><div class="tc-bottom"><div class="tc-meta"><span>50 Questions</span><span>~15 min</span></div><div class="tc-arrow">→</div></div></a>
+
+    <a class="test-card c1 reveal" href="/test/wais_v_young" data-name="wais intelligence iq young adult cognitive age 17 30"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">IQ</div><div class="tc-info"><div class="tc-name">Intelligence Screening (17–30)</div><span class="tc-tag">WAIS-V · Young Adults</span></div></div><div class="tc-desc">Adapted cognitive screening for young adults with advanced reasoning, vocabulary, spatial processing, working memory, and speed assessments.</div></div><div class="tc-bottom"><div class="tc-meta"><span>50 Questions</span><span>~20 min</span></div><div class="tc-arrow">→</div></div></a>
+
+    <a class="test-card c3 reveal" href="/test/wais_v_adult" data-name="wais intelligence iq adult cognitive age 31 55"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">IQ</div><div class="tc-info"><div class="tc-name">Intelligence Screening (31–55)</div><span class="tc-tag">WAIS-V · Adults</span></div></div><div class="tc-desc">Adapted cognitive screening for adults with real-world reasoning, practical knowledge, spatial analysis, and executive function assessments.</div></div><div class="tc-bottom"><div class="tc-meta"><span>50 Questions</span><span>~20 min</span></div><div class="tc-arrow">→</div></div></a>
+
+    <a class="test-card c4 reveal" href="/test/moca" data-name="moca montreal cognitive assessment seniors elderly age 56 120 dementia"><div class="tc-accent"></div><div class="tc-top"><div class="tc-header"><div class="tc-icon">MoCA</div><div class="tc-info"><div class="tc-name">Cognitive Screening (56+)</div><span class="tc-tag">MoCA · Seniors</span></div></div><div class="tc-desc">Adapted Montreal Cognitive Assessment screening for visuospatial function, naming, memory, attention, language, abstraction, and orientation.</div></div><div class="tc-bottom"><div class="tc-meta"><span>30 Questions</span><span>~10 min</span></div><div class="tc-arrow">→</div></div></a>
+  </div>
+  <p id="noResults">No assessments match your search.</p>
+</section>
+
+<section class="contact" id="contact">
+  <div class="contact-inner reveal">
+    <span class="section-label">Get In Touch</span>
+    <h2 class="section-title" style="color:#fff">Contact</h2>
+    <p class="section-desc" style="margin:8px auto 0;max-width:500px">Have questions, feedback, or want to collaborate? Reach out — we'd love to hear from you.</p>
+    <div class="contact-grid">
+      <div class="contact-card"><div class="cc-label">Created By</div><div class="cc-value">Shubham Kaushal</div><div class="cc-sub">Founder &amp; Developer</div></div>
+      <div class="contact-card"><div class="cc-label">Email</div><div class="cc-value"><a href="mailto:shubhamkaushal006@gmail.com">shubhamkaushal006@gmail.com</a></div><div class="cc-sub">We typically respond within 24 hours</div></div>
+      <div class="contact-card"><div class="cc-label">Website</div><div class="cc-value"><a href="https://manmulyankan.com">manmulyankan.com</a></div><div class="cc-sub">Free &amp; open access platform</div></div>
+      <div class="contact-card"><div class="cc-label">Disclaimer</div><div class="cc-value" style="font-size:.82rem;font-weight:500;color:var(--ink)">These assessments are for educational and screening purposes only — not a substitute for professional clinical diagnosis.</div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>&copy; 2026 <a href="/">ManMulyankan</a> — Empowering early detection through digital assessment. Built by <a href="mailto:shubhamkaushal006@gmail.com">Shubham Kaushal</a>.</p>
+</footer>
+
+<script>
+window.addEventListener('scroll',function(){document.getElementById('topbar').classList.toggle('scrolled',window.scrollY>60)});
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el)});
+function filterTests(){var q=document.getElementById('searchTests').value.toLowerCase();var cards=document.querySelectorAll('.test-card');var found=0;cards.forEach(function(c){var name=(c.getAttribute('data-name')||'')+' '+c.textContent;var match=name.toLowerCase().includes(q);c.style.display=match?'':'none';if(match)found++});document.getElementById('noResults').style.display=found===0?'block':'none'}
+</script>
 </body>
 </html>
