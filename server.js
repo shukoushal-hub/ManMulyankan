@@ -176,13 +176,14 @@ app.get('/api/admin/export', requireAdmin, (req, res) => {
 function today() { return new Date().toISOString().split('T')[0]; }
 
 app.post('/api/admin/change-password', requireAdmin, (req, res) => {
-  const { current, newPass } = req.body;
+  const { current, newPass, newUsername } = req.body;
   db = loadDB();
   const admin = db.admins.find(a => a.id === req.session.adminId);
   if (!admin || !bcrypt.compareSync(current, admin.password)) {
     return res.status(401).json({ error: 'Current password is incorrect' });
   }
-  admin.password = bcrypt.hashSync(newPass, 10);
+  if (newPass && newPass.length >= 6) admin.password = bcrypt.hashSync(newPass, 10);
+  if (newUsername && newUsername.length >= 3) admin.username = newUsername;
   saveDB(db);
   res.json({ success: true });
 });

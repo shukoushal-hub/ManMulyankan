@@ -4,6 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Admin Dashboard — ManMulyankan</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#1e2028;--card:#2a2d35;--border:#363840;--navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--blue:#6b8aff;--blue-d:#5570d9;--green:#5ec49a;--red:#f07070;--yellow:#f0b830;--r:12px;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace}
@@ -119,18 +120,31 @@ tr:hover td{background:rgba(107,138,255,.03)}
   </div>
 </div>
 
-<!-- Password Modal -->
+<!-- Password & Username Modal -->
 <div class="modal-bg" id="passModalBg">
-  <div class="modal" style="max-width:400px">
+  <div class="modal" style="max-width:440px">
     <button class="modal-close" onclick="closePassModal()">Close</button>
-    <h3>Change Admin Password</h3>
+    <h3>Change Admin Credentials</h3>
     <div style="margin-top:16px">
-      <div style="margin-bottom:12px"><label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Current Password</label><input type="password" id="cpCurrent" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none"></div>
-      <div style="margin-bottom:12px"><label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">New Password</label><input type="password" id="cpNew" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none"></div>
-      <div style="margin-bottom:16px"><label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Confirm New Password</label><input type="password" id="cpConfirm" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none"></div>
-      <div id="cpError" style="display:none;background:rgba(240,112,112,.1);border:1px solid rgba(240,112,112,.2);color:var(--red);padding:8px;border-radius:6px;font-size:.8rem;margin-bottom:12px"></div>
-      <div id="cpSuccess" style="display:none;background:rgba(94,196,154,.1);border:1px solid rgba(94,196,154,.2);color:var(--green);padding:8px;border-radius:6px;font-size:.8rem;margin-bottom:12px"></div>
-      <button onclick="changePassword()" style="width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:var(--font)">Update Password</button>
+      <div style="margin-bottom:14px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">New Username (optional)</label>
+        <input type="text" id="cpUsername" placeholder="Leave empty to keep current" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Current Password <span style="color:var(--red)">*</span></label>
+        <input type="password" id="cpCurrent" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">New Password <span style="color:var(--red)">*</span></label>
+        <input type="password" id="cpNew" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Confirm New Password <span style="color:var(--red)">*</span></label>
+        <input type="password" id="cpConfirm" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div id="cpError" style="display:none;background:rgba(240,112,112,.1);border:1px solid rgba(240,112,112,.2);color:var(--red);padding:10px 14px;border-radius:8px;font-size:.82rem;margin-bottom:14px"></div>
+      <div id="cpSuccess" style="display:none;background:rgba(94,196,154,.1);border:1px solid rgba(94,196,154,.2);color:var(--green);padding:10px 14px;border-radius:8px;font-size:.82rem;margin-bottom:14px"></div>
+      <button onclick="changePassword()" style="width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s">Update Credentials</button>
     </div>
   </div>
 </div>
@@ -206,7 +220,7 @@ async function loadResults() {
           '<td><span class="test-badge '+testBadgeClass(r.test_type)+'">'+testLabel(r.test_type)+'</span></td>'+
           '<td style="font-size:.8rem;color:var(--grey)">'+fmtDate(r.completed_at)+'</td>'+
           '<td><span class="score-pill">'+getKeyScore(r)+'</span></td>'+
-          '<td><button class="act-btn" onclick="viewDetail('+r.id+')">View</button><button class="act-btn del" onclick="deleteResult('+r.id+')">Delete</button></td>'+
+          '<td><button class="act-btn" onclick="viewDetail('+r.id+')">View</button><button class="act-btn" onclick="downloadPDF('+r.id+')" style="color:var(--red)">PDF</button><button class="act-btn" onclick="downloadWord('+r.id+')" style="color:var(--blue)">Word</button><button class="act-btn del" onclick="deleteResult('+r.id+')">Delete</button></td>'+
           '</tr>';
       }).join('');
     }
@@ -240,6 +254,10 @@ async function viewDetail(id) {
     html += '<div class="json-block">'+JSON.stringify(d.scores, null, 2)+'</div>';
     html += '<h4 style="margin-top:16px;font-size:.82rem;color:var(--grey);font-weight:700">RAW ANSWERS</h4>';
     html += '<div class="json-block">'+JSON.stringify(d.raw_answers, null, 2)+'</div>';
+    html += '<div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">';
+    html += '<button class="act-btn" onclick="downloadPDF('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--red);border-color:var(--red)">Download PDF</button>';
+    html += '<button class="act-btn" onclick="downloadWord('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--blue);border-color:var(--blue)">Download Word</button>';
+    html += '</div>';
     document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalBg').classList.add('show');
   } catch(e) { console.error(e); }
@@ -267,22 +285,162 @@ loadStats();
 loadResults();
 
 // Password modal
-function showPassModal(){document.getElementById('passModalBg').classList.add('show');document.getElementById('cpError').style.display='none';document.getElementById('cpSuccess').style.display='none'}
+function showPassModal(){document.getElementById('passModalBg').classList.add('show');document.getElementById('cpError').style.display='none';document.getElementById('cpSuccess').style.display='none';document.getElementById('cpCurrent').value='';document.getElementById('cpNew').value='';document.getElementById('cpConfirm').value='';document.getElementById('cpUsername').value=''}
 function closePassModal(){document.getElementById('passModalBg').classList.remove('show')}
 document.getElementById('passModalBg').addEventListener('click',function(e){if(e.target===this)closePassModal()});
 async function changePassword(){
-  var cur=document.getElementById('cpCurrent').value,np=document.getElementById('cpNew').value,cf=document.getElementById('cpConfirm').value;
+  var cur=document.getElementById('cpCurrent').value,np=document.getElementById('cpNew').value,cf=document.getElementById('cpConfirm').value,un=document.getElementById('cpUsername').value.trim();
   var err=document.getElementById('cpError'),suc=document.getElementById('cpSuccess');
   err.style.display='none';suc.style.display='none';
-  if(!cur||!np){err.textContent='Please fill all fields';err.style.display='block';return}
+  if(!cur||!np){err.textContent='Please fill current password and new password';err.style.display='block';return}
   if(np.length<6){err.textContent='New password must be at least 6 characters';err.style.display='block';return}
   if(np!==cf){err.textContent='Passwords do not match';err.style.display='block';return}
   try{
-    var res=await fetch('/api/admin/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current:cur,newPass:np})});
+    var res=await fetch('/api/admin/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current:cur,newPass:np,newUsername:un||undefined})});
     var d=await res.json();
-    if(d.success){suc.textContent='Password changed successfully!';suc.style.display='block';document.getElementById('cpCurrent').value='';document.getElementById('cpNew').value='';document.getElementById('cpConfirm').value=''}
-    else{err.textContent=d.error||'Failed to change password';err.style.display='block'}
+    if(d.success){suc.textContent='Credentials updated successfully!'+(un?' Username changed to: '+un:'');suc.style.display='block';document.getElementById('cpCurrent').value='';document.getElementById('cpNew').value='';document.getElementById('cpConfirm').value='';document.getElementById('cpUsername').value=''}
+    else{err.textContent=d.error||'Failed to update';err.style.display='block'}
   }catch(e){err.textContent='Connection error';err.style.display='block'}
+}
+
+// ═══ PDF DOWNLOAD ═══
+async function downloadPDF(id){
+  try{
+    var res=await fetch('/api/admin/results/'+id);
+    var d=await res.json();
+    var jsPDF=window.jspdf.jsPDF;
+    var doc=new jsPDF('p','mm','a4');
+    var y=20,lm=20,pw=170;
+
+    // Header
+    doc.setFillColor(26,58,176);doc.rect(0,0,210,40,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont('helvetica','bold');
+    doc.text('ManMulyankan',lm,18);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');
+    doc.text('Cognitive Assessment Report',lm,26);
+    doc.text(testLabel(d.test_type),lm,33);
+
+    // Participant Info
+    y=52;doc.setTextColor(40,40,60);doc.setFontSize(14);doc.setFont('helvetica','bold');
+    doc.text('Participant Details',lm,y);y+=10;
+    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+    var info=[['Name',d.participant_name],['Age',String(d.participant_age||'--')],['Test',testLabel(d.test_type)],['Started',fmtDate(d.started_at)],['Completed',fmtDate(d.completed_at)]];
+    if(d.started_at&&d.completed_at){
+      var dur=Math.round((new Date(d.completed_at)-new Date(d.started_at))/1000);
+      var mins=Math.floor(dur/60),secs=dur%60;
+      info.push(['Duration',mins+'m '+secs+'s']);
+    }
+    if(d.interpretation)info.push(['Interpretation',d.interpretation]);
+    info.forEach(function(r){
+      doc.setFont('helvetica','bold');doc.text(r[0]+':',lm,y);
+      doc.setFont('helvetica','normal');doc.text(String(r[1]),lm+40,y);y+=7;
+    });
+
+    // Scores
+    y+=5;doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(40,40,60);
+    doc.text('Scores',lm,y);y+=10;
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+    var scoreStr=JSON.stringify(d.scores,null,2);
+    var scoreLines=doc.splitTextToSize(scoreStr,pw);
+    scoreLines.forEach(function(line){
+      if(y>270){doc.addPage();y=20}
+      doc.text(line,lm,y);y+=5;
+    });
+
+    // Raw Answers
+    y+=5;if(y>250){doc.addPage();y=20}
+    doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(40,40,60);
+    doc.text('Raw Answers',lm,y);y+=10;
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+    var ansStr=JSON.stringify(d.raw_answers,null,2);
+    var ansLines=doc.splitTextToSize(ansStr,pw);
+    ansLines.forEach(function(line){
+      if(y>270){doc.addPage();y=20}
+      doc.text(line,lm,y);y+=4;
+    });
+
+    // Footer
+    var pages=doc.internal.getNumberOfPages();
+    for(var i=1;i<=pages;i++){
+      doc.setPage(i);doc.setFontSize(7);doc.setTextColor(150,150,150);
+      doc.text('ManMulyankan — manmulyankan.com — Generated '+new Date().toLocaleDateString(),lm,290);
+      doc.text('Page '+i+' of '+pages,180,290);
+    }
+
+    doc.save(d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.pdf');
+  }catch(e){console.error(e);alert('Error generating PDF')}
+}
+
+// ═══ WORD DOWNLOAD ═══
+async function downloadWord(id){
+  try{
+    var res=await fetch('/api/admin/results/'+id);
+    var d=await res.json();
+
+    var dur='--';
+    if(d.started_at&&d.completed_at){
+      var secs=Math.round((new Date(d.completed_at)-new Date(d.started_at))/1000);
+      dur=Math.floor(secs/60)+'m '+secs%60+'s';
+    }
+
+    var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
+    html+='<head><meta charset="UTF-8"><style>';
+    html+='body{font-family:Calibri,Arial,sans-serif;color:#333;line-height:1.6;margin:40px}';
+    html+='h1{color:#1a3ab0;font-size:24pt;margin-bottom:4px}';
+    html+='h2{color:#2a4ecf;font-size:16pt;margin-top:24px;border-bottom:2px solid #2a4ecf;padding-bottom:4px}';
+    html+='h3{color:#555;font-size:12pt;margin-top:16px}';
+    html+='.header-sub{color:#777;font-size:11pt}';
+    html+='table{border-collapse:collapse;width:100%;margin:10px 0}';
+    html+='th,td{border:1px solid #ccc;padding:8px 12px;text-align:left;font-size:10pt}';
+    html+='th{background:#f0f2f8;font-weight:bold;color:#333}';
+    html+='.score-table td:first-child{font-weight:bold;width:40%}';
+    html+='pre{background:#f5f5f5;border:1px solid #ddd;padding:12px;font-size:9pt;font-family:Consolas,monospace;white-space:pre-wrap;overflow-wrap:break-word}';
+    html+='.footer{margin-top:32px;padding-top:12px;border-top:1px solid #ccc;font-size:8pt;color:#999}';
+    html+='</style></head><body>';
+
+    html+='<h1>ManMulyankan</h1>';
+    html+='<div class="header-sub">Cognitive Assessment Report — '+testLabel(d.test_type)+'</div>';
+
+    html+='<h2>Participant Details</h2>';
+    html+='<table class="score-table">';
+    html+='<tr><td>Name</td><td>'+d.participant_name+'</td></tr>';
+    html+='<tr><td>Age</td><td>'+(d.participant_age||'--')+'</td></tr>';
+    html+='<tr><td>Test</td><td>'+testLabel(d.test_type)+'</td></tr>';
+    html+='<tr><td>Started</td><td>'+fmtDate(d.started_at)+'</td></tr>';
+    html+='<tr><td>Completed</td><td>'+fmtDate(d.completed_at)+'</td></tr>';
+    html+='<tr><td>Duration</td><td>'+dur+'</td></tr>';
+    if(d.interpretation) html+='<tr><td>Interpretation</td><td><strong>'+d.interpretation+'</strong></td></tr>';
+    html+='</table>';
+
+    html+='<h2>Scores</h2>';
+    if(d.scores&&typeof d.scores==='object'){
+      html+='<table>';
+      html+='<tr><th>Metric</th><th>Value</th></tr>';
+      function flattenScores(obj,prefix){
+        var rows=[];
+        Object.keys(obj).forEach(function(k){
+          var v=obj[k],label=prefix?prefix+'.'+k:k;
+          if(v&&typeof v==='object'&&!Array.isArray(v))rows=rows.concat(flattenScores(v,label));
+          else rows.push({k:label,v:Array.isArray(v)?JSON.stringify(v):String(v)});
+        });
+        return rows;
+      }
+      var srows=flattenScores(d.scores,'');
+      srows.forEach(function(r){html+='<tr><td>'+r.k+'</td><td>'+r.v+'</td></tr>'});
+      html+='</table>';
+    }
+
+    html+='<h2>Raw Answers</h2>';
+    html+='<pre>'+JSON.stringify(d.raw_answers,null,2).replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>';
+
+    html+='<div class="footer">Generated by ManMulyankan — manmulyankan.com — '+new Date().toLocaleDateString()+'</div>';
+    html+='</body></html>';
+
+    var blob=new Blob([html],{type:'application/msword;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.doc';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  }catch(e){console.error(e);alert('Error generating Word file')}
 }
 </script>
 </body>
