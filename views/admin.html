@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Dashboard — ManMulyankan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1e2028;--card:#2a2d35;--border:#363840;--navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--blue:#6b8aff;--blue-d:#5570d9;--green:#5ec49a;--red:#f07070;--yellow:#f0b830;--r:12px;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh}
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.95);border-bottom:1px solid rgba(107,138,255,.1);position:sticky;top:0;z-index:100;backdrop-filter:blur(16px)}
+.tb-logo{width:32px;height:32px;background:var(--blue);border-radius:8px;position:relative;overflow:hidden}
+.tb-logo::before{content:'';position:absolute;top:5px;left:5px;width:8px;height:8px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+.tb-t{font-size:.9rem;font-weight:800;color:var(--navy)}.tb-s{font-size:.6rem;color:var(--grey)}
+.tb-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.tb-btn{padding:6px 14px;font-size:.76rem;font-weight:600;color:var(--slate);background:var(--card);border:1px solid var(--border);border-radius:8px;text-decoration:none;cursor:pointer;font-family:var(--font);transition:all .2s}
+.tb-btn:hover{border-color:var(--blue);color:var(--blue)}
+.tb-btn.danger{color:var(--red);border-color:rgba(240,112,112,.2)}
+.tb-btn.danger:hover{background:var(--red);color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 24px 60px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;text-align:center}
+.stat-val{font-size:2rem;font-weight:900;color:var(--navy);font-family:var(--mono)}
+.stat-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);margin-top:4px}
+.stat.s1 .stat-val{color:var(--blue)}.stat.s2 .stat-val{color:var(--green)}.stat.s3 .stat-val{color:var(--yellow)}.stat.s4 .stat-val{color:#b49dff}
+.toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:200px;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--navy);font-family:var(--font);font-size:.88rem;outline:none;transition:border .2s}
+.search-box:focus{border-color:var(--blue)}
+.filter-sel{padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--ink);font-family:var(--font);font-size:.82rem;outline:none;cursor:pointer}
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);padding:14px 16px;text-align:left;border-bottom:1px solid var(--border);background:rgba(54,56,64,.3)}
+td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:.85rem;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(107,138,255,.03)}
+.test-badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.t-depression{background:rgba(91,184,245,.12);color:#5bb8f5}
+.t-trail{background:rgba(180,157,255,.12);color:#b49dff}
+.t-stroop{background:rgba(240,112,112,.12);color:#f07070}
+.t-digit{background:rgba(94,196,154,.12);color:#5ec49a}
+.t-qol{background:rgba(240,184,48,.12);color:#f0b830}
+.score-pill{font-family:var(--mono);font-weight:700;font-size:.82rem;color:var(--navy)}
+.act-btn{padding:4px 10px;font-size:.72rem;font-weight:600;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--slate);cursor:pointer;font-family:var(--font);transition:all .15s;margin-right:4px}
+.act-btn:hover{border-color:var(--blue);color:var(--blue)}
+.act-btn.del:hover{border-color:var(--red);color:var(--red)}
+.empty{text-align:center;padding:48px;color:var(--grey);font-size:.9rem}
+.pagination{display:flex;justify-content:center;gap:8px;margin-top:20px}
+.pg-btn{padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--slate);cursor:pointer;font-family:var(--font);font-size:.82rem;transition:all .2s}
+.pg-btn:hover,.pg-btn.active{border-color:var(--blue);color:var(--blue)}
+.pg-btn:disabled{opacity:.3;cursor:not-allowed}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;display:none;place-items:center}
+.modal-bg.show{display:grid}
+.modal{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:32px;max-width:640px;width:90%;max-height:80vh;overflow-y:auto;animation:mIn .3s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal h3{font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:16px}
+.modal-close{float:right;padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--grey);cursor:pointer;font-family:var(--font);font-size:.82rem}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+.detail-row:last-child{border-bottom:none}
+.dl{color:var(--grey);font-weight:600}.dv{color:var(--navy);font-weight:700;font-family:var(--mono);text-align:right;max-width:60%;word-break:break-word}
+.json-block{background:rgba(30,32,40,.8);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--mono);font-size:.75rem;color:var(--ink);max-height:300px;overflow:auto;white-space:pre-wrap;margin-top:12px;line-height:1.6}
+@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}.toolbar{flex-direction:column}table{font-size:.78rem}th,td{padding:10px 12px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div>
+  <div><div class="tb-t">ManMulyankan</div><div class="tb-s">Admin Dashboard</div></div></a>
+  <div class="tb-right">
+    <a class="tb-btn" href="/">View Tests</a>
+    <a class="tb-btn" href="/api/admin/export">Export CSV</a>
+    <button class="tb-btn" onclick="showPassModal()">Change Password</button>
+    <a class="tb-btn danger" href="/admin/logout">Logout</a>
+  </div>
+</div>
+<div class="wrap">
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat s1"><div class="stat-val" id="stTotal">-</div><div class="stat-label">Total Sessions</div></div>
+    <div class="stat s2"><div class="stat-val" id="stParticipants">-</div><div class="stat-label">Participants</div></div>
+    <div class="stat s3"><div class="stat-val" id="stToday">-</div><div class="stat-label">Today</div></div>
+    <div class="stat s4"><div class="stat-val" id="stTests">-</div><div class="stat-label">Test Types</div></div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input class="search-box" id="searchBox" placeholder="Search participant name...">
+    <select class="filter-sel" id="filterTest">
+      <option value="all">All Tests</option>
+      <option value="depression_screening">Depression Screening</option>
+      <option value="trail_making">Trail Making</option>
+      <option value="stroop_test">Stroop Test</option>
+      <option value="digit_span">Digit Span</option>
+      <option value="quality_of_life">Quality of Life</option>
+      <option value="wisc_v">WISC-V (5-16)</option>
+      <option value="wais_v_young">WAIS-V (17-30)</option>
+      <option value="wais_v_adult">WAIS-V (31-55)</option>
+      <option value="moca">MoCA (56+)</option>
+    </select>
+  </div>
+
+  <!-- Results Table -->
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Participant</th><th>Age</th><th>Test</th><th>Date</th><th>Key Score</th><th>Actions</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">Close</button>
+    <h3 id="modalTitle">Result Detail</h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Password & Username Modal -->
+<div class="modal-bg" id="passModalBg">
+  <div class="modal" style="max-width:440px">
+    <button class="modal-close" onclick="closePassModal()">Close</button>
+    <h3>Change Admin Credentials</h3>
+    <div style="margin-top:16px">
+      <div style="margin-bottom:14px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">New Username (optional)</label>
+        <input type="text" id="cpUsername" placeholder="Leave empty to keep current" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Current Password <span style="color:var(--red)">*</span></label>
+        <input type="password" id="cpCurrent" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">New Password <span style="color:var(--red)">*</span></label>
+        <input type="password" id="cpNew" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Confirm New Password <span style="color:var(--red)">*</span></label>
+        <input type="password" id="cpConfirm" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none">
+      </div>
+      <div id="cpError" style="display:none;background:rgba(240,112,112,.1);border:1px solid rgba(240,112,112,.2);color:var(--red);padding:10px 14px;border-radius:8px;font-size:.82rem;margin-bottom:14px"></div>
+      <div id="cpSuccess" style="display:none;background:rgba(94,196,154,.1);border:1px solid rgba(94,196,154,.2);color:var(--green);padding:10px 14px;border-radius:8px;font-size:.82rem;margin-bottom:14px"></div>
+      <button onclick="changePassword()" style="width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s">Update Credentials</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var PAGE_SIZE = 20, currentPage = 0;
+
+async function loadStats() {
+  try {
+    var res = await fetch('/api/admin/stats');
+    var d = await res.json();
+    document.getElementById('stTotal').textContent = d.totalSessions;
+    document.getElementById('stParticipants').textContent = d.totalParticipants;
+    document.getElementById('stToday').textContent = d.todayCount;
+    document.getElementById('stTests').textContent = d.byTest.length;
+  } catch(e) { console.error(e); }
+}
+
+function testBadgeClass(t) {
+  if (t.includes('depression')) return 't-depression';
+  if (t.includes('trail')) return 't-trail';
+  if (t.includes('stroop')) return 't-stroop';
+  if (t.includes('digit')) return 't-digit';
+  if (t.includes('quality')) return 't-qol';
+  return '';
+}
+
+function testLabel(t) {
+  return t.replace(/_/g, ' ').replace(/\b\w/g, function(c){return c.toUpperCase();});
+}
+
+function getKeyScore(row) {
+  var s = row.scores;
+  if (!s || typeof s !== 'object') return '--';
+  if (s.totalScore !== undefined) return s.totalScore + '/63';
+  if (s.overallScore !== undefined) return s.overallScore + '/100';
+  if (s.stroopEffect_ms !== undefined) return s.stroopEffect_ms + 'ms';
+  if (s.combined !== undefined) {
+    if (typeof s.combined === 'object') return s.combined.score + '/30';
+    return s.combined + '/30';
+  }
+  if (s.domainScores) {
+    var vals = Object.values(s.domainScores);
+    if (vals.length && vals[0].score !== undefined) {
+      var avg = Math.round(vals.reduce(function(a,v){return a+v.score},0)/vals.length);
+      return avg + '/100';
+    }
+  }
+  return '--';
+}
+
+function fmtDate(d) {
+  if (!d) return '--';
+  var dt = new Date(d);
+  return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+
+async function loadResults() {
+  var search = document.getElementById('searchBox').value;
+  var test = document.getElementById('filterTest').value;
+  var offset = currentPage * PAGE_SIZE;
+  try {
+    var res = await fetch('/api/admin/results?test_type='+test+'&search='+encodeURIComponent(search)+'&limit='+PAGE_SIZE+'&offset='+offset);
+    var d = await res.json();
+    var tb = document.getElementById('tbody');
+    if (d.results.length === 0) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty">No results found</td></tr>';
+    } else {
+      tb.innerHTML = d.results.map(function(r) {
+        return '<tr>'+
+          '<td style="font-weight:700;color:var(--navy)">'+r.participant_name+'</td>'+
+          '<td>'+(r.participant_age||'--')+'</td>'+
+          '<td><span class="test-badge '+testBadgeClass(r.test_type)+'">'+testLabel(r.test_type)+'</span></td>'+
+          '<td style="font-size:.8rem;color:var(--grey)">'+fmtDate(r.completed_at)+'</td>'+
+          '<td><span class="score-pill">'+getKeyScore(r)+'</span></td>'+
+          '<td><button class="act-btn" onclick="viewDetail('+r.id+')">View</button><button class="act-btn" onclick="downloadHTML('+r.id+')" style="color:var(--green)">Download</button><button class="act-btn del" onclick="deleteResult('+r.id+')">Delete</button></td>'+
+          '</tr>';
+      }).join('');
+    }
+    // Pagination
+    var totalPages = Math.ceil(d.total / PAGE_SIZE);
+    var pgEl = document.getElementById('pagination');
+    pgEl.innerHTML = '';
+    if (totalPages > 1) {
+      for (var i = 0; i < totalPages; i++) {
+        pgEl.innerHTML += '<button class="pg-btn'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')">'+(i+1)+'</button>';
+      }
+    }
+  } catch(e) { console.error(e); }
+}
+
+function goPage(p) { currentPage = p; loadResults(); }
+
+async function viewDetail(id) {
+  try {
+    var res = await fetch('/api/admin/results/'+id);
+    var d = await res.json();
+    document.getElementById('modalTitle').textContent = d.participant_name + ' — ' + testLabel(d.test_type);
+    var html = '';
+    html += '<div class="detail-row"><span class="dl">Participant</span><span class="dv">'+d.participant_name+'</span></div>';
+    html += '<div class="detail-row"><span class="dl">Age</span><span class="dv">'+(d.participant_age||'--')+'</span></div>';
+    html += '<div class="detail-row"><span class="dl">Test</span><span class="dv">'+testLabel(d.test_type)+'</span></div>';
+    html += '<div class="detail-row"><span class="dl">Started</span><span class="dv">'+fmtDate(d.started_at)+'</span></div>';
+    html += '<div class="detail-row"><span class="dl">Completed</span><span class="dv">'+fmtDate(d.completed_at)+'</span></div>';
+    if (d.interpretation) html += '<div class="detail-row"><span class="dl">Interpretation</span><span class="dv">'+d.interpretation+'</span></div>';
+    html += '<h4 style="margin-top:16px;font-size:.82rem;color:var(--grey);font-weight:700">SCORES</h4>';
+    html += '<div class="json-block">'+JSON.stringify(d.scores, null, 2)+'</div>';
+    html += '<h4 style="margin-top:16px;font-size:.82rem;color:var(--grey);font-weight:700">RAW ANSWERS</h4>';
+    html += '<div class="json-block">'+JSON.stringify(d.raw_answers, null, 2)+'</div>';
+    html += '<div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">';
+    html += '<button class="act-btn" onclick="downloadHTML('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--green);border-color:var(--green)">Download Report</button>';
+    html += '<button class="act-btn" onclick="downloadTXT('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--blue);border-color:var(--blue)">Text File</button>';
+    html += '</div>';
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalBg').classList.add('show');
+  } catch(e) { console.error(e); }
+}
+
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
+document.getElementById('modalBg').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+async function deleteResult(id) {
+  if (!confirm('Delete this result permanently?')) return;
+  await fetch('/api/admin/results/'+id, {method:'DELETE'});
+  loadResults(); loadStats();
+}
+
+// Debounced search
+var searchTimer;
+document.getElementById('searchBox').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(function(){ currentPage=0; loadResults(); }, 300);
+});
+document.getElementById('filterTest').addEventListener('change', function() { currentPage=0; loadResults(); });
+
+// Init
+loadStats();
+loadResults();
+
+// Password modal
+function showPassModal(){document.getElementById('passModalBg').classList.add('show');document.getElementById('cpError').style.display='none';document.getElementById('cpSuccess').style.display='none';document.getElementById('cpCurrent').value='';document.getElementById('cpNew').value='';document.getElementById('cpConfirm').value='';document.getElementById('cpUsername').value=''}
+function closePassModal(){document.getElementById('passModalBg').classList.remove('show')}
+document.getElementById('passModalBg').addEventListener('click',function(e){if(e.target===this)closePassModal()});
+async function changePassword(){
+  var cur=document.getElementById('cpCurrent').value,np=document.getElementById('cpNew').value,cf=document.getElementById('cpConfirm').value,un=document.getElementById('cpUsername').value.trim();
+  var err=document.getElementById('cpError'),suc=document.getElementById('cpSuccess');
+  err.style.display='none';suc.style.display='none';
+  if(!cur||!np){err.textContent='Please fill current password and new password';err.style.display='block';return}
+  if(np.length<6){err.textContent='New password must be at least 6 characters';err.style.display='block';return}
+  if(np!==cf){err.textContent='Passwords do not match';err.style.display='block';return}
+  try{
+    var res=await fetch('/api/admin/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current:cur,newPass:np,newUsername:un||undefined})});
+    var d=await res.json();
+    if(d.success){suc.textContent='Credentials updated successfully!'+(un?' Username changed to: '+un:'');suc.style.display='block';document.getElementById('cpCurrent').value='';document.getElementById('cpNew').value='';document.getElementById('cpConfirm').value='';document.getElementById('cpUsername').value=''}
+    else{err.textContent=d.error||'Failed to update';err.style.display='block'}
+  }catch(e){err.textContent='Connection error';err.style.display='block'}
+}
+
+// ═══ PDF DOWNLOAD ═══
+async function downloadHTML(id){
+  try{
+    var res=await fetch('/api/admin/results/'+id);
+    var d=await res.json();
+    var dur='--';
+    if(d.started_at&&d.completed_at){
+      var secs=Math.round((new Date(d.completed_at)-new Date(d.started_at))/1000);
+      dur=Math.floor(secs/60)+'m '+secs%60+'s';
+    }
+
+    var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
+    html+='<title>'+d.participant_name+' — '+testLabel(d.test_type)+' Report</title>';
+    html+='<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">';
+    html+='<style>';
+    html+='*{box-sizing:border-box;margin:0;padding:0}';
+    html+='body{font-family:"Outfit",sans-serif;background:#1e2028;color:#c8ccd4;min-height:100vh;padding:30px}';
+    html+='.wrap{max-width:700px;margin:0 auto}';
+    html+='.header{background:#1a2340;border-radius:14px;padding:24px 28px;margin-bottom:24px}';
+    html+='.header h1{font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:2px}';
+    html+='.header .sub{font-size:.72rem;color:#6880a8}';
+    html+='.header .test-name{font-size:.88rem;font-weight:700;color:#6b8aff;margin-top:8px}';
+    html+='.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}';
+    html+='.info-item{font-size:.78rem;color:#9098b0}';
+    html+='.info-item strong{color:#c0c8e0}';
+    html+='.card{background:#2a2d35;border:1.5px solid #363840;border-radius:14px;padding:24px;margin-bottom:18px}';
+    html+='.card h2{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#70747e;margin-bottom:16px;display:flex;align-items:center;gap:8px}';
+    html+='.card h2::before{content:"";width:4px;height:14px;background:linear-gradient(180deg,#6b8aff,#b49dff);border-radius:2px}';
+    // Score ring
+    html+='.score-center{text-align:center;margin-bottom:20px}';
+    html+='.score-big{font-size:3rem;font-weight:900;font-family:"JetBrains Mono",monospace;background:linear-gradient(135deg,#6b8aff,#b49dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}';
+    html+='.score-label{font-size:.68rem;color:#70747e;text-transform:uppercase;letter-spacing:.1em;font-weight:600}';
+    html+='.score-class{display:inline-block;padding:6px 18px;border-radius:50px;font-size:.82rem;font-weight:700;margin-top:8px}';
+    // Domain bars
+    html+='.domain{margin-bottom:12px}';
+    html+='.domain-meta{display:flex;justify-content:space-between;margin-bottom:4px}';
+    html+='.domain-name{font-size:.78rem;font-weight:700;color:#eaecf0}';
+    html+='.domain-val{font-size:.78rem;font-weight:700;font-family:"JetBrains Mono",monospace;color:#9498a4}';
+    html+='.domain-track{height:8px;background:#363840;border-radius:4px;overflow:hidden}';
+    html+='.domain-fill{height:100%;border-radius:4px}';
+    // Table
+    html+='.resp-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.78rem}';
+    html+='.resp-table th{background:#1a2340;color:#fff;padding:10px 12px;text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}';
+    html+='.resp-table th:first-child{border-radius:8px 0 0 0}.resp-table th:last-child{border-radius:0 8px 0 0}';
+    html+='.resp-table td{padding:9px 12px;border-bottom:1px solid #363840;color:#c8ccd4}';
+    html+='.resp-table tr:nth-child(even) td{background:rgba(54,56,64,.3)}';
+    html+='.resp-table .score-cell{font-weight:700;font-family:"JetBrains Mono",monospace;color:#6b8aff;text-align:center}';
+    // Interpretation
+    html+='.interp{background:#1e2028;border-radius:10px;padding:16px;font-size:.82rem;line-height:1.65;color:#c8ccd4;border:1px solid #363840}';
+    html+='.interp strong{color:#eaecf0}';
+    // Disclaimer
+    html+='.disclaimer{font-size:.72rem;color:#70747e;text-align:center;padding:14px;border:1px dashed #363840;border-radius:10px;margin-top:18px;line-height:1.6}';
+    html+='.footer{text-align:center;font-size:.68rem;color:#4a4d56;margin-top:20px;padding-top:14px;border-top:1px solid #2a2e3e}';
+    // Print
+    html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+    html+='.header{background:#1a2340!important;-webkit-print-color-adjust:exact!important}.card{border-color:#ddd!important}';
+    html+='.resp-table th{background:#1a2340!important;-webkit-print-color-adjust:exact!important}}';
+    html+='</style></head><body><div class="wrap">';
+
+    // Header
+    html+='<div class="header">';
+    html+='<h1>ManMulyankan</h1>';
+    html+='<div class="sub">Cognitive Assessment Platform · manmulyankan.com</div>';
+    html+='<div class="test-name">'+testLabel(d.test_type)+' Report</div>';
+    html+='<div class="info-grid">';
+    html+='<div class="info-item"><strong>Participant:</strong> '+d.participant_name+'</div>';
+    html+='<div class="info-item"><strong>Age:</strong> '+(d.participant_age||'--')+'</div>';
+    html+='<div class="info-item"><strong>Date:</strong> '+fmtDate(d.completed_at)+'</div>';
+    html+='<div class="info-item"><strong>Duration:</strong> '+dur+'</div>';
+    html+='</div></div>';
+
+    // Main Score
+    var scores=d.scores||{};
+    var mainScore=scores.fsiq||scores.totalScore||scores.mainScore||scores.composite||'';
+    var classification=scores.classification||d.interpretation||'';
+
+    if(mainScore){
+      html+='<div class="card"><h2>Overall Score</h2>';
+      html+='<div class="score-center">';
+      html+='<div class="score-big">'+mainScore+'</div>';
+      html+='<div class="score-label">'+( scores.fsiq?'Estimated FSIQ':scores.totalScore?'Total Score':'Composite Score')+'</div>';
+      if(classification){
+        var clsColor='#f0b830';
+        if(classification.match(/superior|high|normal|minimal/i))clsColor='#5ec49a';
+        else if(classification.match(/low|borderline|moderate|severe|impair/i))clsColor='#f07070';
+        html+='<div class="score-class" style="background:'+clsColor+'18;color:'+clsColor+';border:1px solid '+clsColor+'30">'+classification+'</div>';
+      }
+      html+='</div></div>';
+    }
+
+    // Domain Scores
+    var domains=scores.domains||{};
+    var domKeys=Object.keys(domains);
+    if(domKeys.length>0){
+      html+='<div class="card"><h2>Domain Scores</h2>';
+      domKeys.forEach(function(k){
+        var dom=domains[k];
+        var name=dom.name||k;
+        var scaled=dom.scaled||dom.score||dom.pct||0;
+        var total=dom.total||'';
+        var correct=dom.correct||'';
+        var pct=dom.pct||(dom.scaled?Math.round((dom.scaled-55)/90*100):0);
+        pct=Math.min(100,Math.max(0,pct));
+        var color=dom.color||'#6b8aff';
+        html+='<div class="domain">';
+        html+='<div class="domain-meta"><span class="domain-name" style="color:'+color+'">'+name+'</span>';
+        html+='<span class="domain-val">'+scaled+(total?' ('+correct+'/'+total+')':'')+'</span></div>';
+        html+='<div class="domain-track"><div class="domain-fill" style="width:'+pct+'%;background:'+color+'"></div></div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+
+    // Category breakdown (depression, QoL)
+    var cats=scores.categoryBreakdown||scores.categories||null;
+    if(cats&&typeof cats==='object'){
+      html+='<div class="card"><h2>Category Breakdown</h2>';
+      var catKeys=Array.isArray(cats)?cats:Object.keys(cats);
+      if(Array.isArray(cats)){
+        cats.forEach(function(cat){
+          var name=cat.name||cat.category||'';
+          var val=cat.score||cat.value||cat.avg||0;
+          html+='<div class="domain"><div class="domain-meta"><span class="domain-name">'+name+'</span><span class="domain-val">'+val+'</span></div></div>';
+        });
+      }else{
+        Object.keys(cats).forEach(function(k){
+          var v=cats[k];
+          html+='<div class="domain"><div class="domain-meta"><span class="domain-name">'+k+'</span><span class="domain-val">'+(typeof v==='object'?JSON.stringify(v):v)+'</span></div></div>';
+        });
+      }
+      html+='</div>';
+    }
+
+    // Interpretation
+    if(d.interpretation){
+      html+='<div class="card"><h2>Interpretation</h2>';
+      html+='<div class="interp">'+d.interpretation+'</div></div>';
+    }
+
+    // Responses Table
+    var answers=d.raw_answers;
+    if(answers&&(Array.isArray(answers)||(typeof answers==='object'&&Object.keys(answers).length>0))){
+      html+='<div class="card"><h2>Response Details</h2>';
+      html+='<table class="resp-table"><thead><tr><th>#</th><th>Item</th><th>Response</th><th>Score</th></tr></thead><tbody>';
+      if(Array.isArray(answers)){
+        answers.forEach(function(a,i){
+          var q=a.question||a.q||('Question '+(i+1));
+          var r=a.answer||a.response||a.selected||String(a);
+          var s=(a.score!==undefined)?a.score:'-';
+          html+='<tr><td>'+(i+1)+'</td><td>'+q+'</td><td>'+r+'</td><td class="score-cell">'+s+'</td></tr>';
+        });
+      }else{
+        var idx=1;
+        Object.keys(answers).forEach(function(k){
+          var v=answers[k];
+          html+='<tr><td>'+(idx++)+'</td><td>'+k+'</td><td colspan="2">'+( typeof v==='object'?JSON.stringify(v):v)+'</td></tr>';
+        });
+      }
+      html+='</tbody></table></div>';
+    }
+
+    // Disclaimer
+    html+='<div class="disclaimer">⚠ This assessment is for screening and educational purposes only. It is not a substitute for professional clinical diagnosis. Results should be interpreted by a qualified healthcare professional.</div>';
+    html+='<div class="footer">Generated by ManMulyankan (manmulyankan.com) on '+new Date().toLocaleString('en-GB')+'</div>';
+    html+='</div></body></html>';
+
+    // Download
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.html';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  }catch(e){console.error(e);alert('Error generating report')}
+}
+
+// ═══ TEXT FILE DOWNLOAD ═══
+async function downloadTXT(id){
+  try{
+    var res=await fetch('/api/admin/results/'+id);
+    var d=await res.json();
+    var dur='--';
+    if(d.started_at&&d.completed_at){
+      var secs=Math.round((new Date(d.completed_at)-new Date(d.started_at))/1000);
+      dur=Math.floor(secs/60)+'m '+secs%60+'s';
+    }
+    var scores=d.scores||{};
+    var line='═'.repeat(80);
+    var dash='─'.repeat(80);
+
+    var txt='';
+    txt+=line+'\n';
+    txt+='  MANMULYANKAN — COGNITIVE ASSESSMENT REPORT\n';
+    txt+='  manmulyankan.com\n';
+    txt+=line+'\n\n';
+
+    // Participant
+    txt+='  PARTICIPANT DETAILS\n';
+    txt+=dash+'\n';
+    txt+=pad('  Name:',20)+d.participant_name+'\n';
+    txt+=pad('  Age:',20)+(d.participant_age||'--')+'\n';
+    txt+=pad('  Test:',20)+testLabel(d.test_type)+'\n';
+    txt+=pad('  Started:',20)+fmtDate(d.started_at)+'\n';
+    txt+=pad('  Completed:',20)+fmtDate(d.completed_at)+'\n';
+    txt+=pad('  Duration:',20)+dur+'\n';
+    txt+=pad('  Test ID:',20)+d.id+'\n\n';
+
+    // Overall Score
+    var mainScore=scores.fsiq||scores.totalScore||scores.mainScore||scores.composite||'';
+    var classification=scores.classification||d.interpretation||'';
+    if(mainScore){
+      txt+='  OVERALL SCORE\n';
+      txt+=dash+'\n';
+      txt+=pad('  Score:',20)+mainScore+'\n';
+      if(classification) txt+=pad('  Classification:',20)+classification+'\n';
+      txt+='\n';
+    }
+
+    // Domain Scores
+    var domains=scores.domains||{};
+    var domKeys=Object.keys(domains);
+    if(domKeys.length>0){
+      txt+='  DOMAIN SCORES\n';
+      txt+=dash+'\n';
+      txt+=pad('  Domain',30)+pad('Score',10)+pad('Correct',10)+pad('Total',10)+pad('Percent',10)+'\n';
+      txt+='  '+'-'.repeat(70)+'\n';
+      domKeys.forEach(function(k){
+        var dom=domains[k];
+        txt+=pad('  '+(dom.name||k),30)+pad(String(dom.scaled||dom.score||dom.pct||'-'),10)+pad(String(dom.correct||'-'),10)+pad(String(dom.total||'-'),10)+pad(String(dom.pct||'-')+'%',10)+'\n';
+      });
+      txt+='\n';
+    }
+
+    // Category breakdown
+    var cats=scores.categoryBreakdown||scores.categories||null;
+    if(cats&&typeof cats==='object'){
+      txt+='  CATEGORY BREAKDOWN\n';
+      txt+=dash+'\n';
+      if(Array.isArray(cats)){
+        txt+=pad('  Category',30)+pad('Score',10)+pad('Value',10)+'\n';
+        txt+='  '+'-'.repeat(50)+'\n';
+        cats.forEach(function(cat){
+          txt+=pad('  '+(cat.name||cat.category||''),30)+pad(String(cat.score||cat.value||cat.avg||'-'),10)+pad(String(cat.pct||'-')+'%',10)+'\n';
+        });
+      }else{
+        Object.keys(cats).forEach(function(k){
+          txt+=pad('  '+k,30)+(typeof cats[k]==='object'?JSON.stringify(cats[k]):String(cats[k]))+'\n';
+        });
+      }
+      txt+='\n';
+    }
+
+    // Interpretation
+    if(d.interpretation){
+      txt+='  INTERPRETATION\n';
+      txt+=dash+'\n';
+      var intLines=wordWrap(d.interpretation,76);
+      intLines.forEach(function(l){txt+='  '+l+'\n';});
+      txt+='\n';
+    }
+
+    // ═══ RESPONSE TABLE ═══
+    txt+='  RESPONSE DETAILS\n';
+    txt+=line+'\n';
+
+    var answers=d.raw_answers;
+    var startTime=d.started_at?new Date(d.started_at):null;
+    var endTime=d.completed_at?new Date(d.completed_at):null;
+    var totalDurSec=startTime&&endTime?Math.round((endTime-startTime)/1000):0;
+
+    // Table header
+    var colW=[5,40,20,8,10];
+    txt+=pad('  #',colW[0])+pad('Question',colW[1])+pad('Response',colW[2])+pad('Score',colW[3])+pad('Time',colW[4])+'\n';
+    txt+='  '+'-'.repeat(colW[0]+colW[1]+colW[2]+colW[3]+colW[4])+'\n';
+
+    if(Array.isArray(answers)&&answers.length>0){
+      var avgTime=answers.length>0&&totalDurSec>0?Math.round(totalDurSec/answers.length):0;
+      answers.forEach(function(a,i){
+        var q=String(a.question||a.q||('Q'+(i+1)));
+        if(q.length>38)q=q.substring(0,35)+'...';
+        var r=String(a.answer||a.response||a.selected||a);
+        if(r.length>18)r=r.substring(0,15)+'...';
+        var s=(a.score!==undefined)?String(a.score):'-';
+        var t=(a.time||a.rt)?String(a.time||a.rt)+'s':(avgTime?'~'+avgTime+'s':'--');
+        txt+=pad('  '+(i+1),colW[0])+pad(q,colW[1])+pad(r,colW[2])+pad(s,colW[3])+pad(t,colW[4])+'\n';
+      });
+    }else if(answers&&typeof answers==='object'){
+      var keys=Object.keys(answers);
+      var avgTime=keys.length>0&&totalDurSec>0?Math.round(totalDurSec/keys.length):0;
+      keys.forEach(function(k,i){
+        var v=answers[k];
+        var q=String(k);if(q.length>38)q=q.substring(0,35)+'...';
+        var r=typeof v==='object'?JSON.stringify(v):String(v);
+        if(r.length>18)r=r.substring(0,15)+'...';
+        txt+=pad('  '+(i+1),colW[0])+pad(q,colW[1])+pad(r,colW[2])+pad('-',colW[3])+pad(avgTime?'~'+avgTime+'s':'--',colW[4])+'\n';
+      });
+    }else{
+      txt+='  No response data available.\n';
+    }
+
+    txt+='\n';
+
+    // Summary stats
+    txt+='  SUMMARY STATISTICS\n';
+    txt+=dash+'\n';
+    var totalQ=Array.isArray(answers)?answers.length:(answers?Object.keys(answers).length:0);
+    var correctCount=0;
+    if(Array.isArray(answers)){answers.forEach(function(a){if(a.score&&a.score>0)correctCount++})}
+    txt+=pad('  Total Questions:',25)+totalQ+'\n';
+    txt+=pad('  Total Duration:',25)+dur+'\n';
+    if(totalQ>0&&totalDurSec>0)txt+=pad('  Avg Time/Question:',25)+Math.round(totalDurSec/totalQ)+'s\n';
+    if(Array.isArray(answers))txt+=pad('  Correct Answers:',25)+correctCount+'/'+totalQ+' ('+Math.round(correctCount/totalQ*100)+'%)\n';
+    txt+=pad('  Test Type:',25)+d.test_type+'\n';
+    txt+=pad('  Report Generated:',25)+new Date().toLocaleString('en-GB')+'\n';
+    txt+='\n';
+
+    // Disclaimer
+    txt+=line+'\n';
+    txt+='  DISCLAIMER: This assessment is for screening purposes only.\n';
+    txt+='  Not a substitute for professional clinical diagnosis.\n';
+    txt+='  Generated by ManMulyankan (manmulyankan.com)\n';
+    txt+=line+'\n';
+
+    // Download
+    var blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.txt';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  }catch(e){console.error(e);alert('Error generating text file')}
+}
+
+function pad(str,len){str=String(str);while(str.length<len)str+=' ';return str;}
+function wordWrap(str,max){
+  var words=str.split(' '),lines=[],line='';
+  words.forEach(function(w){
+    if((line+' '+w).length>max){lines.push(line);line=w}
+    else line=line?line+' '+w:w;
+  });
+  if(line)lines.push(line);
+  return lines;
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quality of Life Assessment — ManMulyankan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#2a2d35;--offwhite:#1e2028;--ice:#363840;
+  --blue:#6b8aff;--blue-d:#5570d9;--blue-l:#8fadff;--blue-glow:rgba(107,138,255,.1);
+  --navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--silver:#4a4d56;
+  --yellow:#f0b830;--yellow-bg:rgba(240,184,48,.08);
+  --red:#f07070;--red-bg:rgba(240,112,112,.08);
+  --green:#5ec49a;--green-bg:rgba(94,196,154,.08);
+  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r-sm:10px;--r-md:16px;--r-lg:24px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--offwhite);color:var(--ink);min-height:100vh;overflow-x:hidden;position:relative;display:flex;flex-direction:column;align-items:center;padding:0 0 60px}
+
+/* Shapes */
+.shapes-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.shape{position:absolute;opacity:0;animation:shapeIn 2s ease forwards}
+.sh-c1{top:-80px;right:-60px;width:420px;height:420px;border:3px solid rgba(107,138,255,.5);border-radius:50%;animation:shapeIn 1.5s .2s ease forwards,drift 25s ease-in-out infinite}
+.sh-s1{bottom:60px;left:-30px;width:180px;height:180px;border:3px solid rgba(240,184,48,.45);transform:rotate(15deg);animation:shapeIn 1.5s .5s ease forwards,spin-slow 40s linear infinite}
+.sh-t1{top:40%;right:5%;width:0;height:0;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:120px solid rgba(240,112,112,.35);animation:shapeIn 1.5s .8s ease forwards,bob 18s ease-in-out infinite}
+.sh-c2{top:55%;left:3%;width:100px;height:100px;border:2.5px solid rgba(143,173,255,.45);border-radius:50%;animation:shapeIn 1.5s 1s ease forwards,drift 20s ease-in-out infinite reverse}
+.sh-c3{bottom:15%;right:12%;width:160px;height:160px;border:2px dashed rgba(143,173,255,.3);border-radius:50%;animation:shapeIn 1.5s 1s ease forwards,spin-slow 50s linear infinite}
+@keyframes shapeIn{to{opacity:.35}}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,20px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes spin-slow{to{transform:rotate(375deg)}}
+
+/* Noise */
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");background-size:128px 128px}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:200;width:100%;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.92);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:1px solid rgba(107,138,255,.1);box-shadow:0 1px 24px rgba(0,0,0,.15)}
+.tb-logo{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px var(--blue-glow);position:relative;overflow:hidden}
+.tb-logo::before{content:'';position:absolute;top:6px;left:6px;width:10px;height:10px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:5px;right:5px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid rgba(255,255,255,.6)}
+.tb-title{font-size:.95rem;font-weight:800;color:var(--navy);letter-spacing:-.03em}
+.tb-sub{font-size:.66rem;color:var(--grey);font-weight:500;margin-top:1px}
+.tb-badge{margin-left:auto;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);background:var(--blue-glow);border:1px solid rgba(107,138,255,.15);padding:5px 14px;border-radius:50px}
+
+/* Layout */
+.main{position:relative;z-index:10;max-width:760px;width:100%;padding:20px 20px 0}
+.hidden{display:none!important}
+.screen{display:none}.screen.active{display:block;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Cards */
+.card{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.card::before{content:'';position:absolute;top:0;left:0;width:0;height:0;border-top:48px solid var(--blue);border-right:48px solid transparent;opacity:.06}
+.center{text-align:center}
+
+/* Eyebrow */
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--blue);background:var(--white);border:1px solid var(--ice);padding:6px 18px;border-radius:50px;margin-bottom:16px}
+.eyebrow-dot{width:6px;height:6px;background:var(--blue);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 36px;border:none;border-radius:var(--r-md);font-size:.92rem;font-weight:700;cursor:pointer;transition:all .25s;font-family:var(--font);position:relative}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 4px rgba(107,138,255,.2),0 8px 24px rgba(107,138,255,.1),4px 4px 0 var(--blue-d)}
+.btn-primary:hover{background:var(--blue-d);transform:translate(-2px,-2px);box-shadow:0 4px 8px rgba(107,138,255,.25),6px 6px 0 #3a52b0}
+.btn-sm{padding:7px 18px;font-size:.78rem;font-weight:600;background:var(--white);color:var(--slate);border:1.5px solid var(--ice);border-radius:var(--r-sm);cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-sm:hover{border-color:var(--blue);color:var(--blue)}
+
+
+/* Info grid */
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.info-card{background:var(--white);border:1.5px solid var(--ice);border-radius:12px;padding:14px 12px;text-align:center}
+.ic-title{font-size:.62rem;color:var(--grey);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;font-weight:700}
+.ic-val{font-size:.88rem;font-weight:700;color:var(--navy)}
+
+/* Domain preview */
+.domain-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.domain-card{background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-md);padding:16px;position:relative;overflow:hidden}
+.domain-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+.domain-card.d1::before{background:#5bb8f5}.domain-card.d2::before{background:#b49dff}.domain-card.d3::before{background:#5ec49a}.domain-card.d4::before{background:#f0b830}
+.dc-name{font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:4px}
+.dc-desc{font-size:.7rem;color:var(--slate);line-height:1.5}
+.dc-items{font-size:.62rem;color:var(--grey);margin-top:6px;font-weight:600}
+
+/* Warn box */
+.warn-box{background:var(--yellow-bg);border:1px solid rgba(240,184,48,.15);border-left:4px solid var(--yellow);border-radius:0 var(--r-md) var(--r-md) 0;padding:16px 20px;font-size:.8rem;color:#e6c65a;margin:24px 0;line-height:1.65}
+.warn-box strong{color:#ffd54f}
+
+/* Participant */
+.pi-avatar{width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,var(--blue),var(--blue-l));border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:#fff;box-shadow:0 6px 24px var(--blue-glow);position:relative}
+.pi-avatar::after{content:'';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border:2px solid var(--yellow);border-radius:3px;transform:rotate(20deg);animation:spin-slow 10s linear infinite}
+.pi-title{font-size:1.3rem;font-weight:800;color:var(--navy);margin-bottom:6px}
+.pi-sub{font-size:.86rem;color:var(--slate);margin-bottom:28px;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;text-align:left}
+.field-group{display:flex;flex-direction:column;gap:6px}.field-group.full{grid-column:1/-1}
+.field-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:flex;align-items:center;gap:6px}
+.field-label::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:1px;transform:rotate(45deg)}
+.field-input{width:100%;padding:14px 18px;border:2px solid var(--ice);border-radius:var(--r-md);background:var(--white);font-family:var(--font);font-size:.92rem;font-weight:500;color:var(--navy);transition:all .25s;outline:none}
+.field-input::placeholder{color:var(--silver)}
+.field-input:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-glow)}
+.field-input.err{border-color:var(--red);box-shadow:0 0 0 4px rgba(240,112,112,.1)}
+.field-error{font-size:.72rem;color:var(--red);font-weight:600;min-height:16px;margin-top:2px}
+.pi-note{font-size:.74rem;color:var(--grey);line-height:1.55;margin-bottom:24px;display:flex;align-items:flex-start;gap:8px;justify-content:center}
+.pi-note-icon{width:16px;height:16px;min-width:16px;border-radius:50%;border:1.5px solid var(--silver);display:grid;place-items:center;font-size:.55rem;font-weight:900;color:var(--grey);margin-top:1px}
+
+/* Progress */
+.progress-wrap{margin-bottom:20px}
+.progress-meta{display:flex;justify-content:space-between;margin-bottom:8px;font-size:.78rem;font-weight:600}
+.p-label{color:var(--slate)}.p-pct{color:var(--blue);font-family:var(--mono)}
+.progress-track{height:6px;background:var(--ice);border-radius:50px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-l));border-radius:50px;transition:width .4s}
+
+/* Question */
+.q-num{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.q-num::before{content:'';width:4px;height:16px;background:var(--blue);border-radius:2px}
+.q-text{font-size:1.05rem;font-weight:700;color:var(--navy);line-height:1.5;margin-bottom:20px}
+.q-scale{font-size:.66rem;color:var(--grey);font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}
+.option{background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-sm);margin:8px 0;padding:14px 18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;font-size:.88rem;font-weight:600;color:var(--ink)}
+.option:hover{border-color:var(--blue-l);background:rgba(107,138,255,.06);color:var(--navy)}
+.option.selected{border-color:var(--blue);background:rgba(107,138,255,.1);color:var(--blue)}
+.option .opt-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--ice);display:grid;place-items:center;font-size:.72rem;font-weight:800;color:var(--grey);transition:all .2s;flex-shrink:0}
+.option.selected .opt-num{border-color:var(--blue);background:var(--blue);color:#fff}
+.option:hover .opt-num{border-color:var(--blue-l)}
+
+/* Nav */
+.nav-btns{display:flex;gap:10px;justify-content:space-between;align-items:center}
+
+/* Results */
+.participant-banner{display:flex;align-items:center;gap:16px;background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-md);padding:16px 20px;margin-bottom:20px}
+.pb-avatar{width:44px;height:44px;background:var(--blue);border-radius:50%;display:grid;place-items:center;font-size:1.1rem;color:#fff;font-weight:800;flex-shrink:0;box-shadow:0 2px 8px var(--blue-glow)}
+.pb-info{display:flex;flex-direction:column;gap:2px}
+.pb-name{font-size:.95rem;font-weight:700;color:var(--navy)}
+.pb-meta{font-size:.76rem;color:var(--grey);font-weight:500}
+.rpanel{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:26px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.06);position:relative;overflow:hidden}
+.rpanel::before{content:'';position:absolute;top:0;left:0;width:0;height:0;border-top:36px solid var(--blue);border-right:36px solid transparent;opacity:.04}
+.sec-label{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,var(--blue),var(--blue-l));border-radius:2px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--ice)}
+.domain-bar{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.db-label{font-size:.78rem;font-weight:700;color:var(--slate);min-width:120px;text-align:right}
+.db-track{flex:1;height:14px;background:var(--ice);border-radius:50px;overflow:hidden}
+.db-fill{height:100%;border-radius:50px;width:0%;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.db-val{font-size:.82rem;font-weight:800;color:var(--navy);min-width:48px;font-family:var(--mono)}
+.interp-box{background:var(--white);border:1.5px solid var(--ice);border-left:4px solid var(--blue);border-radius:var(--r-md);padding:16px 20px;margin-bottom:12px}
+.ib-title{font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:6px}
+.ib-text{font-size:.8rem;color:var(--slate);line-height:1.7}
+.overall-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.overall-card{background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-md);padding:18px;text-align:center}
+.oc-label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);margin-bottom:4px}
+.oc-score{font-size:2rem;font-weight:900;color:var(--blue)}
+.oc-desc{font-size:.7rem;color:var(--slate);margin-top:4px}
+.disclaimer{background:var(--yellow-bg);border:1px solid rgba(240,184,48,.15);border-left:4px solid var(--yellow);border-radius:0 var(--r-md) var(--r-md) 0;padding:14px 18px;font-size:.76rem;color:#e6c65a;line-height:1.65;margin-bottom:20px}
+.geo-divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 20px}
+.gd-line{flex:1;height:1px;background:var(--ice)}
+.gd-shape{width:8px;height:8px;background:var(--blue);border-radius:2px;transform:rotate(45deg);opacity:.3}
+.restart-wrap{text-align:center;margin-top:16px}
+
+@media(max-width:640px){.field-row,.domain-grid,.overall-row{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr 1fr}.db-label{min-width:80px;font-size:.7rem}}
+
+.btn-save{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 2px 8px rgba(94,196,154,.2)}
+.btn-save:hover{background:#4aaf86;transform:translateY(-1px)}
+.btn-save::before{content:'';display:inline-block;width:14px;height:14px;border:2px solid #fff;border-radius:3px;position:relative}
+.btn-save::after{content:'';position:absolute;width:6px;height:3px;border-bottom:2px solid #fff;border-left:2px solid #fff;transform:rotate(-45deg);margin-left:-11px;margin-top:4px}
+
+/* ═══ MOBILE RESPONSIVE ENHANCEMENTS ═══ */
+@media(max-width:600px){
+  body{font-size:14px}
+  .topbar,.tb{padding:10px 14px!important;gap:8px!important}
+  .tb-title,.tb-t{font-size:.85rem!important}
+  .tb-badge{font-size:.5rem!important;padding:3px 8px!important}
+  button,input{font-size:16px!important;-webkit-appearance:none}
+  .main,.wrap,.container{padding-left:14px!important;padding-right:14px!important}
+}
+@media(max-width:400px){
+  .topbar,.tb{flex-wrap:wrap}
+}
+
+/* ═══ FLOWING PROGRESS DOT ═══ */
+.progress-fill,.prog-fill,.cat-fill,.domain-fill{position:relative}
+.progress-fill::after,.prog-fill::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--yellow,#f0b830);border-radius:50%;box-shadow:0 0 12px rgba(240,184,48,.6),0 0 24px rgba(240,184,48,.3);animation:dotPulse 1.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(240,184,48,.5),0 0 16px rgba(240,184,48,.2)}50%{box-shadow:0 0 16px rgba(240,184,48,.8),0 0 32px rgba(240,184,48,.4)}}
+</style>
+</head>
+<body>
+<div class="shapes-layer"><div class="shape sh-c1"></div><div class="shape sh-s1"></div><div class="shape sh-t1"></div><div class="shape sh-c2"></div><div class="shape sh-c3"></div></div>
+<div class="topbar"><a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">ManMulyankan</div><div class="tb-sub">Quality of Life Assessment</div></div></a>
+  <a href="/" style="margin-left:auto;font-size:.76rem;color:var(--slate);text-decoration:none;font-weight:600;padding:6px 14px;border:1px solid var(--ice,#363840);border-radius:8px;transition:all .2s" onmouseover="this.style.color='var(--blue,#6b8aff)';this.style.borderColor='var(--blue,#6b8aff)'" onmouseout="this.style.color='var(--slate,#9498a4)';this.style.borderColor='var(--ice,#363840)'">All Tests</a><span class="tb-badge" style="margin-left:0">Quality of Life</span></div>
+<div class="main">
+
+<!-- WELCOME -->
+<div id="s-intro" style="animation:fadeUp .6s ease both">
+  <div class="card center">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> Quality of Life Assessment</div>
+    <h2 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:900;color:var(--navy);margin-bottom:8px">Quality of Life</h2>
+    <p style="color:var(--slate);font-size:.9rem;margin-bottom:24px;line-height:1.6;max-width:540px;margin-left:auto;margin-right:auto">The World Health Organization Quality of Life Brief Assessment measures your perceived quality of life across four key domains over the past two weeks.</p>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-title">Questions</div><div class="ic-val">26 Items</div></div>
+      <div class="info-card"><div class="ic-title">Duration</div><div class="ic-val">~5 min</div></div>
+      <div class="info-card"><div class="ic-title">Domains</div><div class="ic-val">4 Domains</div></div>
+      <div class="info-card"><div class="ic-title">Scale</div><div class="ic-val">1 - 5</div></div>
+    </div>
+    <div class="domain-grid">
+      <div class="domain-card d1"><div class="dc-name">Physical Health</div><div class="dc-desc">Pain, energy, sleep, mobility, daily activities, medication, work capacity</div><div class="dc-items">7 items</div></div>
+      <div class="domain-card d2"><div class="dc-name">Psychological</div><div class="dc-desc">Positive feelings, thinking, self-esteem, body image, negative feelings</div><div class="dc-items">6 items</div></div>
+      <div class="domain-card d3"><div class="dc-name">Social Relationships</div><div class="dc-desc">Personal relationships, social support, sexual activity</div><div class="dc-items">3 items</div></div>
+      <div class="domain-card d4"><div class="dc-name">Environment</div><div class="dc-desc">Safety, home, finances, health services, information, leisure, transport</div><div class="dc-items">8 items</div></div>
+    </div>
+    <div class="warn-box"><strong>Disclaimer:</strong> This is a screening tool for educational purposes only. It does not constitute a clinical diagnosis. Results should be interpreted by a qualified healthcare professional.</div>
+    <button class="btn btn-primary" id="btnBegin">Begin Assessment</button>
+  </div>
+</div>
+
+<!-- PARTICIPANT -->
+<div class="screen" id="s-participant">
+  <div class="card center">
+    <div class="pi-avatar">&#128100;</div>
+    <h2 class="pi-title">Participant Details</h2>
+    <p class="pi-sub">Please enter your information before starting.</p>
+    <div class="field-row">
+      <div class="field-group full"><label class="field-label" for="piName">Full Name</label><input type="text" class="field-input" id="piName" placeholder="e.g. John Smith" maxlength="16"><div class="field-error" id="piNameErr"></div></div>
+      <div class="field-group"><label class="field-label" for="piAge">Age</label><input type="number" class="field-input" id="piAge" placeholder="e.g. 34" min="5" max="120"><div class="field-error" id="piAgeErr"></div></div>
+    </div>
+    <div class="pi-note"><span class="pi-note-icon">i</span><span>Your information is only used locally for your results report.</span></div>
+    <button class="btn btn-primary" id="piStartBtn">Start Assessment</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="s-quiz">
+  <div class="progress-wrap">
+    <div class="progress-meta"><span class="p-label" id="pLabel">Question 1 of 26</span><span class="p-pct" id="pPct">0%</span></div>
+    <div class="progress-track"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+  </div>
+  <div class="card" id="qCard"></div>
+  <div class="nav-btns">
+    <div style="display:flex;gap:8px"><button class="btn-sm" id="btnHome">Home</button></div>
+    <div style="display:flex;gap:8px"><button class="btn-sm" id="btnPrev" disabled>Previous</button><button class="btn btn-primary" id="btnNext" style="padding:10px 28px;font-size:.82rem">Next</button></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="s-results">
+  <div class="participant-banner"><div class="pb-avatar" id="pbInitial">?</div><div class="pb-info"><div class="pb-name" id="pbName">--</div><div class="pb-meta" id="pbMeta">--</div></div></div>
+  <div style="text-align:center;margin-bottom:20px"><h2 style="font-size:1.5rem;font-weight:900;color:var(--navy)">Quality of Life Results</h2><p style="color:var(--slate);font-size:.86rem">Quality of Life Domain Scores (0-100 scale)</p></div>
+  <div class="rpanel"><div class="sec-label">Domain Scores</div><div id="domainBars"></div></div>
+  <div class="geo-divider"><span class="gd-line"></span><span class="gd-shape"></span><span class="gd-line"></span></div>
+  <div class="rpanel"><div class="sec-label">Overall Quality of Life</div><div id="overallBox"></div></div>
+  <div class="geo-divider"><span class="gd-line"></span><span class="gd-shape"></span><span class="gd-line"></span></div>
+  <div class="rpanel"><div class="sec-label">Clinical Interpretation</div><div id="interpBoxes"></div></div>
+  <div 
+  h+='<h3 style="text-align:left;font-size:.82rem;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:28px 0 16px">How to Improve Your Quality of Life</h3>';
+  h+='<div style="text-align:left;margin-bottom:16px;padding:18px;background:var(--bg);border-radius:10px;border-left:3px solid #5bb8f5">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#5bb8f5;margin-bottom:10px">Physical Health</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Regular Exercise</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Aim for 150 minutes of moderate activity per week — walking, swimming, or cycling.</div><a href="https://www.who.int/news-room/fact-sheets/detail/physical-activity" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">WHO Guidelines →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Sleep Hygiene</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Keep a consistent sleep schedule, limit screens before bed, and aim for 7-9 hours nightly.</div><a href="https://www.sleepfoundation.org/sleep-hygiene" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">Sleep Foundation →</a></div>';
+  h+='</div>';
+  h+='<div style="text-align:left;margin-bottom:16px;padding:18px;background:var(--bg);border-radius:10px;border-left:3px solid #b49dff">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#b49dff;margin-bottom:10px">Psychological Well-being</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Mindfulness & Meditation</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Daily mindfulness practice reduces stress and improves emotional regulation.</div><a href="https://www.headspace.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">Try Headspace →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Gratitude Journaling</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Write 3 things you are grateful for each day — proven to boost life satisfaction.</div><a href="https://www.verywellmind.com/how-to-start-a-gratitude-journal-5210352" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">Journal Guide →</a></div>';
+  h+='</div>';
+  h+='<div style="text-align:left;margin-bottom:16px;padding:18px;background:var(--bg);border-radius:10px;border-left:3px solid #5ec49a">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#5ec49a;margin-bottom:10px">Social & Environmental</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Strengthen Relationships</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Schedule regular time with friends and family. Social connection is one of the strongest predictors of wellbeing.</div><a href="https://www.apa.org/topics/social-connection" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">APA on Social Health →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Nature & Environment</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Spend 20+ minutes in green spaces daily. Nature exposure reduces cortisol and improves mood.</div><a href="https://www.nature.com/articles/s41598-019-44097-3" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">Nature Study →</a></div>';
+  h+='</div>';
+
+class="disclaimer"><strong>Clinical Disclaimer:</strong> This digital Quality of Life assessment is for educational and informational purposes only. It is not a substitute for a formal evaluation by a qualified healthcare professional.</div>
+  <div class="restart-wrap"><button class="btn btn-primary" id="retryBtn">Restart Assessment</button> <button class="btn-save" id="btnSaveQol" onclick="triggerSave()">Download Report</button></div>
+</div>
+
+</div>
+
+<script>
+/* ═══ Quality of Life 26-ITEM DATA ═══
+   Q1-Q2: Overall QoL + General Health (not in domain scores)
+   Q3-Q26: Mapped to 4 domains
+   Reverse-scored: Q3, Q4, Q26 (higher raw = worse, so 6-raw)
+*/
+var QUESTIONS = [
+  {id:1,text:"How would you rate your quality of life?",scale:"quality",domain:"overall"},
+  {id:2,text:"How satisfied are you with your health?",scale:"satisfaction",domain:"overall"},
+  {id:3,text:"To what extent do you feel that physical pain prevents you from doing what you need to do?",scale:"amount",domain:"physical",reverse:true},
+  {id:4,text:"How much do you need any medical treatment to function in your daily life?",scale:"amount",domain:"physical",reverse:true},
+  {id:5,text:"How much do you enjoy life?",scale:"amount",domain:"psychological"},
+  {id:6,text:"To what extent do you feel your life to be meaningful?",scale:"amount",domain:"psychological"},
+  {id:7,text:"How well are you able to concentrate?",scale:"capacity",domain:"psychological"},
+  {id:8,text:"How safe do you feel in your daily life?",scale:"amount",domain:"environment"},
+  {id:9,text:"How healthy is your physical environment?",scale:"amount",domain:"environment"},
+  {id:10,text:"Do you have enough energy for everyday life?",scale:"capacity",domain:"physical"},
+  {id:11,text:"Are you able to accept your bodily appearance?",scale:"capacity",domain:"psychological"},
+  {id:12,text:"Have you enough money to meet your needs?",scale:"capacity",domain:"environment"},
+  {id:13,text:"How available to you is the information that you need in your day-to-day life?",scale:"capacity",domain:"environment"},
+  {id:14,text:"To what extent do you have the opportunity for leisure activities?",scale:"capacity",domain:"environment"},
+  {id:15,text:"How well are you able to get around?",scale:"capacity",domain:"physical"},
+  {id:16,text:"How satisfied are you with your sleep?",scale:"satisfaction",domain:"physical"},
+  {id:17,text:"How satisfied are you with your ability to perform your daily living activities?",scale:"satisfaction",domain:"physical"},
+  {id:18,text:"How satisfied are you with your capacity for work?",scale:"satisfaction",domain:"physical"},
+  {id:19,text:"How satisfied are you with yourself?",scale:"satisfaction",domain:"psychological"},
+  {id:20,text:"How satisfied are you with your personal relationships?",scale:"satisfaction",domain:"social"},
+  {id:21,text:"How satisfied are you with your sex life?",scale:"satisfaction",domain:"social"},
+  {id:22,text:"How satisfied are you with the support you get from your friends?",scale:"satisfaction",domain:"social"},
+  {id:23,text:"How satisfied are you with the conditions of your living place?",scale:"satisfaction",domain:"environment"},
+  {id:24,text:"How satisfied are you with your access to health services?",scale:"satisfaction",domain:"environment"},
+  {id:25,text:"How satisfied are you with your transport?",scale:"satisfaction",domain:"environment"},
+  {id:26,text:"How often do you have negative feelings such as blue mood, despair, anxiety, depression?",scale:"frequency",domain:"psychological",reverse:true}
+];
+
+var SCALES = {
+  quality:[{l:"Very Poor",v:1},{l:"Poor",v:2},{l:"Neither Poor nor Good",v:3},{l:"Good",v:4},{l:"Very Good",v:5}],
+  satisfaction:[{l:"Very Dissatisfied",v:1},{l:"Dissatisfied",v:2},{l:"Neither Satisfied nor Dissatisfied",v:3},{l:"Satisfied",v:4},{l:"Very Satisfied",v:5}],
+  amount:[{l:"Not at All",v:1},{l:"A Little",v:2},{l:"A Moderate Amount",v:3},{l:"Very Much",v:4},{l:"An Extreme Amount",v:5}],
+  capacity:[{l:"Not at All",v:1},{l:"A Little",v:2},{l:"Moderately",v:3},{l:"Mostly",v:4},{l:"Completely",v:5}],
+  frequency:[{l:"Never",v:1},{l:"Seldom",v:2},{l:"Quite Often",v:3},{l:"Very Often",v:4},{l:"Always",v:5}]
+};
+
+var DOMAINS = {
+  physical:{name:"Physical Health",color:"#5bb8f5",items:[3,4,10,15,16,17,18]},
+  psychological:{name:"Psychological",color:"#b49dff",items:[5,6,7,11,19,26]},
+  social:{name:"Social Relationships",color:"#5ec49a",items:[20,21,22]},
+  environment:{name:"Environment",color:"#f0b830",items:[8,9,12,13,14,23,24,25]}
+};
+
+var currentQ = 0;
+var answers = [];
+for(var i=0;i<QUESTIONS.length;i++) answers.push(null);
+var participantName='',participantAge='',testStartTime=null;
+
+/* ═══ SCREEN MANAGEMENT ═══ */
+function showScreen(id){
+  var screens = document.querySelectorAll('.screen');
+  for(var i=0;i<screens.length;i++) screens[i].classList.remove('active');
+  var el = document.getElementById(id);
+  if(el) el.classList.add('active');
+  document.getElementById('s-intro').style.display = id==='none'?'none':'';
+  if(id!=='none') document.getElementById('s-intro').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ═══ BEGIN BUTTON ═══ */
+document.getElementById('btnBegin').addEventListener('click',function(){
+  document.getElementById('s-intro').style.display='none';
+  showScreen('s-participant');
+});
+
+/* ═══ PARTICIPANT VALIDATION ═══ */
+document.getElementById('piStartBtn').addEventListener('click',function(){
+  var name=document.getElementById('piName').value.trim();
+  var age=document.getElementById('piAge').value.trim();
+  var ok=true;
+  document.getElementById('piName').classList.remove('err');
+  document.getElementById('piAge').classList.remove('err');
+  document.getElementById('piNameErr').textContent='';
+  document.getElementById('piAgeErr').textContent='';
+  if(!name){document.getElementById('piName').classList.add('err');document.getElementById('piNameErr').textContent='Please enter your name';ok=false;}
+  if(!age||isNaN(age)||parseInt(age)<5||parseInt(age)>120){document.getElementById('piAge').classList.add('err');document.getElementById('piAgeErr').textContent='Enter a valid age (5-120)';ok=false;}
+  if(!ok) return;
+  participantName=name;
+  participantAge=age;
+  testStartTime=new Date();
+  currentQ=0;
+  for(var i=0;i<answers.length;i++) answers[i]=null;
+  showScreen('s-quiz');
+  renderQuestion();
+});
+document.getElementById('piName').addEventListener('focus',function(){this.classList.remove('err');document.getElementById('piNameErr').textContent='';});
+document.getElementById('piAge').addEventListener('focus',function(){this.classList.remove('err');document.getElementById('piAgeErr').textContent='';});
+
+/* ═══ RENDER QUESTION ═══ */
+function renderQuestion(){
+  var q=QUESTIONS[currentQ];
+  var scale=SCALES[q.scale];
+  var card=document.getElementById('qCard');
+  var html='<div class="q-num">Question '+q.id+' of 26</div>';
+  html+='<div class="q-text">'+q.text+'</div>';
+  html+='<div class="q-scale">Select your response</div>';
+  for(var i=0;i<scale.length;i++){
+    var sel=answers[currentQ]===scale[i].v?' selected':'';
+    html+='<div class="option'+sel+'" data-val="'+scale[i].v+'"><span class="opt-num">'+scale[i].v+'</span>'+scale[i].l+'</div>';
+  }
+  card.innerHTML=html;
+  card.querySelectorAll('.option').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      answers[currentQ]=parseInt(this.dataset.val);
+      card.querySelectorAll('.option').forEach(function(o){o.classList.remove('selected');});
+      this.classList.add('selected');
+      document.getElementById('btnNext').disabled=false;
+      /* auto-advance disabled — user presses Next */
+    });
+  });
+  updateProgress();
+  document.getElementById('btnPrev').disabled=(currentQ===0);
+  document.getElementById('btnNext').disabled=(answers[currentQ]===null);
+}
+
+/* ═══ PROGRESS ═══ */
+function updateProgress(){
+  var pct=Math.round(((currentQ)/QUESTIONS.length)*100);
+  document.getElementById('pLabel').textContent='Question '+(currentQ+1)+' of 26';
+  document.getElementById('pPct').textContent=pct+'%';
+  document.getElementById('pFill').style.width=pct+'%';
+}
+
+/* ═══ NAVIGATION ═══ */
+function goNext(){
+  if(answers[currentQ]===null) return;
+  if(currentQ<QUESTIONS.length-1){
+    currentQ++;
+    renderQuestion();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    showResults();
+  }
+}
+
+document.getElementById('btnNext').addEventListener('click',function(){goNext();});
+document.getElementById('btnPrev').addEventListener('click',function(){
+  if(currentQ>0){currentQ--;renderQuestion();window.scrollTo({top:0,behavior:'smooth'});}
+});
+document.getElementById('btnHome').addEventListener('click',function(){
+  showScreen('none');
+  document.getElementById('s-intro').style.display='block';
+  document.getElementById('s-intro').style.animation='fadeUp .4s ease both';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+
+/* ═══ SCORING (Quality of Life methodology) ═══
+   1. Reverse-score items 3, 4, 26: transformed = 6 - raw
+   2. Sum items per domain
+   3. Mean domain score = sum / n_items
+   4. Transform to 0-100: ((mean - 1) / 4) * 100
+*/
+function calcDomainScores(){
+  var result = {};
+  var domKeys = Object.keys(DOMAINS);
+  for(var d=0;d<domKeys.length;d++){
+    var key = domKeys[d];
+    var dom = DOMAINS[key];
+    var sum=0, n=0;
+    for(var i=0;i<dom.items.length;i++){
+      var qIdx = dom.items[i]-1;
+      var raw = answers[qIdx];
+      if(raw===null) continue;
+      if(QUESTIONS[qIdx].reverse) raw = 6 - raw;
+      sum += raw;
+      n++;
+    }
+    var mean = n>0 ? sum/n : 0;
+    var transformed = Math.round(((mean-1)/4)*100);
+    result[key] = {raw:sum, mean:Math.round(mean*100)/100, score:Math.max(0,Math.min(100,transformed)), n:n, color:dom.color, name:dom.name};
+  }
+  return result;
+}
+
+/* ═══ SHOW RESULTS ═══ */
+function showResults(){
+  showScreen('s-results');
+  var scores = calcDomainScores();
+
+  /* Participant banner */
+  document.getElementById('pbName').textContent=participantName||'--';
+  var initials = participantName ? participantName.split(' ').map(function(w){return w[0]||'';}).join('').substring(0,2).toUpperCase():'?';
+  document.getElementById('pbInitial').textContent=initials;
+  var dateStr='';
+  if(testStartTime){
+    var d=testStartTime;
+    dateStr='Age '+participantAge+' | '+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  }
+  document.getElementById('pbMeta').textContent=dateStr;
+
+  /* Domain bars */
+  var barsEl=document.getElementById('domainBars');
+  barsEl.innerHTML='';
+  var domKeys=['physical','psychological','social','environment'];
+  for(var i=0;i<domKeys.length;i++){
+    var s=scores[domKeys[i]];
+    barsEl.innerHTML+='<div class="domain-bar"><div class="db-label">'+s.name+'</div><div class="db-track"><div class="db-fill" id="bar-'+domKeys[i]+'" style="background:'+s.color+'"></div></div><div class="db-val">'+s.score+'</div></div>';
+  }
+  setTimeout(function(){
+    for(var i=0;i<domKeys.length;i++){
+      var el=document.getElementById('bar-'+domKeys[i]);
+      if(el) el.style.width=scores[domKeys[i]].score+'%';
+    }
+  },100);
+
+  /* Overall QoL (Q1 + Q2) */
+  var q1=answers[0]||0, q2=answers[1]||0;
+  var q1Labels=['','Very Poor','Poor','Neither Poor nor Good','Good','Very Good'];
+  var q2Labels=['','Very Dissatisfied','Dissatisfied','Neither','Satisfied','Very Satisfied'];
+  document.getElementById('overallBox').innerHTML=
+    '<div class="overall-row">'+
+    '<div class="overall-card"><div class="oc-label">Quality of Life Rating</div><div class="oc-score">'+q1+'/5</div><div class="oc-desc">'+(q1Labels[q1]||'--')+'</div></div>'+
+    '<div class="overall-card"><div class="oc-label">Health Satisfaction</div><div class="oc-score">'+q2+'/5</div><div class="oc-desc">'+(q2Labels[q2]||'--')+'</div></div>'+
+    '</div>';
+
+  /* Interpretation */
+  var interpEl=document.getElementById('interpBoxes');
+  interpEl.innerHTML='';
+  for(var i=0;i<domKeys.length;i++){
+    var s=scores[domKeys[i]];
+    var level='',desc='';
+    if(s.score>=75){level='High';desc='Scores in this range suggest good perceived quality of life in this domain.';}
+    else if(s.score>=50){level='Moderate';desc='Scores in this range suggest an acceptable but not optimal level. Some areas may benefit from attention.';}
+    else if(s.score>=25){level='Low';desc='Scores in this range suggest notable difficulty. Professional consultation may be helpful.';}
+    else{level='Very Low';desc='Scores in this range indicate significant concerns. Professional evaluation is strongly recommended.';}
+    interpEl.innerHTML+='<div class="interp-box" style="border-left-color:'+s.color+'"><div class="ib-title">'+s.name+': '+s.score+'/100 ('+level+')</div><div class="ib-text">'+desc+'</div></div>';
+  }
+
+  /* AUTO-SAVE RESULTS */
+  var domainResults={};
+  for(var k=0;k<domKeys.length;k++){
+    var ds=scores[domKeys[k]];
+    domainResults[domKeys[k]]={name:ds.name,score:ds.score,mean:ds.mean,rawSum:ds.raw,items:ds.n};
+  }
+  saveResultsToFile('quality_of_life', {
+    overallQoL: {rating: q1, label: q1Labels[q1]||'--'},
+    healthSatisfaction: {rating: q2, label: q2Labels[q2]||'--'},
+    domainScores: domainResults,
+    rawAnswers: answers.slice()
+  });
+
+  interpEl.innerHTML+='<div class="interp-box" style="border-left-color:var(--yellow)"><div class="ib-title">About Quality of Life Scoring</div><div class="ib-text">Domain scores are transformed to a 0-100 scale where higher scores indicate better quality of life. Items 3, 4, and 26 are reverse-scored as they measure negative constructs (pain, medication dependence, negative feelings). The two overall items (Q1, Q2) are reported separately as they provide a general indication of quality of life and health satisfaction.</div></div>';
+}
+
+/* ═══ RESTART ═══ */
+document.getElementById('retryBtn').addEventListener('click',function(){
+  currentQ=0;
+  for(var i=0;i<answers.length;i++) answers[i]=null;
+  showScreen('none');
+  document.getElementById('s-intro').style.display='block';
+  document.getElementById('s-intro').style.animation='fadeUp .4s ease both';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+
+/* ═══ SAVE RESULTS TO SERVER ═══ */
+function saveResultsToServer(testName, resultData){
+  var payload = {
+    participant: { name: participantName||'Unknown', age: parseInt(participantAge)||null },
+    test_type: testName,
+    started_at: testStartTime ? testStartTime.toISOString() : new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    raw_answers: resultData.rawAnswers || resultData.answers || {},
+    scores: resultData,
+    interpretation: resultData.severity || resultData.category || ''
+  };
+  fetch('/api/results', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){return r.json()}).then(function(d){
+    console.log('Results saved to server:', d);
+  }).catch(function(e){
+    console.log('Server save failed (offline mode):', e);
+  });
+}
+
+/* ═══ SAVE RESULTS TO FILE ═══ */
+function saveResultsToFile(testName, resultData){
+  saveResultsToServer(testName, resultData);
+  var name = (participantName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var d = testStartTime || new Date();
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var yy=d.getFullYear();
+  var hh=String(d.getHours()).padStart(2,'0');
+  var mi=String(d.getMinutes()).padStart(2,'0');
+  var ss=String(d.getSeconds()).padStart(2,'0');
+  var dateStr=yy+'-'+mm+'-'+dd;
+  var timeStr=hh+'-'+mi+'-'+ss;
+  var fileName='results/'+testName+'/'+name+'_'+dateStr+'_'+timeStr+'.json';
+  var payload = {
+    meta: {
+      test: testName,
+      participant: participantName||'Unknown',
+      age: participantAge||'--',
+      date: dd+'/'+mm+'/'+yy,
+      time: hh+':'+mi+':'+ss,
+      timestamp: d.toISOString(),
+      filePath: fileName
+    },
+    results: resultData
+  };
+  var json = JSON.stringify(payload, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name+'_'+testName+'_'+dateStr+'_'+timeStr+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+
+
+
+
+
+
+/* ═══ HTML REPORT EXPORT ═══ */
+function triggerSave(){
+  // Clone the results section exactly as displayed
+  var resultsEl = document.querySelector('.screen.active') || document.querySelector('#s-results.active') || document.querySelector('.results-view') || document.querySelector('#resultsCard');
+  if(!resultsEl){
+    // Try alternate selectors
+    resultsEl = document.querySelector('#s-results') || document.querySelector('.result-card') || document.querySelector('[class*="result"]');
+  }
+  if(!resultsEl){alert('No results to export');return}
+  
+  // Get all styles from the page
+  var styles='';
+  document.querySelectorAll('style').forEach(function(s){styles+=s.outerHTML});
+  // Get linked fonts
+  var fonts='';
+  document.querySelectorAll('link[href*="font"]').forEach(function(l){fonts+=l.outerHTML});
+  
+  // Build standalone HTML
+  var pName=window.participantName||window._pName||'Participant';
+  var pAge=window.participantAge||window._pAge||'';
+  var testTitle=document.title||'ManMulyankan Assessment';
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">';
+  html+='<title>'+testTitle+' — Results for '+pName+'</title>';
+  html+=fonts;
+  html+=styles;
+  html+='<style>';
+  html+='body{background:#1e2028!important;color:#c8ccd4!important;font-family:"Outfit",sans-serif!important;padding:20px!important;min-height:auto!important}';
+  html+='.topbar,.shapes,.shapes-layer,.progress-wrap,.tb,.search-wrap,.ai-modal-bg{display:none!important}';
+  html+='.screen,.screen.active{display:block!important}';
+  html+='.main,.wrap,.container{max-width:800px!important;margin:0 auto!important;padding:20px!important}';
+  // Print styles
+  html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+  html+='.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button{display:none!important}';
+  html+='.card,.q-card,.result-card,.interp-box{border:1px solid #ddd!important;box-shadow:none!important}';
+  html+='.score-ring-wrap svg circle,.iq-ring svg circle,.domain-fill,.cat-fill{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}}';
+  html+='</style></head><body>';
+  
+  // Header
+  html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
+  html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
+  if(pAge) html+='<span><strong style="color:#6b8aff">Age:</strong> '+pAge+'</span>';
+  html+='<span><strong style="color:#6b8aff">Date:</strong> '+dateStr+'</span>';
+  html+='</div></div>';
+  
+  // Clone results content
+  var clone=resultsEl.cloneNode(true);
+  // Remove buttons from clone
+  clone.querySelectorAll('.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button,[onclick*="reload"],[onclick*="restart"],[onclick*="triggerSave"],[onclick*="Start"]').forEach(function(el){el.remove()});
+  // Remove progress bar from clone
+  clone.querySelectorAll('.progress-wrap,.progress-bar').forEach(function(el){el.remove()});
+  
+  html+='<div class="main" style="padding:0">'+clone.innerHTML+'</div>';
+  
+  // Footer
+  html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
+  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
+  
+  html+='<script src="/game-fx.js"></script>
+</body></html>';
+  
+  // Download as HTML file
+  var safeName=(pName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var testKey=document.title.split('—')[0].trim().replace(/[^a-zA-Z0-9]/g,'_');
+  var d=now;
+  var fileName=safeName+'_'+testKey+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.html';
+  
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+<script src="/game-fx.js"></script>
+</body>
+</html>

@@ -1,0 +1,3619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Digit Span Test — ManMulyankan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+
+/* ══════════════════════════════════════════
+   CSS VARIABLES & RESET
+══════════════════════════════════════════ */
+:root {
+  --bg:           #1e2028;
+  --bg2:          #2a2d35;
+  --bg3:          #33363e;
+  --bg4:          #3c3f48;
+  --border:       #3e414a;
+  --border2:      #4a4d56;
+
+  --text:         #eaecf0;
+  --text-sub:     #9498a4;
+  --text-dim:     #5a5e6a;
+
+  --accent1:      #6b8aff;
+  --accent1-glow: rgba(107,138,255,0.2);
+  --accent2:      #5bb8f5;
+  --accent2-glow: rgba(91,184,245,0.15);
+
+  --s-forward:    #5bb8f5;
+  --s-backward:   #b49dff;
+
+  --success:      #5ec49a;
+  --success-bg:   rgba(94,196,154,0.12);
+  --error:        #f07070;
+  --error-bg:     rgba(240,112,112,0.12);
+  --warn:         #f0b830;
+
+  --radius:       14px;
+  --radius-sm:    8px;
+  --radius-lg:    20px;
+
+  --shadow:       0 8px 32px rgba(0,0,0,0.35);
+  --shadow-sm:    0 4px 16px rgba(0,0,0,0.25);
+
+  --transition:   0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 16px 60px;
+  line-height: 1.6;
+}
+
+/* ── Utility ── */
+.hidden { display: none !important; }
+
+/* ══════════════════════════════════════════
+   WELCOME SCREEN — LAYOUT
+══════════════════════════════════════════ */
+#welcomeScreen {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  animation: fadeUp 0.55s ease both;
+}
+
+/* Badge */
+.welcome-badge {
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 99px;
+}
+
+/* Title */
+.welcome-title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text) 40%, var(--accent1));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
+
+/* Subtitle */
+.welcome-sub {
+  max-width: 600px;
+  text-align: center;
+  color: var(--text-sub);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+/* ══════════════════════════════════════════
+   INFO GRID (4 stats cards)
+══════════════════════════════════════════ */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .info-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.info-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 14px;
+  text-align: center;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.info-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+}
+
+.ic-icon  { font-size: 1.5rem; margin-bottom: 6px; }
+.ic-title { font-size: 0.68rem; color: var(--text-sub); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em; }
+.ic-val   { font-size: 1.15rem; font-weight: 800; color: var(--text);
+            margin-top: 4px; }
+
+/* ══════════════════════════════════════════
+   SETS PREVIEW CARDS (2 sets)
+══════════════════════════════════════════ */
+.sets-preview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 540px) {
+  .sets-preview { grid-template-columns: 1fr; }
+}
+
+.set-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color var(--transition), transform var(--transition),
+              box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.set-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.set-card.sf::before { background: var(--s-forward); }
+.set-card.sb::before { background: var(--s-backward); }
+
+.set-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border2);
+}
+
+.set-letter {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 2px;
+}
+.set-card.sf .set-letter { color: var(--s-forward); }
+.set-card.sb .set-letter { color: var(--s-backward); }
+
+.set-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.set-desc {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  line-height: 1.65;
+  flex: 1;
+}
+
+/* Complexity tags */
+.complexity-tag {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 99px;
+  width: fit-content;
+  margin-top: 4px;
+}
+.complexity-tag.low {
+  background: rgba(66,165,245,0.12);
+  color: var(--s-forward);
+  border: 1px solid rgba(66,165,245,0.3);
+}
+.complexity-tag.high {
+  background: rgba(167,139,250,0.12);
+  color: var(--s-backward);
+  border: 1px solid rgba(167,139,250,0.3);
+}
+
+/* ══════════════════════════════════════════
+   BEGIN BUTTON
+══════════════════════════════════════════ */
+.begin-btn {
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 16px 48px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition),
+              opacity var(--transition);
+  box-shadow: 0 4px 24px var(--accent1-glow);
+}
+.begin-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 32px var(--accent1-glow);
+}
+.begin-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 1;    transform: scale(1);    }
+  50%      { opacity: 0.65; transform: scale(0.96); }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.7);  }
+  70%  { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+
+
+/* ══════════════════════════════════════════
+   DESIGN SYSTEM ADDITIONS
+══════════════════════════════════════════ */
+.hidden{display:none!important}
+.shapes-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.shape{position:absolute;opacity:0;animation:shapeAppear 2s ease forwards}
+.sh-c1{top:-80px;right:-60px;width:420px;height:420px;border:3px solid rgba(107,138,255,.5);border-radius:50%;animation:shapeAppear 1.5s .2s ease forwards,driftAnim 25s ease-in-out infinite}
+.sh-s1{bottom:60px;left:-30px;width:180px;height:180px;border:3px solid rgba(240,184,48,.45);transform:rotate(15deg);animation:shapeAppear 1.5s .5s ease forwards,spinAnim 40s linear infinite}
+.sh-t1{top:40%;right:5%;width:0;height:0;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:120px solid rgba(240,112,112,.35);animation:shapeAppear 1.5s .8s ease forwards,bobAnim 18s ease-in-out infinite}
+.sh-c2{top:55%;left:3%;width:100px;height:100px;border:2.5px solid rgba(143,173,255,.45);border-radius:50%;animation:shapeAppear 1.5s 1s ease forwards,driftAnim 20s ease-in-out infinite reverse}
+.sh-c3{bottom:15%;right:12%;width:160px;height:160px;border:2px dashed rgba(143,173,255,.3);border-radius:50%;animation:shapeAppear 1.5s 1s ease forwards,spinAnim 50s linear infinite}
+@keyframes shapeAppear{to{opacity:.35}}
+@keyframes driftAnim{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,20px)}}
+@keyframes bobAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes spinAnim{to{transform:rotate(375deg)}}
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");background-size:128px 128px}
+.topbar{position:sticky;top:0;z-index:200;width:100%;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.92);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:1px solid rgba(107,138,255,.1);box-shadow:0 1px 24px rgba(0,0,0,.15)}
+.tb-logo{width:36px;height:36px;background:var(--accent1);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px var(--accent1-glow);position:relative;overflow:hidden}
+.tb-logo::before{content:'';position:absolute;top:6px;left:6px;width:10px;height:10px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:5px;right:5px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid rgba(255,255,255,.6)}
+.tb-title{font-size:.95rem;font-weight:800;color:var(--text);letter-spacing:-.03em}
+.tb-sub{font-size:.66rem;color:var(--text-sub);font-weight:500;margin-top:1px}
+.tb-badge{margin-left:auto;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent1);background:var(--accent1-glow);border:1px solid rgba(107,138,255,.15);padding:5px 14px;border-radius:50px}
+#s-participant{display:none;width:100%;max-width:860px}
+#s-participant.active{display:flex;flex-direction:column;align-items:center;animation:fadeUp .5s ease both}
+.pi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px 32px;width:100%;text-align:center;box-shadow:var(--shadow-sm)}
+.pi-avatar{width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,var(--accent1),var(--accent2));border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:#fff;box-shadow:0 6px 24px var(--accent1-glow);position:relative}
+.pi-avatar::after{content:'';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border:2px solid var(--warn);border-radius:3px;transform:rotate(20deg);animation:spinAnim 10s linear infinite}
+.pi-title{font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:6px}
+.pi-sub{font-size:.86rem;color:var(--text-sub);margin-bottom:28px;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto}
+.field-group{display:flex;flex-direction:column;gap:6px}.field-group.full{grid-column:1/-1}
+.field-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-sub);display:flex;align-items:center;gap:6px}
+.field-label::before{content:'';width:5px;height:5px;background:var(--accent1);border-radius:1px;transform:rotate(45deg)}
+.field-input{width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:var(--radius);background:var(--bg3);font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:500;color:var(--text);transition:all .25s;outline:none}
+.field-input::placeholder{color:var(--text-dim)}
+.field-input:focus{border-color:var(--accent1);box-shadow:0 0 0 4px var(--accent1-glow)}
+.field-input.err{border-color:var(--error);box-shadow:0 0 0 4px var(--error-bg)}
+.field-error{font-size:.72rem;color:var(--error);font-weight:600;min-height:16px;margin-top:2px}
+.pi-note{font-size:.74rem;color:var(--text-sub);line-height:1.55;margin-bottom:24px;display:flex;align-items:flex-start;gap:8px;justify-content:center}
+.pi-note-icon{width:16px;height:16px;min-width:16px;border-radius:50%;border:1.5px solid var(--text-dim);display:grid;place-items:center;font-size:.55rem;font-weight:900;color:var(--text-sub);margin-top:1px}
+.participant-banner{display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin:20px 36px 0}
+.pb-avatar{width:44px;height:44px;background:var(--accent1);border-radius:50%;display:grid;place-items:center;font-size:1.1rem;color:#fff;font-weight:800;flex-shrink:0;box-shadow:0 2px 8px var(--accent1-glow);font-family:'Outfit',sans-serif}
+.pb-info{display:flex;flex-direction:column;gap:2px}
+.pb-name{font-size:.95rem;font-weight:700;color:var(--text)}
+.pb-meta{font-size:.76rem;color:var(--text-sub);font-weight:500;display:flex;align-items:center;gap:8px}
+.pb-meta .pb-dot{width:3px;height:3px;background:var(--text-dim);border-radius:50%}
+.test-nav{display:flex;gap:10px;padding:16px 28px;border-top:1px solid var(--border)}
+.btn-nav{padding:7px 18px;font-size:.78rem;font-weight:600;background:var(--bg3);color:var(--text-sub);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.btn-nav:hover{border-color:var(--accent1);color:var(--accent1)}
+.btn-nav.btn-stop{background:var(--error-bg);color:var(--error);border-color:rgba(240,112,112,.2)}
+.btn-nav.btn-stop:hover{background:var(--error);color:#fff}
+#welcomeScreen,#testArea,#resultsCard,#s-participant{position:relative;z-index:10}
+
+
+/* ═══ MOBILE RESPONSIVE ENHANCEMENTS ═══ */
+@media(max-width:600px){
+  body{font-size:14px}
+  .topbar,.tb{padding:10px 14px!important;gap:8px!important}
+  .tb-title,.tb-t{font-size:.85rem!important}
+  .tb-badge{font-size:.5rem!important;padding:3px 8px!important}
+  button,input{font-size:16px!important;-webkit-appearance:none}
+  .main,.wrap,.container{padding-left:14px!important;padding-right:14px!important}
+}
+@media(max-width:400px){
+  .topbar,.tb{flex-wrap:wrap}
+}
+
+/* ═══ FLOWING PROGRESS DOT ═══ */
+.progress-fill,.prog-fill,.cat-fill,.domain-fill{position:relative}
+.progress-fill::after,.prog-fill::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--yellow,#f0b830);border-radius:50%;box-shadow:0 0 12px rgba(240,184,48,.6),0 0 24px rgba(240,184,48,.3);animation:dotPulse 1.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(240,184,48,.5),0 0 16px rgba(240,184,48,.2)}50%{box-shadow:0 0 16px rgba(240,184,48,.8),0 0 32px rgba(240,184,48,.4)}}
+</style>
+<style>
+
+
+/* ══════════════════════════════════════════
+   MAIN WRAPPER
+══════════════════════════════════════════ */
+#testArea {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeUp 0.45s ease both;
+}
+
+/* ══════════════════════════════════════════
+   TOP PROGRESS HEADER
+══════════════════════════════════════════ */
+.test-header {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.th-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.th-meta {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+.th-scores {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.th-score-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  min-width: 80px;
+}
+
+.tsp-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-sub);
+}
+
+.tsp-val {
+  font-size: 1.35rem;
+  font-weight: 900;
+  margin-top: 2px;
+}
+
+.tsp-val.forward  { color: var(--s-forward);  }
+.tsp-val.backward { color: var(--s-backward); }
+.tsp-val.combined { color: var(--accent1);    }
+
+/* ══════════════════════════════════════════
+   SET TABS
+══════════════════════════════════════════ */
+.tab-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.tab-btn {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.tab-btn.forward-tab::after  { background: var(--s-forward); }
+.tab-btn.backward-tab::after { background: var(--s-backward); }
+
+.tab-btn.active {
+  color: var(--text);
+  background: var(--bg3);
+  border-color: var(--border2);
+}
+
+.tab-btn.active::after { opacity: 1; }
+
+.tab-btn.done {
+  color: var(--success);
+  border-color: rgba(102,187,106,0.30);
+}
+
+.tab-btn.done::after {
+  background: var(--success);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════
+   PANEL WRAPPER
+══════════════════════════════════════════ */
+.panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  animation: fadeIn 0.3s ease both;
+}
+
+/* ── Panel Header ── */
+.panel-header {
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ph-left { display: flex; flex-direction: column; gap: 3px; }
+
+.ph-set-tag {
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.ph-set-tag.sf { color: var(--s-forward);  }
+.ph-set-tag.sb { color: var(--s-backward); }
+
+.ph-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.ph-sub {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+}
+
+/* Panel header right — score tracker */
+.ph-score-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  text-align: center;
+  min-width: 90px;
+}
+
+.psb-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+
+.psb-val {
+  font-size: 1.7rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.psb-val.sf { color: var(--s-forward);  }
+.psb-val.sb { color: var(--s-backward); }
+
+/* ══════════════════════════════════════════
+   ITEM PROGRESS TABLE
+══════════════════════════════════════════ */
+.items-table {
+  padding: 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.items-table::-webkit-scrollbar { width: 5px; }
+.items-table::-webkit-scrollbar-track { background: transparent; }
+.items-table::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 99px;
+}
+
+/* Single item row */
+.item-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 60px 60px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.item-row:last-child  { border-bottom: none; }
+.item-row.active-row  { background: var(--bg3); margin: 0 -28px; padding: 10px 28px; }
+.item-row.skipped-row { opacity: 0.4; }
+
+.ir-letter {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--text-sub);
+  text-align: center;
+}
+
+.ir-digits {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.08em;
+}
+
+.ir-digits.revealed { color: var(--text); }
+
+/* Trial dot columns */
+.ir-trial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trial-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  transition: all var(--transition);
+  background: var(--bg3);
+}
+
+.trial-dot.correct {
+  border-color: var(--success);
+  background: var(--success-bg);
+  color: var(--success);
+  animation: popIn 0.3s ease both;
+}
+
+.trial-dot.incorrect {
+  border-color: var(--error);
+  background: var(--error-bg);
+  color: var(--error);
+  animation: popIn 0.3s ease both;
+}
+
+.trial-dot.active-dot {
+  border-color: var(--accent1);
+  background: var(--accent1-glow);
+  color: var(--accent1);
+  animation: pulse 1.4s infinite;
+}
+
+.ir-span-label {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Column headers */
+.item-row-header {
+  display: grid;
+  grid-template-columns: 28px 1fr 60px 60px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0 6px;
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+  z-index: 2;
+  border-bottom: 1px solid var(--border2);
+}
+
+.irh-cell {
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-align: center;
+}
+.irh-cell:nth-child(2) { text-align: left; }
+.irh-cell:last-child   { text-align: right; }
+
+/* ══════════════════════════════════════════
+   TRIAL ENGINE AREA
+══════════════════════════════════════════ */
+.trial-engine {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ── Ready Screen ── */
+.ready-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.rs-icon    { font-size: 2.4rem; }
+.rs-title   { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+.rs-sub     {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+  max-width: 480px;
+  line-height: 1.7;
+}
+
+/* ── Digit Display Stage ── */
+.digit-stage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Digit frame */
+.digit-frame {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.digit-frame.playing {
+  border-color: var(--accent1);
+  box-shadow: 0 0 40px var(--accent1-glow);
+}
+
+.digit-frame.waiting {
+  border-color: var(--border2);
+}
+
+.digit-frame.input-mode {
+  border-color: var(--accent2);
+  box-shadow: 0 0 32px var(--accent2-glow);
+}
+
+/* The big digit number displayed */
+.digit-display {
+  font-size: 5.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text);
+  transition: all 0.12s ease;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.digit-display.flash-in {
+  animation: popIn 0.18s ease both;
+}
+
+.digit-display.blank { color: transparent; }
+
+/* Countdown ring position indicator */
+.digit-pos {
+  position: absolute;
+  bottom: -30px;
+  display: flex;
+  gap: 5px;
+}
+
+.dp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: background var(--transition), transform var(--transition);
+}
+
+.dp-dot.shown   { background: var(--accent1); transform: scale(1.3); }
+.dp-dot.current { background: var(--warn);    transform: scale(1.5);
+                  box-shadow: 0 0 8px var(--warn); }
+
+/* Status label under frame */
+.digit-status {
+  margin-top: 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-sub);
+  text-align: center;
+  min-height: 22px;
+}
+
+/* ── Sequence Progress Bar ── */
+.seq-progress-wrap {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.spw-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-sub);
+  text-align: center;
+}
+
+.seq-bar-bg {
+  width: 100%;
+  height: 5px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.seq-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* ══════════════════════════════════════════
+   ANSWER DISPLAY (user's typed input)
+══════════════════════════════════════════ */
+.answer-area {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.answer-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-sub);
+}
+
+/* Digit answer boxes row */
+.answer-boxes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 56px;
+  align-items: center;
+}
+
+.ans-box {
+  width: 44px;
+  height: 54px;
+  background: var(--bg3);
+  border: 2px solid var(--border2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text);
+  transition: border-color var(--transition), transform var(--transition),
+              box-shadow var(--transition);
+  font-variant-numeric: tabular-nums;
+}
+
+.ans-box.filled {
+  border-color: var(--accent2);
+  box-shadow: 0 0 12px var(--accent2-glow);
+  animation: popIn 0.2s ease both;
+}
+
+.ans-box.empty-slot {
+  color: var(--text-dim);
+  border-style: dashed;
+}
+
+.ans-box.correct-box {
+  border-color: var(--success);
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.ans-box.incorrect-box {
+  border-color: var(--error);
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+/* ══════════════════════════════════════════
+   NUMBER PAD
+══════════════════════════════════════════ */
+.num-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.np-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 16px 10px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  letter-spacing: -0.01em;
+  user-select: none;
+}
+
+.np-btn:hover:not(:disabled) {
+  background: var(--bg4);
+  border-color: var(--accent1);
+  color: var(--accent1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--accent1-glow);
+}
+
+.np-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.np-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Backspace key */
+.np-btn.np-back {
+  grid-column: span 1;
+  font-size: 1rem;
+  color: var(--warn);
+  border-color: rgba(255,167,38,0.25);
+}
+
+.np-btn.np-back:hover:not(:disabled) {
+  background: rgba(255,167,38,0.08);
+  border-color: var(--warn);
+  color: var(--warn);
+  box-shadow: 0 4px 12px rgba(255,167,38,0.2);
+}
+
+/* Submit key */
+.np-btn.np-submit {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  border: none;
+  color: #fff;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.np-btn.np-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px var(--accent1-glow);
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════
+   FEEDBACK BANNER
+══════════════════════════════════════════ */
+.feedback-banner {
+  width: 100%;
+  max-width: 480px;
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  display: none;
+  animation: fadeIn 0.2s ease both;
+}
+
+.feedback-banner.show { display: block; }
+
+.feedback-banner.fb-correct {
+  background: var(--success-bg);
+  border: 1px solid rgba(102,187,106,0.30);
+  color: var(--success);
+}
+
+.feedback-banner.fb-incorrect {
+  background: var(--error-bg);
+  border: 1px solid rgba(239,83,80,0.30);
+  color: var(--error);
+}
+
+.feedback-banner.fb-info {
+  background: rgba(66,165,245,0.08);
+  border: 1px solid rgba(66,165,245,0.25);
+  color: var(--accent2);
+}
+
+/* ══════════════════════════════════════════
+   ACTION BUTTONS (Start / Reset)
+══════════════════════════════════════════ */
+.action-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  border: none;
+  border-radius: 99px;
+  padding: 12px 32px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.action-btn.start-btn {
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  color: #fff;
+  box-shadow: 0 4px 18px var(--accent1-glow);
+}
+
+.action-btn.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px var(--accent1-glow);
+}
+
+.action-btn.reset-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text-sub);
+}
+
+.action-btn.reset-btn:hover {
+  border-color: var(--warn);
+  color: var(--warn);
+  background: rgba(255,167,38,0.06);
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════
+   DISCONTINUATION NOTICE
+══════════════════════════════════════════ */
+.stop-notice {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(239,83,80,0.07);
+  border: 1px solid rgba(239,83,80,0.22);
+  border-radius: var(--radius-sm);
+  padding: 14px 20px;
+  font-size: 0.8rem;
+  color: var(--error);
+  font-weight: 700;
+  text-align: center;
+  display: none;
+  animation: fadeIn 0.25s ease both;
+}
+
+.stop-notice.show { display: block; }
+
+/* ══════════════════════════════════════════
+   RESULTS CARD
+══════════════════════════════════════════ */
+#resultsCard {
+  width: 100%;
+  max-width: 860px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+#resultsCard.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Results header */
+.results-header {
+  padding: 32px 36px 26px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.rh-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.rh-sub {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+  margin-top: 4px;
+}
+
+/* ── Final Score Trio ── */
+.score-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 28px 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 500px) {
+  .score-trio { grid-template-columns: 1fr; }
+}
+
+.st-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.st-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.st-box.fwd::before { background: var(--s-forward);  }
+.st-box.bwd::before { background: var(--s-backward); }
+.st-box.cmb::before { background: var(--accent1);    }
+
+.stb-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-sub);
+}
+
+.stb-score {
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.stb-score.fwd { color: var(--s-forward);  }
+.stb-score.bwd { color: var(--s-backward); }
+.stb-score.cmb { color: var(--accent1);    }
+
+.stb-out-of {
+  font-size: 0.72rem;
+  color: var(--text-sub);
+}
+
+.stb-span {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ── Results Section Title ── */
+.res-section-title {
+  padding: 22px 36px 10px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-sub);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Detail Rows (per item breakdown) ── */
+.detail-grid {
+  padding: 0 36px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-row {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  display: grid;
+  grid-template-columns: 32px 1fr 80px 80px 80px;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.78rem;
+}
+
+.dr-item {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: var(--text-sub);
+  text-align: center;
+}
+
+.dr-digits {
+  font-family: 'Courier New', monospace;
+  color: var(--text-sub);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.dr-t1, .dr-t2 {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.dr-score {
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.88rem;
+}
+
+.dr-score.s2  { color: var(--success); }
+.dr-score.s1  { color: var(--warn);    }
+.dr-score.s0  { color: var(--error);   }
+
+/* ── Interpretation Block ── */
+.interp-section {
+  padding: 0 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.interp-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent1);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+}
+
+.ib-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.ib-text {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  line-height: 1.75;
+}
+
+/* ── Span Length visual bar ── */
+.span-bar-section {
+  padding: 0 36px 24px;
+}
+
+.sbs-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.sbs-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 60px;
+  align-items: center;
+  gap: 14px;
+}
+
+.sbs-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-align: right;
+}
+
+.sbs-bar-bg {
+  height: 10px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.sbs-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sbs-bar-fill.fwd { background: var(--s-forward);  }
+.sbs-bar-fill.bwd { background: var(--s-backward); }
+
+.sbs-val {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════════
+   RESTART BUTTON (Results bottom)
+══════════════════════════════════════════ */
+.results-footer {
+  padding: 24px 36px 32px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+}
+
+.restart-btn {
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 14px 42px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 20px var(--accent1-glow);
+}
+
+.restart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px var(--accent1-glow);
+}
+
+.restart-btn:active {
+  transform: scale(0.97);
+}
+
+/* ══════════════════════════════════════════
+   SET COMPLETE OVERLAY (between sets)
+══════════════════════════════════════════ */
+.set-complete-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.set-complete-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.sco-card {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 44px 48px;
+  max-width: 440px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+  box-shadow: var(--shadow);
+}
+
+.sco-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.sco-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.sco-sub {
+  font-size: 0.83rem;
+  color: var(--text-sub);
+  line-height: 1.7;
+  max-width: 340px;
+}
+
+.sco-score-pill {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 16px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.sco-score-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-sub);
+}
+
+.sco-score-val {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sco-score-val.fwd { color: var(--s-forward);  }
+.sco-score-val.bwd { color: var(--s-backward); }
+
+.sco-next-btn {
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 14px 40px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 18px var(--accent1-glow);
+  margin-top: 6px;
+}
+
+.sco-next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px var(--accent1-glow);
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE TWEAKS
+══════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .test-header   { flex-direction: column; align-items: flex-start; }
+  .th-scores     { width: 100%; justify-content: space-between; }
+  .panel-header  { flex-direction: column; align-items: flex-start; }
+  .item-row      { grid-template-columns: 22px 1fr 48px 48px; }
+  .ir-span-label { display: none; }
+  .trial-engine  { padding: 20px 16px; }
+  .digit-frame   { width: 140px; height: 140px; }
+  .digit-display { font-size: 4rem; }
+  .detail-row    {
+    grid-template-columns: 28px 1fr 60px 60px 50px;
+    font-size: 0.72rem;
+  }
+  .results-header { flex-direction: column; }
+  .score-trio    { gap: 10px; }
+  .stb-score     { font-size: 2.4rem; }
+  .sbs-row       { grid-template-columns: 80px 1fr 50px; }
+  .interp-section,
+  .detail-grid,
+  .span-bar-section,
+  .results-footer { padding-left: 20px; padding-right: 20px; }
+  .results-header { padding: 22px 20px 18px; }
+  .res-section-title { padding-left: 20px; padding-right: 20px; }
+  .score-trio    { padding: 20px; }
+  .num-pad       { max-width: 260px; }
+  .np-btn        { padding: 14px 8px; font-size: 1.15rem; }
+}
+
+@media (max-width: 400px) {
+  .digit-frame   { width: 120px; height: 120px; }
+  .digit-display { font-size: 3.4rem; }
+  .ans-box       { width: 36px; height: 46px; font-size: 1.2rem; }
+  .sco-card      { padding: 32px 24px; }
+}
+
+
+
+.btn-save{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 2px 8px rgba(94,196,154,.2)}
+.btn-save:hover{background:#4aaf86;transform:translateY(-1px)}
+.btn-save::before{content:'';display:inline-block;width:14px;height:14px;border:2px solid #fff;border-radius:3px;position:relative}
+.btn-save::after{content:'';position:absolute;width:6px;height:3px;border-bottom:2px solid #fff;border-left:2px solid #fff;transform:rotate(-45deg);margin-left:-11px;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="shapes-layer"><div class="shape sh-c1"></div><div class="shape sh-s1"></div><div class="shape sh-t1"></div><div class="shape sh-c2"></div><div class="shape sh-c3"></div></div>
+<div class="topbar"><a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">ManMulyankan</div><div class="tb-sub">Digit Span Test</div></div></a>
+  <a href="/" style="margin-left:auto;font-size:.76rem;color:var(--slate);text-decoration:none;font-weight:600;padding:6px 14px;border:1px solid var(--ice,#363840);border-radius:8px;transition:all .2s" onmouseover="this.style.color='var(--blue,#6b8aff)';this.style.borderColor='var(--blue,#6b8aff)'" onmouseout="this.style.color='var(--slate,#9498a4)';this.style.borderColor='var(--ice,#363840)'">All Tests</a><span class="tb-badge" style="margin-left:0">Cognitive Assessment</span></div>
+
+
+<!-- ══════════════════════════════════════════
+     WELCOME SCREEN
+══════════════════════════════════════════ -->
+<div id="welcomeScreen">
+
+  <span class="welcome-badge">Neuropsychological Assessment</span>
+
+  <h1 class="welcome-title">Digit Span Test</h1>
+
+  <p class="welcome-sub">
+    A standardised measure of <strong>short-term</strong> and
+    <strong>working memory</strong> capacity. You will hear a sequence of
+    digits displayed one at a time, then recall them in the correct order.
+    Listen carefully — each sequence is shown <em>once only</em>.
+  </p>
+
+  <!-- Info stat cards -->
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="ic-icon"></div>
+      <div class="ic-title">Sets</div>
+      <div class="ic-val">2</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon"></div>
+      <div class="ic-title">Total Items</div>
+      <div class="ic-val">15</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon"></div>
+      <div class="ic-title">Pace</div>
+      <div class="ic-val">1/sec</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon"></div>
+      <div class="ic-title">Max Span</div>
+      <div class="ic-val">9 digits</div>
+    </div>
+  </div>
+
+  <!-- Sets preview -->
+  <div class="sets-preview">
+
+    <div class="set-card sf">
+      <div class="set-letter">Set 1</div>
+      <div class="set-name">Digits Forward</div>
+      <div class="set-desc">
+        Sequences of 2 to 9 digits are displayed one per second.
+        Repeat the digits back in the <strong>exact same order</strong>.
+        Tests short-term auditory memory and attention.
+      </div>
+      <span class="complexity-tag low">8 Items · 2 Trials Each</span>
+    </div>
+
+    <div class="set-card sb">
+      <div class="set-letter">Set 2</div>
+      <div class="set-name">Digits Backward</div>
+      <div class="set-desc">
+        Sequences of 2 to 8 digits are displayed one per second.
+        Repeat the digits back in <strong>reverse order</strong>.
+        Tests working memory and mental manipulation ability.
+      </div>
+      <span class="complexity-tag high">7 Items · 2 Trials Each</span>
+    </div>
+
+  </div>
+
+  <!-- Instructions note -->
+  <div style="
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent1);
+    border-radius:var(--radius-sm);
+    padding:16px 22px;
+    width:100%;
+    max-width:680px;
+    font-size:0.8rem;
+    color:var(--text-sub);
+    line-height:1.8;
+  ">
+    <strong style="color:var(--text);display:block;margin-bottom:6px;">
+      Instructions
+    </strong>
+    Watch each digit carefully as it appears on screen.
+    After the full sequence has been shown, a number pad will appear —
+    enter the digits you recall using the on-screen pad or your keyboard.
+    The test stops automatically after <strong style="color:var(--text);">
+    two consecutive failures</strong> on any given item length.
+  </div>
+
+  <button class="begin-btn" onclick="startTest()">
+    Begin Assessment
+  </button>
+
+</div><!-- /welcomeScreen -->
+
+<!-- PARTICIPANT DETAILS -->
+<div id="s-participant">
+  <div class="pi-card">
+    <div class="pi-avatar">&#128100;</div>
+    <h2 class="pi-title">Participant Details</h2>
+    <p class="pi-sub">Please enter your information before starting the assessment.</p>
+    <div class="field-row">
+      <div class="field-group full"><label class="field-label" for="piName">Full Name</label><input type="text" class="field-input" id="piName" placeholder="e.g. John Smith" autocomplete="name" maxlength="16"><div class="field-error" id="piNameErr"></div></div>
+      <div class="field-group"><label class="field-label" for="piAge">Age</label><input type="number" class="field-input" id="piAge" placeholder="e.g. 34" min="5" max="120"><div class="field-error" id="piAgeErr"></div></div>
+    </div>
+    <div class="pi-note"><span class="pi-note-icon">i</span><span>Your information is only used locally for your results report.</span></div>
+    <button class="begin-btn" id="piStartBtn">Start Assessment</button>
+  </div>
+</div>
+
+
+
+<!-- ══════════════════════════════════════════
+     MAIN TEST AREA
+══════════════════════════════════════════ -->
+<div id="testArea" class="hidden">
+
+  <!-- Top running score header -->
+  <div class="test-header">
+    <div>
+      <div class="th-title" id="thTitle">Set 1 — Digits Forward</div>
+      <div class="th-meta" id="thMeta">Item A · Trial 1 of 2</div>
+    </div>
+    <div class="th-scores">
+      <div class="th-score-pill">
+        <span class="tsp-label">Forward</span>
+        <span class="tsp-val forward" id="liveScoreFwd">0</span>
+      </div>
+      <div class="th-score-pill">
+        <span class="tsp-label">Backward</span>
+        <span class="tsp-val backward" id="liveScoreBwd">0</span>
+      </div>
+      <div class="th-score-pill">
+        <span class="tsp-label">Combined</span>
+        <span class="tsp-val combined" id="liveScoreCmb">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Set tab switcher -->
+  <div class="tab-row">
+    <button class="tab-btn forward-tab active" id="tabFwd"
+            onclick="switchTab('fwd')">
+      Set 1 · Digits Forward
+    </button>
+    <button class="tab-btn backward-tab" id="tabBwd"
+            onclick="switchTab('bwd')">
+      Set 2 · Digits Backward
+    </button>
+  </div>
+
+  <!-- ── PANEL: Set 1 Forward ── -->
+  <div class="panel" id="panelFwd">
+
+    <!-- Panel header -->
+    <div class="panel-header">
+      <div class="ph-left">
+        <span class="ph-set-tag sf">Set 1 — Forward</span>
+        <span class="ph-title">Repeat digits in the same order</span>
+        <span class="ph-sub">
+          2 trials per item · Sequence length increases each item
+        </span>
+      </div>
+      <div class="ph-score-box">
+        <div class="psb-label">Score</div>
+        <div class="psb-val sf" id="scoreFwdDisplay">0</div>
+      </div>
+    </div>
+
+    <!-- Items progress table -->
+    <div class="items-table">
+
+      <!-- Column headers -->
+      <div class="item-row-header">
+        <span class="irh-cell">Item</span>
+        <span class="irh-cell" style="text-align:left">Sequence</span>
+        <span class="irh-cell">Trial 1</span>
+        <span class="irh-cell">Trial 2</span>
+        <span class="irh-cell" style="text-align:right">Span</span>
+      </div>
+
+      <!-- Items A–H populated by JS -->
+      <div id="fwdTableRows"></div>
+
+    </div><!-- /items-table -->
+
+    <!-- Trial engine -->
+    <div class="trial-engine" id="engineFwd">
+
+      <!-- STATE 1: Ready screen -->
+      <div class="ready-screen" id="fwdReady">
+        <div class="rs-icon"></div>
+        <div class="rs-title" id="fwdReadyTitle">Ready for Item A · Trial 1</div>
+        <div class="rs-sub">
+          Watch the digits as they appear one per second.
+          After the last digit, enter what you saw using the number pad.
+          Do <strong>not</strong> write anything down.
+        </div>
+        <div class="action-row">
+          <button class="action-btn start-btn" id="fwdStartBtn"
+                  onclick="beginSequence('fwd')">
+            Show Sequence
+          </button>
+        </div>
+      </div>
+
+      <!-- STATE 2: Playing sequence -->
+      <div class="digit-stage hidden" id="fwdPlaying">
+
+        <div class="digit-frame" id="fwdFrame">
+          <span class="digit-display" id="fwdDigit">–</span>
+          <div class="digit-pos" id="fwdDots"></div>
+        </div>
+
+        <div class="digit-status" id="fwdStatus">
+          Preparing sequence…
+        </div>
+
+        <div class="seq-progress-wrap">
+          <div class="spw-label" id="fwdProgressLabel">0 of 0 digits shown</div>
+          <div class="seq-bar-bg">
+            <div class="seq-bar-fill" id="fwdSeqBar"></div>
+          </div>
+        </div>
+
+      </div><!-- /fwdPlaying -->
+
+      <!-- STATE 3: Input mode -->
+      <div class="hidden" id="fwdInput">
+
+        <div class="answer-area">
+          <div class="answer-label" id="fwdAnsLabel">
+            Enter the digits in order
+          </div>
+          <div class="answer-boxes" id="fwdAnsBoxes"></div>
+        </div>
+
+        <div class="num-pad" id="fwdPad">
+          <button class="np-btn" onclick="padPress('fwd',1)">1</button>
+          <button class="np-btn" onclick="padPress('fwd',2)">2</button>
+          <button class="np-btn" onclick="padPress('fwd',3)">3</button>
+          <button class="np-btn" onclick="padPress('fwd',4)">4</button>
+          <button class="np-btn" onclick="padPress('fwd',5)">5</button>
+          <button class="np-btn" onclick="padPress('fwd',6)">6</button>
+          <button class="np-btn" onclick="padPress('fwd',7)">7</button>
+          <button class="np-btn" onclick="padPress('fwd',8)">8</button>
+          <button class="np-btn" onclick="padPress('fwd',9)">9</button>
+          <button class="np-btn" onclick="padPress('fwd',0)">0</button>
+          <button class="np-btn np-back"
+                  onclick="padBack('fwd')">⌫</button>
+          <button class="np-btn np-submit"
+                  onclick="submitAnswer('fwd')">Submit</button>
+        </div>
+
+        <div class="feedback-banner" id="fwdFeedback"></div>
+        <div class="stop-notice"    id="fwdStop"></div>
+
+      </div><!-- /fwdInput -->
+
+    </div><!-- /trial-engine fwd -->
+    <div class="test-nav"><button class="btn-nav" id="homeFwd" onclick="goHome()">Home</button><button class="btn-nav btn-stop" id="stopFwd" onclick="stopSet('fwd')">Stop Test</button></div>
+  </div><!-- /panelFwd -->
+
+
+  <!-- ── PANEL: Set 2 Backward ── -->
+  <div class="panel hidden" id="panelBwd">
+
+    <!-- Panel header -->
+    <div class="panel-header">
+      <div class="ph-left">
+        <span class="ph-set-tag sb">Set 2 — Backward</span>
+        <span class="ph-title">Repeat digits in reverse order</span>
+        <span class="ph-sub">
+          2 trials per item · Sequence length increases each item
+        </span>
+      </div>
+      <div class="ph-score-box">
+        <div class="psb-label">Score</div>
+        <div class="psb-val sb" id="scoreBwdDisplay">0</div>
+      </div>
+    </div>
+
+    <!-- Items progress table -->
+    <div class="items-table">
+
+      <div class="item-row-header">
+        <span class="irh-cell">Item</span>
+        <span class="irh-cell" style="text-align:left">Sequence</span>
+        <span class="irh-cell">Trial 1</span>
+        <span class="irh-cell">Trial 2</span>
+        <span class="irh-cell" style="text-align:right">Span</span>
+      </div>
+
+      <div id="bwdTableRows"></div>
+
+    </div>
+
+    <!-- Trial engine -->
+    <div class="trial-engine" id="engineBwd">
+
+      <!-- STATE 1: Ready -->
+      <div class="ready-screen" id="bwdReady">
+        <div class="rs-icon"></div>
+        <div class="rs-title" id="bwdReadyTitle">Ready for Item A · Trial 1</div>
+        <div class="rs-sub">
+          Watch the digits as they appear one per second.
+          Then enter them back in <strong>reverse order</strong>.
+          For example, if you see <em>4 · 7 · 2</em> enter <em>2 · 7 · 4</em>.
+        </div>
+        <div class="action-row">
+          <button class="action-btn start-btn" id="bwdStartBtn"
+                  onclick="beginSequence('bwd')">
+            Show Sequence
+          </button>
+        </div>
+      </div>
+
+      <!-- STATE 2: Playing -->
+      <div class="digit-stage hidden" id="bwdPlaying">
+
+        <div class="digit-frame" id="bwdFrame">
+          <span class="digit-display" id="bwdDigit">–</span>
+          <div class="digit-pos" id="bwdDots"></div>
+        </div>
+
+        <div class="digit-status" id="bwdStatus">
+          Preparing sequence…
+        </div>
+
+        <div class="seq-progress-wrap">
+          <div class="spw-label" id="bwdProgressLabel">0 of 0 digits shown</div>
+          <div class="seq-bar-bg">
+            <div class="seq-bar-fill" id="bwdSeqBar"></div>
+          </div>
+        </div>
+
+      </div><!-- /bwdPlaying -->
+
+      <!-- STATE 3: Input -->
+      <div class="hidden" id="bwdInput">
+
+        <div class="answer-area">
+          <div class="answer-label" id="bwdAnsLabel">
+            Enter the digits in REVERSE order
+          </div>
+          <div class="answer-boxes" id="bwdAnsBoxes"></div>
+        </div>
+
+        <div class="num-pad" id="bwdPad">
+          <button class="np-btn" onclick="padPress('bwd',1)">1</button>
+          <button class="np-btn" onclick="padPress('bwd',2)">2</button>
+          <button class="np-btn" onclick="padPress('bwd',3)">3</button>
+          <button class="np-btn" onclick="padPress('bwd',4)">4</button>
+          <button class="np-btn" onclick="padPress('bwd',5)">5</button>
+          <button class="np-btn" onclick="padPress('bwd',6)">6</button>
+          <button class="np-btn" onclick="padPress('bwd',7)">7</button>
+          <button class="np-btn" onclick="padPress('bwd',8)">8</button>
+          <button class="np-btn" onclick="padPress('bwd',9)">9</button>
+          <button class="np-btn" onclick="padPress('bwd',0)">0</button>
+          <button class="np-btn np-back"
+                  onclick="padBack('bwd')">⌫</button>
+          <button class="np-btn np-submit"
+                  onclick="submitAnswer('bwd')">Submit</button>
+        </div>
+
+        <div class="feedback-banner" id="bwdFeedback"></div>
+        <div class="stop-notice"    id="bwdStop"></div>
+
+      </div><!-- /bwdInput -->
+
+    </div><!-- /trial-engine bwd -->
+    <div class="test-nav"><button class="btn-nav" id="homeBwd" onclick="goHome()">Home</button><button class="btn-nav btn-stop" id="stopBwd" onclick="stopSet('bwd')">Stop Test</button></div>
+  </div><!-- /panelBwd -->
+
+</div><!-- /testArea -->
+
+
+<!-- ══════════════════════════════════════════
+     SET COMPLETE OVERLAY
+══════════════════════════════════════════ -->
+<div class="set-complete-overlay" id="setCompleteOverlay">
+  <div class="sco-card">
+    <div class="sco-icon" id="scoIcon"></div>
+    <div class="sco-title" id="scoTitle">Set 1 Complete!</div>
+    <div class="sco-sub"   id="scoSub">
+      You have completed all Forward digit sequences.
+    </div>
+    <div class="sco-score-pill">
+      <span class="sco-score-label" id="scoScoreLabel">Forward Score</span>
+      <span class="sco-score-val"   id="scoScoreVal">0</span>
+    </div>
+    <button class="sco-next-btn" id="scoNextBtn" onclick="proceedFromOverlay()">
+      Continue to Set 2
+    </button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     RESULTS CARD
+══════════════════════════════════════════ -->
+<div id="resultsCard" class="hidden">
+
+  <div class="participant-banner"><div class="pb-avatar" id="pbInitial">?</div><div class="pb-info"><div class="pb-name" id="pbName">—</div><div class="pb-meta"><span id="pbAge">—</span><span class="pb-dot"></span><span>Started: </span><span id="pbDate">—</span></div></div></div>
+
+  <!-- Header -->
+  <div class="results-header">
+    <div>
+      <div class="rh-title">Assessment Complete</div>
+      <div class="rh-sub">
+        Digit Span Test · Both sets finished ·
+        <span id="resDate"></span>
+      </div>
+    </div>
+    <span class="welcome-badge">Final Report</span>
+  </div>
+
+  <!-- Score trio -->
+  <div class="score-trio">
+    <div class="st-box fwd">
+      <div class="stb-label">Digits Forward</div>
+      <div class="stb-score fwd" id="resFwdScore">0</div>
+      <div class="stb-out-of" id="resFwdOutOf">out of 16</div>
+      <div class="stb-span"   id="resFwdSpan">Max span: –</div>
+    </div>
+    <div class="st-box bwd">
+      <div class="stb-label">Digits Backward</div>
+      <div class="stb-score bwd" id="resBwdScore">0</div>
+      <div class="stb-out-of" id="resBwdOutOf">out of 14</div>
+      <div class="stb-span"   id="resBwdSpan">Max span: –</div>
+    </div>
+    <div class="st-box cmb">
+      <div class="stb-label">Combined Total</div>
+      <div class="stb-score cmb" id="resCmbScore">0</div>
+      <div class="stb-out-of">out of 30</div>
+      <div class="stb-span"   id="resCmbNote">–</div>
+    </div>
+  </div>
+
+  <!-- Span length visual bars -->
+  <div class="res-section-title">Span Length Achieved</div>
+  <div class="span-bar-section">
+    <div class="sbs-bars">
+      <div class="sbs-row">
+        <span class="sbs-label">Forward Span</span>
+        <div class="sbs-bar-bg">
+          <div class="sbs-bar-fill fwd" id="spanBarFwd"></div>
+        </div>
+        <span class="sbs-val" id="spanValFwd">–</span>
+      </div>
+      <div class="sbs-row">
+        <span class="sbs-label">Backward Span</span>
+        <div class="sbs-bar-bg">
+          <div class="sbs-bar-fill bwd" id="spanBarBwd"></div>
+        </div>
+        <span class="sbs-val" id="spanValBwd">–</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forward detail breakdown -->
+  <div class="res-section-title">Set 1 — Forward Detail</div>
+  <div class="detail-grid" id="detailFwd"></div>
+
+  <!-- Backward detail breakdown -->
+  <div class="res-section-title">Set 2 — Backward Detail</div>
+  <div class="detail-grid" id="detailBwd"></div>
+
+  <!-- Clinical interpretation -->
+  <div class="res-section-title">Clinical Interpretation</div>
+  <div class="interp-section">
+    <div class="interp-box">
+      <div class="ib-title">Score Interpretation</div>
+      <div class="ib-text" id="interpText">–</div>
+    </div>
+    <div class="interp-box" style="border-left-color:var(--s-backward);">
+      <div class="ib-title"> Forward vs. Backward Gap</div>
+      <div class="ib-text" id="interpGap">–</div>
+    </div>
+
+    <!-- Improvement Resources -->
+    <div class="interp-box" style="border-left-color:var(--green);">
+      <div class="ib-title">How to Improve Forward Span (Short-Term Memory)</div>
+      <div class="ib-text">
+        <div style="margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--ice)"><strong>Chunking Technique</strong><br>Group numbers into meaningful chunks (e.g., 4-7-2-8 becomes 47-28) to hold more in memory.<br><a href="https://www.verywellmind.com/chunking-how-can-this-technique-improve-your-memory-2794969" target="_blank" style="font-size:.78rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>
+        <div style="margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--ice)"><strong>Visualization</strong><br>Create mental images for number sequences — picture them on a number pad or as spatial patterns.<br><a href="https://www.lumosity.com/" target="_blank" style="font-size:.78rem;color:var(--blue);text-decoration:none;font-weight:700">Try Lumosity →</a></div>
+      </div>
+    </div>
+    <div class="interp-box" style="border-left-color:var(--blue);">
+      <div class="ib-title">How to Improve Backward Span (Working Memory)</div>
+      <div class="ib-text">
+        <div style="margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--ice)"><strong>Dual N-Back Training</strong><br>Scientifically proven to improve working memory. Practice 20 minutes daily for results.<br><a href="https://brainworkshop.sourceforge.net/" target="_blank" style="font-size:.78rem;color:var(--blue);text-decoration:none;font-weight:700">Brain Workshop (Free) →</a></div>
+        <div style="margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--ice)"><strong>Mindfulness Meditation</strong><br>Regular meditation strengthens attention and working memory. Start with 10 minutes daily.<br><a href="https://www.headspace.com/" target="_blank" style="font-size:.78rem;color:var(--blue);text-decoration:none;font-weight:700">Try Headspace →</a></div>
+        <div style="padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--ice)"><strong>Physical Exercise</strong><br>30 minutes of aerobic exercise daily improves hippocampal function and memory consolidation.<br><a href="https://www.health.harvard.edu/blog/regular-exercise-changes-brain-improve-memory-thinking-skills-201404097110" target="_blank" style="font-size:.78rem;color:var(--blue);text-decoration:none;font-weight:700">Harvard Health →</a></div>
+      </div>
+    </div>
+
+    <div class="interp-box" style="border-left-color:var(--warn);">
+      <div class="ib-title">Disclaimer</div>
+      <div class="ib-text">
+        This assessment is a screening tool only and does not constitute
+        a clinical diagnosis. Results should be interpreted by a qualified
+        neuropsychologist in the context of a full evaluation.
+      </div>
+    </div>
+  </div>
+
+  <!-- Restart -->
+  <div class="results-footer">
+    <button class="restart-btn" onclick="restartTest()">
+      Restart Assessment
+    </button>
+    <button class="btn-save" id="btnSaveDigit" onclick="triggerSave()">Download Report</button>
+  </div>
+
+</div><!-- /resultsCard -->
+
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   TEST DATA — Sequences taken from standardised Digit Span norms
+   Each item has 2 trials. Forward: 2–9 digits. Backward: 2–8 digits.
+════════════════════════════════════════════════════════════════ */
+const TEST_DATA = {
+  fwd: [
+    { letter:'A', span:2,  trials:[ [2,4],         [7,1]         ] },
+    { letter:'B', span:3,  trials:[ [6,1,9],        [3,8,2]       ] },
+    { letter:'C', span:4,  trials:[ [7,4,2,3],      [4,1,7,2]     ] },
+    { letter:'D', span:5,  trials:[ [1,7,9,5,3],    [7,1,3,8,6]   ] },
+    { letter:'E', span:6,  trials:[ [1,6,5,2,9,8],  [5,3,7,4,1,8] ] },
+    { letter:'F', span:7,  trials:[ [5,9,1,7,4,2,8],[4,1,7,9,3,8,6] ] },
+    { letter:'G', span:8,  trials:[ [5,8,1,9,2,6,4,7],[3,8,2,9,5,1,7,4] ] },
+    { letter:'H', span:9,  trials:[ [2,7,5,8,6,2,5,8,4],[7,1,3,9,4,2,8,5,6] ] },
+  ],
+  bwd: [
+    { letter:'A', span:2,  trials:[ [2,7],          [6,3]         ] },
+    { letter:'B', span:3,  trials:[ [5,7,4],        [2,5,9]       ] },
+    { letter:'C', span:4,  trials:[ [7,2,9,6],      [8,4,9,3]     ] },
+    { letter:'D', span:5,  trials:[ [4,1,3,5,7],    [6,1,8,4,3]   ] },
+    { letter:'E', span:6,  trials:[ [7,2,8,6,5,4],  [9,4,2,7,3,8] ] },
+    { letter:'F', span:7,  trials:[ [8,1,3,6,4,7,2],[4,7,2,9,3,8,5] ] },
+    { letter:'G', span:8,  trials:[ [3,8,5,2,9,1,6,4],[6,2,8,5,1,9,3,7] ] },
+  ],
+};
+
+/* ════════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════════ */
+const STATE = {
+  fwd: {
+    currentItem  : 0,       // index into TEST_DATA.fwd
+    currentTrial : 0,       // 0 or 1
+    score        : 0,
+    maxSpan      : 0,
+    consecFails  : 0,       // consecutive item failures (both trials wrong)
+    stopped      : false,
+    results      : [],      // { letter, span, t1:bool, t2:bool, itemScore }
+    userInput    : [],
+    phase        : 'ready', // 'ready' | 'playing' | 'input' | 'done'
+    seqTimer     : null,
+  },
+  bwd: {
+    currentItem  : 0,
+    currentTrial : 0,
+    score        : 0,
+    maxSpan      : 0,
+    consecFails  : 0,
+    stopped      : false,
+    results      : [],
+    userInput    : [],
+    phase        : 'ready',
+    seqTimer     : null,
+  },
+};
+
+/* active tab */
+let activeTab = 'fwd';
+/* overlay pending set */
+let overlayPendingSet = null;
+/* whether backward set has been unlocked */
+let bwdUnlocked = false;
+
+/* ════════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════════ */
+function $(id) { return document.getElementById(id); }
+
+function show(el) {
+  if (typeof el === 'string') el = $(el);
+  el.classList.remove('hidden');
+}
+
+function hide(el) {
+  if (typeof el === 'string') el = $(el);
+  el.classList.add('hidden');
+}
+
+function getItems(set) { return TEST_DATA[set]; }
+
+function getItem(set) {
+  return TEST_DATA[set][STATE[set].currentItem];
+}
+
+function getTrialSeq(set) {
+  const s = STATE[set];
+  return TEST_DATA[set][s.currentItem].trials[s.currentTrial];
+}
+
+/* Correct answer for current trial (forward = same, backward = reversed) */
+function getCorrectAnswer(set) {
+  const seq = getTrialSeq(set);
+  return set === 'fwd' ? [...seq] : [...seq].reverse();
+}
+
+/* Compare two arrays */
+function arrEq(a, b) {
+  return a.length === b.length && a.every((v,i) => v === b[i]);
+}
+
+/* Build letter label for item index */
+function itemLabel(idx) {
+  return String.fromCharCode(65 + idx); // A, B, C …
+}
+
+/* ════════════════════════════════════════════════════════════════
+   INITIALISE — called once on Begin Assessment
+════════════════════════════════════════════════════════════════ */
+function startTest() {
+  hide('welcomeScreen');
+  document.getElementById('s-participant').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+let participantName='',participantAge='',testStartTime=null;
+
+function startTestReal() {
+  document.getElementById('s-participant').classList.remove('active');
+  show('testArea');
+
+  /* Reset state */
+  ['fwd','bwd'].forEach(set => {
+    Object.assign(STATE[set], {
+      currentItem  : 0,
+      currentTrial : 0,
+      score        : 0,
+      maxSpan      : 0,
+      consecFails  : 0,
+      stopped      : false,
+      results      : [],
+      userInput    : [],
+      phase        : 'ready',
+      seqTimer     : null,
+    });
+  });
+
+  bwdUnlocked = false;
+  activeTab   = 'fwd';
+
+  /* Lock backward tab until set 1 done */
+  $('tabBwd').disabled = true;
+  $('tabBwd').style.opacity = '0.4';
+  $('tabBwd').title = 'Complete Set 1 first';
+
+  /* Build item tables */
+  buildTable('fwd');
+  buildTable('bwd');
+
+  /* Show fwd panel, hide bwd */
+  show('panelFwd');
+  hide('panelBwd');
+
+  /* Activate fwd tab */
+  $('tabFwd').classList.add('active');
+  $('tabBwd').classList.remove('active');
+
+  /* Update header */
+  updateHeader('fwd');
+  updateLiveScores();
+
+  /* Prepare ready screen for fwd */
+  prepareReadyScreen('fwd');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BUILD ITEM TABLE (row stubs — dots updated dynamically)
+════════════════════════════════════════════════════════════════ */
+function buildTable(set) {
+  const container = $(set === 'fwd' ? 'fwdTableRows' : 'bwdTableRows');
+  container.innerHTML = '';
+
+  getItems(set).forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.id = `row-${set}-${idx}`;
+
+    /* Sequence digits — hidden until item is attempted */
+    const digStr = item.trials.map(t => t.join(' · ')).join('  /  ');
+
+    row.innerHTML = `
+      <span class="ir-letter">${item.letter}</span>
+      <span class="ir-digits" id="seq-${set}-${idx}">
+        ${'— '.repeat(item.span).trim()}
+      </span>
+      <div class="ir-trial">
+        <div class="trial-dot" id="dot-${set}-${idx}-0">–</div>
+      </div>
+      <div class="ir-trial">
+        <div class="trial-dot" id="dot-${set}-${idx}-1">–</div>
+      </div>
+      <span class="ir-span-label" style="text-align:right;font-size:0.65rem;
+            color:var(--text-dim);">
+        ${item.span} digit${item.span>1?'s':''}
+      </span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB SWITCHING
+════════════════════════════════════════════════════════════════ */
+function switchTab(set) {
+  if (set === 'bwd' && !bwdUnlocked) return;
+
+  activeTab = set;
+
+  $('tabFwd').classList.toggle('active', set === 'fwd');
+  $('tabBwd').classList.toggle('active', set === 'bwd');
+
+  if (set === 'fwd') {
+    show('panelFwd'); hide('panelBwd');
+  } else {
+    hide('panelFwd'); show('panelBwd');
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   UPDATE TOP HEADER TEXT
+════════════════════════════════════════════════════════════════ */
+function updateHeader(set) {
+  const s    = STATE[set];
+  const item = getItems(set)[s.currentItem];
+  const setName = set === 'fwd' ? 'Set 1 — Digits Forward' : 'Set 2 — Digits Backward';
+
+  $('thTitle').textContent = setName;
+
+  if (s.stopped || s.currentItem >= getItems(set).length) {
+    $('thMeta').textContent = `${setName} — Complete`;
+  } else {
+    $('thMeta').textContent =
+      `Item ${item.letter} · Trial ${s.currentTrial + 1} of 2`;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   UPDATE LIVE SCORE PILLS IN HEADER
+════════════════════════════════════════════════════════════════ */
+function updateLiveScores() {
+  const fwd = STATE.fwd.score;
+  const bwd = STATE.bwd.score;
+  $('liveScoreFwd').textContent = fwd;
+  $('liveScoreBwd').textContent = bwd;
+  $('liveScoreCmb').textContent = fwd + bwd;
+  $('scoreFwdDisplay').textContent = fwd;
+  $('scoreBwdDisplay').textContent = bwd;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PREPARE READY SCREEN
+════════════════════════════════════════════════════════════════ */
+function prepareReadyScreen(set) {
+  const s     = STATE[set];
+  const item  = getItem(set);
+  const pfx   = set === 'fwd' ? 'fwd' : 'bwd';
+
+  /* Show ready, hide others */
+  show(`${pfx}Ready`);
+  hide(`${pfx}Playing`);
+  hide(`${pfx}Input`);
+
+  /* Update ready title */
+  $(`${pfx}ReadyTitle`).textContent =
+    `Ready for Item ${item.letter} · Trial ${s.currentTrial + 1} of 2`;
+
+  /* Highlight current row */
+  highlightRow(set, s.currentItem);
+
+  /* Update active dot */
+  markDotActive(set, s.currentItem, s.currentTrial);
+
+  /* Update header */
+  updateHeader(set);
+  s.phase = 'ready';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ROW HIGHLIGHTING
+════════════════════════════════════════════════════════════════ */
+function highlightRow(set, idx) {
+  const items = getItems(set);
+  items.forEach((_, i) => {
+    const row = $(`row-${set}-${i}`);
+    if (!row) return;
+    row.classList.toggle('active-row', i === idx);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TRIAL DOT STATE MANAGEMENT
+════════════════════════════════════════════════════════════════ */
+function markDotActive(set, itemIdx, trialIdx) {
+  const dot = $(`dot-${set}-${itemIdx}-${trialIdx}`);
+  if (!dot) return;
+  dot.classList.add('active-dot');
+  dot.textContent = '●';
+}
+
+function markDotResult(set, itemIdx, trialIdx, correct) {
+  const dot = $(`dot-${set}-${itemIdx}-${trialIdx}`);
+  if (!dot) return;
+  dot.classList.remove('active-dot');
+  dot.classList.add(correct ? 'correct' : 'incorrect');
+  dot.textContent = correct ? '✓' : '✗';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   REVEAL SEQUENCE IN TABLE ROW (after item completes)
+════════════════════════════════════════════════════════════════ */
+function revealSeqInRow(set, itemIdx) {
+  const item = getItems(set)[itemIdx];
+  const el   = $(`seq-${set}-${itemIdx}`);
+  if (!el) return;
+  /* Show trial 1 sequence (canonical) */
+  el.textContent = item.trials[0].join(' – ');
+  el.classList.add('revealed');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BEGIN SEQUENCE PLAYBACK
+════════════════════════════════════════════════════════════════ */
+function beginSequence(set) {
+  const s   = STATE[set];
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+  const seq = getTrialSeq(set);
+
+  s.phase     = 'playing';
+  s.userInput = [];
+
+  /* Switch UI states */
+  hide(`${pfx}Ready`);
+  show(`${pfx}Playing`);
+  hide(`${pfx}Input`);
+
+  /* Style frame as playing */
+  const frame = $(`${pfx}Frame`);
+  frame.classList.remove('waiting','input-mode');
+  frame.classList.add('playing');
+
+  /* Build position dots */
+  const dotsEl = $(`${pfx}Dots`);
+  dotsEl.innerHTML = '';
+  seq.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dp-dot';
+    d.id = `pdot-${pfx}-${i}`;
+    dotsEl.appendChild(d);
+  });
+
+  /* Reset progress bar */
+  $(`${pfx}SeqBar`).style.width = '0%';
+  $(`${pfx}ProgressLabel`).textContent = `0 of ${seq.length} digits shown`;
+
+  /* Flash each digit */
+  playDigits(set, seq, 0);
+}
+
+/* ── Core digit playback loop ── */
+function playDigits(set, seq, idx) {
+  const s   = STATE[set];
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+
+  if (idx >= seq.length) {
+    /* Sequence done — transition to blank then input */
+    $(`${pfx}Digit`).textContent = '–';
+    $(`${pfx}Digit`).classList.remove('flash-in');
+    $(`${pfx}Status`).textContent = 'Now enter the digits you saw…';
+
+    /* Reset all position dots */
+    seq.forEach((_,i) => {
+      const pd = $(`pdot-${pfx}-${i}`);
+      if (pd) { pd.classList.remove('shown','current'); }
+    });
+
+    s.seqTimer = setTimeout(() => transitionToInput(set, seq), 2000);
+    return;
+  }
+
+  const digitEl  = $(`${pfx}Digit`);
+  const statusEl = $(`${pfx}Status`);
+  const barEl    = $(`${pfx}SeqBar`);
+  const lblEl    = $(`${pfx}ProgressLabel`);
+
+  /* Blank briefly between digits */
+  digitEl.textContent = '';
+  digitEl.classList.remove('flash-in');
+
+  s.seqTimer = setTimeout(() => {
+    /* Show digit */
+    digitEl.textContent = seq[idx];
+    digitEl.classList.add('flash-in');
+
+    /* Update position dots */
+    seq.forEach((_,i) => {
+      const pd = $(`pdot-${pfx}-${i}`);
+      if (!pd) return;
+      pd.classList.remove('shown','current');
+      if (i < idx)  pd.classList.add('shown');
+      if (i === idx) pd.classList.add('current');
+    });
+
+    /* Update progress bar + label */
+    const pct = Math.round(((idx+1) / seq.length) * 100);
+    barEl.style.width = pct + '%';
+    lblEl.textContent = `${idx+1} of ${seq.length} digits shown`;
+    statusEl.textContent = `Digit ${idx+1} of ${seq.length}`;
+
+    /* Schedule next */
+    s.seqTimer = setTimeout(() => playDigits(set, seq, idx+1), 1200);
+
+  }, idx === 0 ? 800 : 500); /* proper gap per methodology */
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TRANSITION TO INPUT MODE
+════════════════════════════════════════════════════════════════ */
+function transitionToInput(set, seq) {
+  const s   = STATE[set];
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+
+  s.phase     = 'input';
+  s.userInput = [];
+
+  /* Switch UI */
+  hide(`${pfx}Playing`);
+  show(`${pfx}Input`);
+
+  /* Update frame style */
+  const frame = $(`${pfx}Frame`);
+  frame.classList.remove('playing','waiting');
+  frame.classList.add('input-mode');
+
+  /* Answer label */
+  const ansLabel = $(`${pfx}AnsLabel`);
+  ansLabel.textContent = set === 'fwd'
+    ? `Enter ${seq.length} digits in the same order ▸`
+    : `Enter ${seq.length} digits in REVERSE order ◂`;
+
+  /* Build answer boxes */
+  buildAnswerBoxes(set, seq.length);
+
+  /* Clear feedback */
+  clearFeedback(set);
+
+  /* Enable pad */
+  togglePad(set, true);
+
+  /* Keyboard support */
+  setupKeyboard(set);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BUILD ANSWER BOXES
+════════════════════════════════════════════════════════════════ */
+function buildAnswerBoxes(set, count) {
+  const pfx       = set === 'fwd' ? 'fwd' : 'bwd';
+  const container = $(`${pfx}AnsBoxes`);
+  container.innerHTML = '';
+
+  for (let i = 0; i < count; i++) {
+    const box = document.createElement('div');
+    box.className = 'ans-box empty-slot';
+    box.id = `ansbox-${pfx}-${i}`;
+    box.textContent = '_';
+    container.appendChild(box);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   NUMBER PAD PRESS
+════════════════════════════════════════════════════════════════ */
+function padPress(set, digit) {
+  const s      = STATE[set];
+  const pfx    = set === 'fwd' ? 'fwd' : 'bwd';
+  const seq    = getTrialSeq(set);
+  const maxLen = seq.length;
+
+  if (s.phase !== 'input') return;
+  if (s.userInput.length >= maxLen) return;
+
+  s.userInput.push(digit);
+
+  /* Update answer box */
+  const idx = s.userInput.length - 1;
+  const box = $(`ansbox-${pfx}-${idx}`);
+  if (box) {
+    box.textContent = digit;
+    box.classList.remove('empty-slot');
+    box.classList.add('filled');
+  }
+
+  /* Auto-submit when full */
+  if (s.userInput.length === maxLen) {
+    setTimeout(() => submitAnswer(set), 350);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BACKSPACE
+════════════════════════════════════════════════════════════════ */
+function padBack(set) {
+  const s   = STATE[set];
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+
+  if (s.phase !== 'input') return;
+  if (s.userInput.length === 0) return;
+
+  const idx = s.userInput.length - 1;
+  s.userInput.pop();
+
+  const box = $(`ansbox-${pfx}-${idx}`);
+  if (box) {
+    box.textContent = '_';
+    box.classList.add('empty-slot');
+    box.classList.remove('filled');
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   KEYBOARD SUPPORT
+════════════════════════════════════════════════════════════════ */
+let _keyHandler = null;
+
+function setupKeyboard(set) {
+  /* Remove previous */
+  if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
+
+  _keyHandler = (e) => {
+    if (STATE[set].phase !== 'input') return;
+    const k = e.key;
+    if (k >= '0' && k <= '9') padPress(set, parseInt(k));
+    if (k === 'Backspace')     padBack(set);
+    if (k === 'Enter')         submitAnswer(set);
+  };
+
+  document.addEventListener('keydown', _keyHandler);
+}
+
+function removeKeyboard() {
+  if (_keyHandler) {
+    document.removeEventListener('keydown', _keyHandler);
+    _keyHandler = null;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TOGGLE PAD ENABLED / DISABLED
+════════════════════════════════════════════════════════════════ */
+function togglePad(set, enabled) {
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+  const pad = $(`${pfx}Pad`);
+  pad.querySelectorAll('button').forEach(btn => {
+    btn.disabled = !enabled;
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FEEDBACK HELPERS
+════════════════════════════════════════════════════════════════ */
+function showFeedback(set, type, msg) {
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+  const el  = $(`${pfx}Feedback`);
+  el.textContent = msg;
+  el.className = `feedback-banner show fb-${type}`;
+}
+
+function clearFeedback(set) {
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+  const el  = $(`${pfx}Feedback`);
+  el.className = 'feedback-banner';
+  el.textContent = '';
+
+  const stop = $(`${pfx}Stop`);
+  stop.className = 'stop-notice';
+  stop.textContent = '';
+}
+
+function showStopNotice(set, msg) {
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+  const el  = $(`${pfx}Stop`);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+
+
+
+
+/* ═══ HTML REPORT EXPORT ═══ */
+function triggerSave(){
+  // Clone the results section exactly as displayed
+  var resultsEl = document.querySelector('.screen.active') || document.querySelector('#s-results.active') || document.querySelector('.results-view') || document.querySelector('#resultsCard');
+  if(!resultsEl){
+    // Try alternate selectors
+    resultsEl = document.querySelector('#s-results') || document.querySelector('.result-card') || document.querySelector('[class*="result"]');
+  }
+  if(!resultsEl){alert('No results to export');return}
+  
+  // Get all styles from the page
+  var styles='';
+  document.querySelectorAll('style').forEach(function(s){styles+=s.outerHTML});
+  // Get linked fonts
+  var fonts='';
+  document.querySelectorAll('link[href*="font"]').forEach(function(l){fonts+=l.outerHTML});
+  
+  // Build standalone HTML
+  var pName=window.participantName||window._pName||'Participant';
+  var pAge=window.participantAge||window._pAge||'';
+  var testTitle=document.title||'ManMulyankan Assessment';
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">';
+  html+='<title>'+testTitle+' — Results for '+pName+'</title>';
+  html+=fonts;
+  html+=styles;
+  html+='<style>';
+  html+='body{background:#1e2028!important;color:#c8ccd4!important;font-family:"Outfit",sans-serif!important;padding:20px!important;min-height:auto!important}';
+  html+='.topbar,.shapes,.shapes-layer,.progress-wrap,.tb,.search-wrap,.ai-modal-bg{display:none!important}';
+  html+='.screen,.screen.active{display:block!important}';
+  html+='.main,.wrap,.container{max-width:800px!important;margin:0 auto!important;padding:20px!important}';
+  // Print styles
+  html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+  html+='.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button{display:none!important}';
+  html+='.card,.q-card,.result-card,.interp-box{border:1px solid #ddd!important;box-shadow:none!important}';
+  html+='.score-ring-wrap svg circle,.iq-ring svg circle,.domain-fill,.cat-fill{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}}';
+  html+='</style></head><body>';
+  
+  // Header
+  html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
+  html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
+  if(pAge) html+='<span><strong style="color:#6b8aff">Age:</strong> '+pAge+'</span>';
+  html+='<span><strong style="color:#6b8aff">Date:</strong> '+dateStr+'</span>';
+  html+='</div></div>';
+  
+  // Clone results content
+  var clone=resultsEl.cloneNode(true);
+  // Remove buttons from clone
+  clone.querySelectorAll('.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button,[onclick*="reload"],[onclick*="restart"],[onclick*="triggerSave"],[onclick*="Start"]').forEach(function(el){el.remove()});
+  // Remove progress bar from clone
+  clone.querySelectorAll('.progress-wrap,.progress-bar').forEach(function(el){el.remove()});
+  
+  html+='<div class="main" style="padding:0">'+clone.innerHTML+'</div>';
+  
+  // Footer
+  html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
+  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
+  
+  html+='<script src="/game-fx.js"></script>
+</body></html>';
+  
+  // Download as HTML file
+  var safeName=(pName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var testKey=document.title.split('—')[0].trim().replace(/[^a-zA-Z0-9]/g,'_');
+  var d=now;
+  var fileName=safeName+'_'+testKey+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.html';
+  
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   SUBMIT ANSWER
+════════════════════════════════════════════════════════════════ */
+function submitAnswer(set) {
+  const s      = STATE[set];
+  const pfx    = set === 'fwd' ? 'fwd' : 'bwd';
+  const seq    = getTrialSeq(set);
+
+  if (s.phase !== 'input') return;
+  if (s.userInput.length < seq.length) {
+    showFeedback(set, 'info',
+      `Please enter all ${seq.length} digit${seq.length > 1 ? 's' : ''} before submitting.`);
+    return;
+  }
+
+  /* Disable pad immediately */
+  togglePad(set, false);
+  removeKeyboard();
+  s.phase = 'evaluating';
+
+  const correct = arrEq(s.userInput, getCorrectAnswer(set));
+  const itemIdx = s.currentItem;
+  const trialIdx = s.currentTrial;
+
+  /* Colour answer boxes */
+  colourAnswerBoxes(set, seq, correct);
+
+  /* Mark dot */
+  markDotResult(set, itemIdx, trialIdx, correct);
+
+  /* Feedback message */
+  if (correct) {
+    showFeedback(set, 'correct',
+      `✓ Correct! Well done — ${seq.length}-digit sequence recalled perfectly.`);
+  } else {
+    const correctSeq = getCorrectAnswer(set);
+    showFeedback(set, 'incorrect',
+      `✗ Incorrect. The correct answer was: ${correctSeq.join(' – ')}`);
+  }
+
+  /* Record result into state */
+  recordTrialResult(set, itemIdx, trialIdx, correct);
+
+  /* Advance after short pause */
+  setTimeout(() => advanceAfterTrial(set), 1800);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   COLOUR ANSWER BOXES AFTER SUBMISSION
+════════════════════════════════════════════════════════════════ */
+function colourAnswerBoxes(set, seq, correct) {
+  const pfx    = set === 'fwd' ? 'fwd' : 'bwd';
+  const answer = getCorrectAnswer(set);
+  const input  = STATE[set].userInput;
+
+  input.forEach((digit, i) => {
+    const box = $(`ansbox-${pfx}-${i}`);
+    if (!box) return;
+    box.classList.remove('filled', 'empty-slot');
+    /* Per-digit colouring for incorrect responses */
+    if (correct) {
+      box.classList.add('correct-box');
+    } else {
+      box.classList.add(digit === answer[i] ? 'correct-box' : 'incorrect-box');
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RECORD TRIAL RESULT
+════════════════════════════════════════════════════════════════ */
+function recordTrialResult(set, itemIdx, trialIdx, correct) {
+  const s = STATE[set];
+
+  /* Ensure result record exists for this item */
+  if (!s.results[itemIdx]) {
+    s.results[itemIdx] = {
+      letter    : TEST_DATA[set][itemIdx].letter,
+      span      : TEST_DATA[set][itemIdx].span,
+      t1        : null,
+      t2        : null,
+      itemScore : 0,
+    };
+  }
+
+  if (trialIdx === 0) s.results[itemIdx].t1 = correct;
+  if (trialIdx === 1) s.results[itemIdx].t2 = correct;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ADVANCE AFTER A TRIAL
+════════════════════════════════════════════════════════════════ */
+function advanceAfterTrial(set) {
+  const s       = STATE[set];
+  const items   = getItems(set);
+  const itemIdx = s.currentItem;
+  const trial   = s.currentTrial;
+  const rec     = s.results[itemIdx];
+
+  /* ── If Trial 1 was correct → skip trial 2, award 2 pts ── */
+  if (trial === 0 && rec.t1 === true) {
+    /* Award score: 2 for t1 correct */
+    finaliseItem(set, itemIdx, 2);
+    moveToNextItem(set);
+    return;
+  }
+
+  /* ── If Trial 1 was wrong → go to trial 2 ── */
+  if (trial === 0 && rec.t1 === false) {
+    s.currentTrial = 1;
+    markDotActive(set, itemIdx, 1);
+    clearFeedback(set);
+    prepareReadyScreen(set);
+    return;
+  }
+
+  /* ── Trial 2 result ── */
+  if (trial === 1) {
+    let itemScore = 0;
+    if (rec.t1 === true  && rec.t2 === true)  itemScore = 2;
+    if (rec.t1 === false && rec.t2 === true)  itemScore = 1;
+    if (rec.t1 === true  && rec.t2 === false) itemScore = 1;
+    if (rec.t1 === false && rec.t2 === false) itemScore = 0;
+    finaliseItem(set, itemIdx, itemScore);
+    moveToNextItem(set);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FINALISE ITEM — apply score, update span, reveal seq in table
+════════════════════════════════════════════════════════════════ */
+function finaliseItem(set, itemIdx, itemScore) {
+  const s    = STATE[set];
+  const item = TEST_DATA[set][itemIdx];
+
+  s.results[itemIdx].itemScore = itemScore;
+
+  /* Update total score */
+  s.score += itemScore;
+
+  /* Update max span achieved (at least 1 correct trial) */
+  if (itemScore > 0) {
+    s.maxSpan = item.span;
+  }
+
+  /* Update consecutive failures */
+  if (itemScore === 0) {
+    s.consecFails++;
+  } else {
+    s.consecFails = 0;
+  }
+
+  /* Reveal digits in table row */
+  revealSeqInRow(set, itemIdx);
+
+  /* Mark second dot if it was skipped (trial 1 correct → trial 2 never shown) */
+  if (s.results[itemIdx].t2 === null) {
+    const dot2 = $(`dot-${set}-${itemIdx}-1`);
+    if (dot2) {
+      dot2.textContent = '—';
+      dot2.style.opacity = '0.3';
+    }
+  }
+
+  /* Live score update */
+  updateLiveScores();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MOVE TO NEXT ITEM (or end set)
+════════════════════════════════════════════════════════════════ */
+function moveToNextItem(set) {
+  const s     = STATE[set];
+  const items = getItems(set);
+
+  /* ── Discontinuation rule: 2 consecutive item failures ── */
+  if (s.consecFails >= 2) {
+    endSet(set, 'discontinued');
+    return;
+  }
+
+  /* Advance item index */
+  s.currentItem++;
+  s.currentTrial = 0;
+
+  /* ── All items exhausted ── */
+  if (s.currentItem >= items.length) {
+    endSet(set, 'completed');
+    return;
+  }
+
+  /* Prepare next item */
+  clearFeedback(set);
+  prepareReadyScreen(set);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   END SET
+════════════════════════════════════════════════════════════════ */
+function endSet(set, reason) {
+  const s   = STATE[set];
+  const pfx = set === 'fwd' ? 'fwd' : 'bwd';
+
+  s.stopped = true;
+  s.phase   = 'done';
+  removeKeyboard();
+
+  /* Dim remaining rows */
+  const items = getItems(set);
+  for (let i = s.currentItem; i < items.length; i++) {
+    const row = $(`row-${set}-${i}`);
+    if (row) row.classList.add('skipped-row');
+  }
+
+  /* Stop notice if discontinued */
+  if (reason === 'discontinued') {
+    showStopNotice(set,
+      `Test discontinued — two consecutive failures reached.`);
+  }
+
+  /* Hide engine area */
+  const pfxReady   = $(`${pfx}Ready`);
+  const pfxPlaying = $(`${pfx}Playing`);
+  const pfxInput   = $(`${pfx}Input`);
+  if (pfxReady)   hide(pfxReady);
+  if (pfxPlaying) hide(pfxPlaying);
+
+  /* Mark tab as done */
+  const tabEl = $(set === 'fwd' ? 'tabFwd' : 'tabBwd');
+  tabEl.classList.add('done');
+  tabEl.classList.remove('active');
+
+  /* ── Forward set done → show overlay then unlock backward ── */
+  if (set === 'fwd') {
+    showSetCompleteOverlay('fwd', () => {
+      bwdUnlocked = true;
+      $('tabBwd').disabled = false;
+      $('tabBwd').style.opacity = '1';
+      $('tabBwd').removeAttribute('title');
+      switchTab('bwd');
+      prepareReadyScreen('bwd');
+      updateHeader('bwd');
+    });
+    return;
+  }
+
+  /* ── Backward set done → show overlay then show results ── */
+  if (set === 'bwd') {
+    showSetCompleteOverlay('bwd', () => {
+      showResults();
+    });
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SET COMPLETE OVERLAY
+════════════════════════════════════════════════════════════════ */
+let _overlayCallback = null;
+
+function showSetCompleteOverlay(set, callback) {
+  _overlayCallback = callback;
+
+  const overlay   = $('setCompleteOverlay');
+  const iconEl    = $('scoIcon');
+  const titleEl   = $('scoTitle');
+  const subEl     = $('scoSub');
+  const labelEl   = $('scoScoreLabel');
+  const valEl     = $('scoScoreVal');
+  const nextBtn   = $('scoNextBtn');
+  const s         = STATE[set];
+
+  if (set === 'fwd') {
+    iconEl.textContent  = '';
+    titleEl.textContent = 'Set 1 Complete!';
+    subEl.textContent   =
+      `You have completed all Digits Forward sequences. ` +
+      `Your forward span score is recorded. ` +
+      `Now proceed to Set 2 — Digits Backward.`;
+    labelEl.textContent = 'Forward Score';
+    valEl.className     = 'sco-score-val fwd';
+    valEl.textContent   = s.score;
+    nextBtn.textContent = 'Continue to Set 2';
+  } else {
+    iconEl.textContent  = '';
+    titleEl.textContent = 'Set 2 Complete!';
+    subEl.textContent   =
+      `You have completed all Digits Backward sequences. ` +
+      `Both sets are now finished — view your full results below.`;
+    labelEl.textContent = 'Backward Score';
+    valEl.className     = 'sco-score-val bwd';
+    valEl.textContent   = s.score;
+    nextBtn.textContent = 'View Results';
+  }
+
+  overlay.classList.add('show');
+}
+
+function proceedFromOverlay() {
+  $('setCompleteOverlay').classList.remove('show');
+  if (_overlayCallback) {
+    _overlayCallback();
+    _overlayCallback = null;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SHOW RESULTS
+════════════════════════════════════════════════════════════════ */
+function showResults() {
+  /* Hide test area */
+  hide('testArea');
+
+  const fwd = STATE.fwd;
+  const bwd = STATE.bwd;
+
+  /* Max possible scores: fwd = 16, bwd = 14, total = 30 */
+  const fwdMax = 16;
+  const bwdMax = 14;
+
+  /* Populate score trio */
+  $('resFwdScore').textContent = fwd.score;
+  $('resBwdScore').textContent = bwd.score;
+  $('resCmbScore').textContent = fwd.score + bwd.score;
+
+  $('resFwdOutOf').textContent = `out of ${fwdMax}`;
+  $('resBwdOutOf').textContent = `out of ${bwdMax}`;
+
+  $('resFwdSpan').textContent  = `Max span: ${fwd.maxSpan} digit${fwd.maxSpan !== 1 ? 's' : ''}`;
+  $('resBwdSpan').textContent  = `Max span: ${bwd.maxSpan} digit${bwd.maxSpan !== 1 ? 's' : ''}`;
+  $('resCmbNote').textContent  = `${Math.round(((fwd.score + bwd.score) / 30) * 100)}% of maximum`;
+
+  /* Date stamp */
+  const now = new Date();
+  $('resDate').textContent = now.toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  /* Span bars (max forward span = 9, max backward = 8) */
+  setTimeout(() => {
+    $('spanBarFwd').style.width = `${(fwd.maxSpan / 9) * 100}%`;
+    $('spanBarBwd').style.width = `${(bwd.maxSpan / 8) * 100}%`;
+  }, 200);
+
+  $('spanValFwd').textContent = fwd.maxSpan || '—';
+  $('spanValBwd').textContent = bwd.maxSpan || '—';
+
+  /* Detail grids */
+  buildDetailGrid('fwd');
+  buildDetailGrid('bwd');
+
+  /* Clinical interpretation */
+  buildInterpretation();
+
+  /* Populate participant banner */
+  $('pbName').textContent = participantName || '\u2014';
+  $('pbAge').textContent = participantAge ? 'Age ' + participantAge : '\u2014';
+  if (testStartTime) {
+    var d = testStartTime;
+    $('pbDate').textContent = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear() + ' at ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+  $('pbInitial').textContent = participantName ? participantName.split(' ').map(function(w){return w[0]}).join('').substring(0,2).toUpperCase() : '?';
+
+  
+  /* AUTO-SAVE RESULTS */
+  saveResultsToFile('digit_span', {
+    forward: {score: fwd.score, maxSpan: fwd.maxSpan, maxPossible: fwdMax},
+    backward: {score: bwd.score, maxSpan: bwd.maxSpan, maxPossible: bwdMax},
+    combined: {score: fwd.score + bwd.score, maxPossible: 30, pct: Math.round(((fwd.score + bwd.score)/30)*100)},
+    itemDetails: {forward: fwd.results, backward: bwd.results}
+  });
+
+  /* Reveal results card */
+  const card = $('resultsCard');
+  card.classList.remove('hidden');
+  /* Force reflow then animate */
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      card.classList.add('show');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BUILD DETAIL GRID (per-item breakdown in results)
+════════════════════════════════════════════════════════════════ */
+function buildDetailGrid(set) {
+  const container = $(set === 'fwd' ? 'detailFwd' : 'detailBwd');
+  container.innerHTML = '';
+  const results = STATE[set].results;
+  const items   = getItems(set);
+
+  /* Column headers row */
+  const hdr = document.createElement('div');
+  hdr.className = 'detail-row';
+  hdr.style.cssText = 'background:var(--bg2);border-color:var(--border2);';
+  hdr.innerHTML = `
+    <span class="dr-item" style="font-size:0.6rem;color:var(--text-dim);">Item</span>
+    <span class="dr-digits" style="color:var(--text-dim);font-size:0.62rem;
+          text-transform:uppercase;letter-spacing:0.1em;">Sequence</span>
+    <span class="dr-t1" style="color:var(--text-dim);font-size:0.6rem;">Trial 1</span>
+    <span class="dr-t2" style="color:var(--text-dim);font-size:0.6rem;">Trial 2</span>
+    <span class="dr-score" style="color:var(--text-dim);font-size:0.6rem;">Pts</span>
+  `;
+  container.appendChild(hdr);
+
+  items.forEach((item, idx) => {
+    const rec = results[idx];
+    const row = document.createElement('div');
+    row.className = 'detail-row';
+
+    /* Determine if item was skipped (not reached) */
+    if (!rec) {
+      row.style.opacity = '0.35';
+      row.innerHTML = `
+        <span class="dr-item">${item.letter}</span>
+        <span class="dr-digits">${item.trials[0].join(' – ')}</span>
+        <span class="dr-t1" style="color:var(--text-dim);">—</span>
+        <span class="dr-t2" style="color:var(--text-dim);">—</span>
+        <span class="dr-score s0">—</span>
+      `;
+      container.appendChild(row);
+      return;
+    }
+
+    const t1Str = rec.t1 === null ? '—'
+                : rec.t1 ? '<span style="color:var(--success)">✓</span>'
+                           : '<span style="color:var(--error)">✗</span>';
+    const t2Str = rec.t2 === null ? '<span style="opacity:0.35">—</span>'
+                : rec.t2 ? '<span style="color:var(--success)">✓</span>'
+                           : '<span style="color:var(--error)">✗</span>';
+
+    const scoreClass = rec.itemScore === 2 ? 's2'
+                     : rec.itemScore === 1 ? 's1' : 's0';
+
+    row.innerHTML = `
+      <span class="dr-item">${item.letter}</span>
+      <span class="dr-digits">${item.trials[0].join(' – ')}</span>
+      <span class="dr-t1">${t1Str}</span>
+      <span class="dr-t2">${t2Str}</span>
+      <span class="dr-score ${scoreClass}">${rec.itemScore}</span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CLINICAL INTERPRETATION
+════════════════════════════════════════════════════════════════ */
+function buildInterpretation() {
+  const fwdScore = STATE.fwd.score;
+  const bwdScore = STATE.bwd.score;
+  const fwdSpan  = STATE.fwd.maxSpan;
+  const bwdSpan  = STATE.bwd.maxSpan;
+  const total    = fwdScore + bwdScore;
+  const gap      = fwdSpan - bwdSpan;
+
+  /* ── Score interpretation ── */
+  let scoreText = '';
+
+  /* Forward span classification */
+  let fwdClass = '';
+  if      (fwdSpan >= 7) fwdClass = 'above average (≥ 7 digits)';
+  else if (fwdSpan === 6) fwdClass = 'average (6 digits)';
+  else if (fwdSpan === 5) fwdClass = 'low average (5 digits)';
+  else if (fwdSpan <= 4)  fwdClass = 'below average (≤ 4 digits)';
+
+  /* Backward span classification */
+  let bwdClass = '';
+  if      (bwdSpan >= 6) bwdClass = 'above average (≥ 6 digits)';
+  else if (bwdSpan === 5) bwdClass = 'average (5 digits)';
+  else if (bwdSpan === 4) bwdClass = 'low average (4 digits)';
+  else if (bwdSpan <= 3)  bwdClass = 'below average (≤ 3 digits)';
+
+  /* Total score range */
+  let totalRange = '';
+  const pct = total / 30;
+  if      (pct >= 0.80) totalRange = 'High — strong short-term and working memory';
+  else if (pct >= 0.60) totalRange = 'Average — typical memory span range';
+  else if (pct >= 0.40) totalRange = 'Low Average — mild difficulty in recall tasks';
+  else                  totalRange = 'Below Average — possible working memory weakness';
+
+  scoreText =
+    `Forward Span of ${fwdSpan} is considered ${fwdClass}. ` +
+    `Backward Span of ${bwdSpan} is considered ${bwdClass}. ` +
+    `Combined score of ${total}/30 falls in the ${totalRange} range. ` +
+    `The normative forward span for healthy adults is 6–7 digits; ` +
+    `the normative backward span is 4–5 digits.`;
+
+  /* ── Forward vs Backward gap interpretation ── */
+  let gapText = '';
+  if (gap <= 1) {
+    gapText =
+      `The gap between your forward span (${fwdSpan}) and backward span ` +
+      `(${bwdSpan}) is ${gap} digit${gap !== 1 ? 's' : ''}, which is ` +
+      `within the expected range. A small gap suggests efficient ` +
+      `working memory and mental manipulation ability.`;
+  } else if (gap === 2) {
+    gapText =
+      `The gap between forward span (${fwdSpan}) and backward span ` +
+      `(${bwdSpan}) is 2 digits, which is at the upper limit of the ` +
+      `normal range. Minor difficulty with active manipulation of ` +
+      `information in working memory may be present.`;
+  } else {
+    gapText =
+      `The gap between forward span (${fwdSpan}) and backward span ` +
+      `(${bwdSpan}) is ${gap} digits, which exceeds the typical ` +
+      `range of ≤ 2. A gap this large may indicate relative ` +
+      `difficulty with working memory and executive function ` +
+      `compared to short-term storage capacity. ` +
+      `Professional evaluation is recommended.`;
+  }
+
+  $('interpText').textContent = scoreText;
+  $('interpGap').textContent  = gapText;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESTART TEST
+════════════════════════════════════════════════════════════════ */
+/* PARTICIPANT VALIDATION */
+document.getElementById('piStartBtn').addEventListener('click', function() {
+  var name = document.getElementById('piName').value.trim();
+  var age = document.getElementById('piAge').value.trim();
+  var valid = true;
+  document.getElementById('piName').classList.remove('err');
+  document.getElementById('piAge').classList.remove('err');
+  document.getElementById('piNameErr').textContent = '';
+  document.getElementById('piAgeErr').textContent = '';
+  if (!name) { document.getElementById('piName').classList.add('err'); document.getElementById('piNameErr').textContent = 'Please enter your name'; valid = false; }
+  else if (name.length > 16) { document.getElementById('piName').classList.add('err'); document.getElementById('piNameErr').textContent = 'Name must be 16 characters or less'; valid = false; }
+  if (!age || isNaN(age) || parseInt(age) < 5 || parseInt(age) > 120) { document.getElementById('piAge').classList.add('err'); document.getElementById('piAgeErr').textContent = 'Enter a valid age (5-120)'; valid = false; }
+  if (!valid) return;
+  participantName = name;
+  participantAge = age;
+  testStartTime = new Date();
+  startTestReal();
+});
+document.getElementById('piName').addEventListener('focus', function() { this.classList.remove('err'); document.getElementById('piNameErr').textContent = ''; });
+document.getElementById('piAge').addEventListener('focus', function() { this.classList.remove('err'); document.getElementById('piAgeErr').textContent = ''; });
+
+function goHome() {
+  ['fwd','bwd'].forEach(function(s) { if (STATE[s].seqTimer) clearTimeout(STATE[s].seqTimer); });
+  removeKeyboard();
+  hide('testArea');
+  var card = $('resultsCard'); card.classList.remove('show'); card.classList.add('hidden');
+  document.getElementById('s-participant').classList.remove('active');
+  show('welcomeScreen');
+  window.scrollTo(0,0);
+}
+
+function stopSet(set) {
+  if (STATE[set].seqTimer) clearTimeout(STATE[set].seqTimer);
+  removeKeyboard();
+  STATE[set].stopped = true;
+  STATE[set].phase = 'done';
+  var pfx = set === 'fwd' ? 'fwd' : 'bwd';
+  showStopNotice(set, 'Test stopped by participant');
+  hide(pfx + 'Ready'); hide(pfx + 'Playing');
+}
+
+function restartTest() {
+  /* Hide results */
+  const card = $('resultsCard');
+  card.classList.remove('show');
+  card.classList.add('hidden');
+
+  /* Hide test area */
+  hide('testArea');
+
+  /* Show welcome */
+  show('welcomeScreen');
+  document.getElementById('s-participant').classList.remove('active');
+
+  /* Scroll to top */
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   WELCOME SCREEN — CSS VARIABLES & KEYFRAME ANIMATIONS
+   (Injected here to avoid a separate segment)
+════════════════════════════════════════════════════════════════ */
+
+
+/* ═══ SAVE RESULTS TO SERVER ═══ */
+function saveResultsToServer(testName, resultData){
+  var payload = {
+    participant: { name: participantName||'Unknown', age: parseInt(participantAge)||null },
+    test_type: testName,
+    started_at: testStartTime ? testStartTime.toISOString() : new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    raw_answers: resultData.rawAnswers || resultData.answers || {},
+    scores: resultData,
+    interpretation: resultData.severity || resultData.category || ''
+  };
+  fetch('/api/results', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){return r.json()}).then(function(d){
+    console.log('Results saved to server:', d);
+  }).catch(function(e){
+    console.log('Server save failed (offline mode):', e);
+  });
+}
+
+/* ═══ SAVE RESULTS TO FILE ═══ */
+function saveResultsToFile(testName, resultData){
+  saveResultsToServer(testName, resultData);
+  var name = (participantName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var d = testStartTime || new Date();
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var yy=d.getFullYear();
+  var hh=String(d.getHours()).padStart(2,'0');
+  var mi=String(d.getMinutes()).padStart(2,'0');
+  var ss=String(d.getSeconds()).padStart(2,'0');
+  var dateStr=yy+'-'+mm+'-'+dd;
+  var timeStr=hh+'-'+mi+'-'+ss;
+  var fileName='results/'+testName+'/'+name+'_'+dateStr+'_'+timeStr+'.json';
+  var payload = {
+    meta: {
+      test: testName,
+      participant: participantName||'Unknown',
+      age: participantAge||'--',
+      date: dd+'/'+mm+'/'+yy,
+      time: hh+':'+mi+':'+ss,
+      timestamp: d.toISOString(),
+      filePath: fileName
+    },
+    results: resultData
+  };
+  var json = JSON.stringify(payload, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name+'_'+testName+'_'+dateStr+'_'+timeStr+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+
+
+
+/* ═══ PDF REPORT GENERATOR ═══ */
+function generatePDF(testName, participant, results) {
+  var scr = document.createElement('script');
+  scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  scr.onload = function() {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    var W = 210, H = 297, M = 18, y = 0;
+    var cW = W - M * 2;
+
+    function setFont(size, style) { doc.setFontSize(size); if(style==='bold') doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal'); }
+    function addLine(x1,y1,x2,y2,color) { doc.setDrawColor(color||'#ddd'); doc.setLineWidth(0.3); doc.line(x1,y1,x2,y2); }
+    function checkPage(need) { if(y+need > H-20) { doc.addPage(); y=20; drawHeader(); } }
+    function drawHeader() {
+      doc.setFillColor('#1a2340'); doc.rect(0,0,W,42,'F');
+      setFont(18,'bold'); doc.setTextColor('#ffffff'); doc.text('ManMulyankan',M,18);
+      setFont(8,'normal'); doc.setTextColor('#8890a4'); doc.text('Cognitive Assessment Platform · manmulyankan.com',M,25);
+      setFont(10,'bold'); doc.setTextColor('#6b8aff'); doc.text(testName.replace(/_/g,' ').toUpperCase()+' REPORT',M,35);
+      y=50;
+    }
+    function drawBar(x, barY, w, pct, color) {
+      doc.setFillColor('#e8e8e8'); doc.roundedRect(x,barY,w,4,2,2,'F');
+      if(pct>0){ doc.setFillColor(color||'#6b8aff'); doc.roundedRect(x,barY,w*(pct/100),4,2,2,'F'); }
+    }
+
+    drawHeader();
+
+    // Participant Info Box
+    doc.setFillColor('#f5f6f8'); doc.roundedRect(M,y,cW,22,3,3,'F');
+    doc.setDrawColor('#ddd'); doc.roundedRect(M,y,cW,22,3,3,'S');
+    setFont(8,'bold'); doc.setTextColor('#333');
+    doc.text('Participant:',M+4,y+7); doc.text('Age:',M+4,y+14); doc.text('Date:',M+80,y+7); doc.text('Time:',M+80,y+14);
+    setFont(8,'normal'); doc.setTextColor('#555');
+    doc.text(participant.name||'-',M+28,y+7);
+    doc.text(String(participant.age||'-'),M+14,y+14);
+    var now=results._date||new Date();
+    if(typeof now==='string') now=new Date(now);
+    doc.text(now.toLocaleDateString('en-GB'),M+92,y+7);
+    doc.text(now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),M+92,y+14);
+    y+=30;
+
+    // ═══ SCORES SECTION ═══
+    if(results.mainScore!==undefined){
+      setFont(12,'bold'); doc.setTextColor('#1a2340'); doc.text('Overall Score',M,y); y+=8;
+      doc.setFillColor('#f0f4ff'); doc.roundedRect(M,y,cW,18,3,3,'F');
+      setFont(22,'bold'); doc.setTextColor('#6b8aff');
+      doc.text(String(results.mainScore),M+cW/2,y+13,{align:'center'});
+      if(results.maxScore){ setFont(9,'normal'); doc.setTextColor('#888'); doc.text('/ '+results.maxScore,M+cW/2+14,y+13); }
+      y+=22;
+      if(results.classification){ setFont(10,'bold'); doc.setTextColor('#333'); doc.text('Classification: '+results.classification,M,y); y+=8; }
+    }
+
+    // ═══ DOMAIN SCORES ═══
+    if(results.domains && typeof results.domains==='object'){
+      y+=4; setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Domain Scores',M,y); y+=8;
+      var dkeys=Object.keys(results.domains);
+      dkeys.forEach(function(k){
+        checkPage(14);
+        var d=results.domains[k];
+        var dName=d.name||k, dScore=d.scaled||d.score||d.pct||0, dMax=d.total||100;
+        var pct=(d.pct!==undefined)?d.pct:(d.scaled?Math.round((d.scaled-55)/90*100):Math.round(d.score/d.total*100));
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(dName,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(dScore)+(d.total?' ('+d.correct+'/'+d.total+')':''),M+cW-30,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-35,Math.min(100,Math.max(0,pct)),d.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ CATEGORY SCORES (for QoL, Depression) ═══
+    if(results.categories && Array.isArray(results.categories)){
+      y+=4; checkPage(12); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Category Breakdown',M,y); y+=8;
+      results.categories.forEach(function(cat){
+        checkPage(14);
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(cat.name,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(cat.score||cat.value||''),M+cW-10,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-15,cat.pct||0,cat.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ INTERPRETATION ═══
+    if(results.interpretation){
+      y+=4; checkPage(20); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Interpretation',M,y); y+=7;
+      setFont(8,'normal'); doc.setTextColor('#444');
+      var lines=doc.splitTextToSize(results.interpretation,cW);
+      lines.forEach(function(l){ checkPage(6); doc.text(l,M,y); y+=5; });
+      y+=4;
+    }
+
+    // ═══ RESPONSES TABLE ═══
+    if(results.responses && Array.isArray(results.responses) && results.responses.length>0){
+      y+=4; checkPage(16);
+      setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Response Details',M,y); y+=8;
+
+      // Table header
+      var colQ=M, colR=M+cW*0.65, colS=M+cW*0.85;
+      doc.setFillColor('#1a2340'); doc.rect(M,y-4,cW,7,'F');
+      setFont(7,'bold'); doc.setTextColor('#fff');
+      doc.text('Question',colQ+2,y);
+      doc.text('Response',colR,y);
+      doc.text('Score',colS,y);
+      y+=6;
+
+      var alt=false;
+      results.responses.forEach(function(r,i){
+        checkPage(10);
+        if(alt){ doc.setFillColor('#f8f9fb'); doc.rect(M,y-4,cW,8,'F'); }
+        alt=!alt;
+        setFont(6.5,'normal'); doc.setTextColor('#333');
+        var qText=(i+1)+'. '+(r.question||r.q||'Q'+(i+1));
+        var qLines=doc.splitTextToSize(qText,cW*0.62);
+        doc.text(qLines[0],colQ+2,y);
+        doc.setTextColor('#555');
+        var rText=String(r.answer||r.response||r.selected||'-');
+        var rLines=doc.splitTextToSize(rText,cW*0.18);
+        doc.text(rLines[0],colR,y);
+        doc.setTextColor('#6b8aff'); setFont(7,'bold');
+        doc.text(String(r.score!==undefined?r.score:'-'),colS+5,y);
+        y+=Math.max(6, qLines.length*4+2);
+      });
+    }
+
+    // ═══ DISCLAIMER ═══
+    y+=6; checkPage(20);
+    addLine(M,y,W-M,y,'#ddd'); y+=6;
+    setFont(7,'normal'); doc.setTextColor('#999');
+    var disc='Disclaimer: This assessment is for educational and screening purposes only. It is not a substitute for professional clinical diagnosis. Results should be interpreted by a qualified healthcare professional.';
+    var dLines=doc.splitTextToSize(disc,cW);
+    dLines.forEach(function(l){ doc.text(l,M,y); y+=4; });
+    y+=4;
+    setFont(6,'normal'); doc.setTextColor('#bbb');
+    doc.text('Generated by ManMulyankan (manmulyankan.com) on '+new Date().toLocaleString('en-GB'),M,y);
+
+    // Save
+    var pName=(participant.name||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+    var dStr=new Date().toISOString().slice(0,10);
+    doc.save(pName+'_'+testName+'_'+dStr+'.pdf');
+  };
+  document.head.appendChild(scr);
+}
+
+
+/* ═══ HTML REPORT EXPORT ═══ */
+function triggerSave(){
+  // Clone the results section exactly as displayed
+  var resultsEl = document.querySelector('.screen.active') || document.querySelector('#s-results.active') || document.querySelector('.results-view') || document.querySelector('#resultsCard');
+  if(!resultsEl){
+    // Try alternate selectors
+    resultsEl = document.querySelector('#s-results') || document.querySelector('.result-card') || document.querySelector('[class*="result"]');
+  }
+  if(!resultsEl){alert('No results to export');return}
+  
+  // Get all styles from the page
+  var styles='';
+  document.querySelectorAll('style').forEach(function(s){styles+=s.outerHTML});
+  // Get linked fonts
+  var fonts='';
+  document.querySelectorAll('link[href*="font"]').forEach(function(l){fonts+=l.outerHTML});
+  
+  // Build standalone HTML
+  var pName=window.participantName||window._pName||'Participant';
+  var pAge=window.participantAge||window._pAge||'';
+  var testTitle=document.title||'ManMulyankan Assessment';
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">';
+  html+='<title>'+testTitle+' — Results for '+pName+'</title>';
+  html+=fonts;
+  html+=styles;
+  html+='<style>';
+  html+='body{background:#1e2028!important;color:#c8ccd4!important;font-family:"Outfit",sans-serif!important;padding:20px!important;min-height:auto!important}';
+  html+='.topbar,.shapes,.shapes-layer,.progress-wrap,.tb,.search-wrap,.ai-modal-bg{display:none!important}';
+  html+='.screen,.screen.active{display:block!important}';
+  html+='.main,.wrap,.container{max-width:800px!important;margin:0 auto!important;padding:20px!important}';
+  // Print styles
+  html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+  html+='.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button{display:none!important}';
+  html+='.card,.q-card,.result-card,.interp-box{border:1px solid #ddd!important;box-shadow:none!important}';
+  html+='.score-ring-wrap svg circle,.iq-ring svg circle,.domain-fill,.cat-fill{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}}';
+  html+='</style></head><body>';
+  
+  // Header
+  html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
+  html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
+  if(pAge) html+='<span><strong style="color:#6b8aff">Age:</strong> '+pAge+'</span>';
+  html+='<span><strong style="color:#6b8aff">Date:</strong> '+dateStr+'</span>';
+  html+='</div></div>';
+  
+  // Clone results content
+  var clone=resultsEl.cloneNode(true);
+  // Remove buttons from clone
+  clone.querySelectorAll('.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button,[onclick*="reload"],[onclick*="restart"],[onclick*="triggerSave"],[onclick*="Start"]').forEach(function(el){el.remove()});
+  // Remove progress bar from clone
+  clone.querySelectorAll('.progress-wrap,.progress-bar').forEach(function(el){el.remove()});
+  
+  html+='<div class="main" style="padding:0">'+clone.innerHTML+'</div>';
+  
+  // Footer
+  html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
+  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
+  
+  html+='<script src="/game-fx.js"></script>
+</body></html>';
+  
+  // Download as HTML file
+  var safeName=(pName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var testKey=document.title.split('—')[0].trim().replace(/[^a-zA-Z0-9]/g,'_');
+  var d=now;
+  var fileName=safeName+'_'+testKey+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.html';
+  
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+<script src="/game-fx.js"></script>
+</body>
+</html>

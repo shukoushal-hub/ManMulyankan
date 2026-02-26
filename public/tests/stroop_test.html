@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stroop Color Test — ManMulyankan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#2a2d35;--offwhite:#1e2028;--ice:#363840;
+  --blue:#6b8aff;--blue-d:#5570d9;--blue-l:#8fadff;--blue-glow:rgba(107,138,255,.1);
+  --navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--silver:#4a4d56;
+  --yellow:#f0b830;--yellow-bg:rgba(240,184,48,.08);
+  --red:#f07070;--red-bg:rgba(240,112,112,.08);
+  --green:#5ec49a;--green-bg:rgba(94,196,154,.08);
+  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r-sm:10px;--r-md:16px;--r-lg:24px;
+  --stroop-red:#ef5350;--stroop-blue:#42a5f5;--stroop-green:#66bb6a;--stroop-yellow:#ffd54f;
+  --sa:#7c6ff7;--sb:#42a5f5;--sc:#66bb6a;--sd:#ef5350;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--offwhite);color:var(--ink);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;padding:0 16px 60px}
+
+.shapes-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.shape{position:absolute;opacity:0;animation:shapeIn 2s ease forwards}
+.sh-c1{top:-80px;right:-60px;width:420px;height:420px;border:3px solid rgba(107,138,255,.5);border-radius:50%;animation:shapeIn 1.5s .2s ease forwards,drift 25s ease-in-out infinite}
+.sh-s1{bottom:60px;left:-30px;width:180px;height:180px;border:3px solid rgba(240,184,48,.45);transform:rotate(15deg);animation:shapeIn 1.5s .5s ease forwards,spin-slow 40s linear infinite}
+.sh-t1{top:40%;right:5%;width:0;height:0;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:120px solid rgba(240,112,112,.35);animation:shapeIn 1.5s .8s ease forwards,bob 18s ease-in-out infinite}
+.sh-c2{top:55%;left:3%;width:100px;height:100px;border:2.5px solid rgba(143,173,255,.45);border-radius:50%;animation:shapeIn 1.5s 1s ease forwards,drift 20s ease-in-out infinite reverse}
+.sh-c3{bottom:15%;right:12%;width:160px;height:160px;border:2px dashed rgba(143,173,255,.3);border-radius:50%;animation:shapeIn 1.5s 1s ease forwards,spin-slow 50s linear infinite}
+@keyframes shapeIn{to{opacity:.35}}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,20px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes spin-slow{to{transform:rotate(375deg)}}
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");background-size:128px 128px}
+
+.topbar{position:sticky;top:0;z-index:200;width:100%;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.92);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:1px solid rgba(107,138,255,.1);box-shadow:0 1px 24px rgba(7,14,36,.04)}
+.tb-logo{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(26,86,255,.3);position:relative;overflow:hidden}
+.tb-logo::before{content:'';position:absolute;top:6px;left:6px;width:10px;height:10px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:5px;right:5px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid rgba(255,255,255,.6)}
+.tb-title{font-size:.95rem;font-weight:800;color:var(--navy);letter-spacing:-.03em}
+.tb-sub{font-size:.66rem;color:var(--grey);font-weight:500;margin-top:1px}
+.tb-badge{margin-left:auto;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);background:linear-gradient(135deg,var(--blue-glow),rgba(26,86,255,.05));border:1px solid rgba(26,86,255,.15);padding:5px 14px;border-radius:50px}
+
+.main-wrap{position:relative;z-index:10;max-width:900px;width:100%}
+.hidden{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes heroIn{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.card{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 1px 1px rgba(7,14,36,.02),0 4px 8px rgba(7,14,36,.03),0 16px 48px rgba(7,14,36,.05)}
+.card::before{content:'';position:absolute;top:0;left:0;width:0;height:0;border-top:48px solid var(--blue);border-right:48px solid transparent;opacity:.06}
+.center{text-align:center}
+
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--blue);background:var(--white);border:1px solid var(--ice);padding:6px 18px;border-radius:50px;margin-bottom:16px;box-shadow:0 1px 8px rgba(26,86,255,.06)}
+.eyebrow-dot{width:6px;height:6px;background:var(--blue);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 36px;border:none;border-radius:var(--r-md);font-size:.92rem;font-weight:700;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);font-family:var(--font);position:relative;overflow:hidden}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 4px rgba(26,86,255,.2),0 8px 24px rgba(26,86,255,.15),4px 4px 0 var(--navy)}
+.btn-primary:hover{background:var(--blue-d);transform:translate(-2px,-2px);box-shadow:0 4px 8px rgba(26,86,255,.25),0 12px 32px rgba(26,86,255,.2),6px 6px 0 var(--navy)}
+.btn-primary::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 8px,rgba(255,255,255,.04) 8px,rgba(255,255,255,.04) 16px)}
+.btn-sm{padding:7px 18px;font-size:.78rem;font-weight:600;background:var(--white);color:var(--slate);border:1.5px solid var(--ice);border-radius:var(--r-sm);box-shadow:0 1px 4px rgba(7,14,36,.04);cursor:pointer}
+.btn-sm:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-glow)}
+.btn-stop{background:var(--red-bg)!important;color:var(--red)!important;border-color:rgba(240,62,62,.2)!important}
+.btn-stop:hover{background:var(--red)!important;color:#fff!important}
+.warn-box{background:linear-gradient(135deg,var(--yellow-bg),rgba(255,190,46,.04));border:1px solid rgba(240,184,48,.12);border-left:4px solid var(--yellow);border-radius:0 var(--r-md) var(--r-md) 0;padding:16px 20px;font-size:.8rem;color:#e6c65a;margin:24px 0;line-height:1.65}
+.warn-box strong{color:#ffd54f}
+
+/* Participant */
+.screen{display:none}.screen.active{display:block}
+.pi-avatar{width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,var(--blue),var(--blue-l));border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:#fff;box-shadow:0 6px 24px rgba(26,86,255,.2);position:relative}
+.pi-avatar::after{content:'';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border:2px solid var(--yellow);border-radius:3px;transform:rotate(20deg);animation:spin-slow 10s linear infinite}
+.pi-title{font-size:1.3rem;font-weight:800;color:var(--navy);margin-bottom:6px}
+.pi-sub{font-size:.86rem;color:var(--slate);margin-bottom:28px;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;text-align:left}
+.field-group{display:flex;flex-direction:column;gap:6px}.field-group.full{grid-column:1/-1}
+.field-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:flex;align-items:center;gap:6px}
+.field-label::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:1px;transform:rotate(45deg)}
+.field-input{width:100%;padding:14px 18px;border:2px solid var(--ice);border-radius:var(--r-md);background:var(--white);font-family:var(--font);font-size:.92rem;font-weight:500;color:var(--navy);transition:all .25s;outline:none}
+.field-input::placeholder{color:var(--silver)}
+.field-input:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-glow)}
+.field-input.err{border-color:var(--red);box-shadow:0 0 0 4px rgba(240,62,62,.1)}
+.field-error{font-size:.72rem;color:var(--red);font-weight:600;min-height:16px;margin-top:2px}
+.pi-note{font-size:.74rem;color:var(--grey);line-height:1.55;margin-bottom:24px;display:flex;align-items:flex-start;gap:8px}
+.pi-note-icon{width:16px;height:16px;min-width:16px;border-radius:50%;border:1.5px solid var(--silver);display:grid;place-items:center;font-size:.55rem;font-weight:900;color:var(--grey);margin-top:1px}
+
+/* Welcome sets preview */
+.sets-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.set-card{background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-md);padding:20px 16px;text-align:left;position:relative;overflow:hidden;transition:all .2s}
+.set-card:hover{border-color:var(--blue-l);box-shadow:0 4px 16px var(--blue-glow);transform:translateY(-2px)}
+.set-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+.set-card.sa::before{background:var(--sa)}.set-card.sb::before{background:var(--sb)}.set-card.sc::before{background:var(--sc)}.set-card.sd::before{background:var(--sd)}
+.set-letter{font-size:1.8rem;font-weight:900;margin-bottom:4px}
+.set-card.sa .set-letter{color:var(--sa)}.set-card.sb .set-letter{color:var(--sb)}.set-card.sc .set-letter{color:var(--sc)}.set-card.sd .set-letter{color:var(--sd)}
+.set-name{font-size:.78rem;font-weight:700;letter-spacing:.05em;margin-bottom:6px;color:var(--navy)}
+.set-desc{font-size:.72rem;color:var(--slate);line-height:1.6;margin-bottom:8px}
+.conflict-tag{display:inline-block;font-size:.64rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em}
+.conflict-tag.no{background:var(--green-bg);color:var(--green);border:1px solid rgba(18,183,106,.2)}
+.conflict-tag.yes{background:var(--red-bg);color:var(--red);border:1px solid rgba(240,62,62,.2)}
+
+/* Info grid */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
+.info-card{background:var(--white);border:1.5px solid var(--ice);border-radius:12px;padding:16px 12px;text-align:center}
+.ic-title{font-size:.64rem;color:var(--grey);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;font-weight:700}
+.ic-val{font-size:.88rem;font-weight:700;color:var(--navy)}
+
+/* Tabs */
+.tab-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{flex:1;min-width:80px;padding:9px 14px;border-radius:var(--r-sm);border:1.5px solid var(--ice);background:var(--white);color:var(--grey);font-size:.8rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:all .18s;text-align:center;font-family:var(--font)}
+.tab-btn:hover{background:var(--offwhite);color:var(--ink)}
+.tab-btn.active{color:#fff;border-color:transparent}
+.tab-btn.done{opacity:.55}
+.tab-btn.tab-a.active{background:var(--sa);box-shadow:0 0 16px rgba(124,111,247,.3)}
+.tab-btn.tab-b.active{background:var(--sb);box-shadow:0 0 16px rgba(66,165,245,.3)}
+.tab-btn.tab-c.active{background:var(--sc);box-shadow:0 0 16px rgba(102,187,106,.3)}
+.tab-btn.tab-d.active{background:var(--sd);box-shadow:0 0 16px rgba(239,83,80,.3)}
+
+/* Test panel */
+.test-panel{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:28px 24px;animation:fadeUp .3s ease both;box-shadow:0 1px 1px rgba(7,14,36,.02),0 4px 8px rgba(7,14,36,.03),0 16px 48px rgba(7,14,36,.05)}
+.panel-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.panel-tag{display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.1em;padding:4px 12px;border-radius:20px;margin-bottom:8px}
+.panel-a .panel-tag{background:rgba(124,111,247,.1);color:var(--sa);border:1px solid rgba(124,111,247,.2)}
+.panel-b .panel-tag{background:rgba(66,165,245,.1);color:var(--sb);border:1px solid rgba(66,165,245,.2)}
+.panel-c .panel-tag{background:rgba(102,187,106,.1);color:var(--sc);border:1px solid rgba(102,187,106,.2)}
+.panel-d .panel-tag{background:rgba(239,83,80,.1);color:var(--sd);border:1px solid rgba(239,83,80,.2)}
+.panel-title{font-size:1.2rem;font-weight:900;color:var(--navy);margin-bottom:4px}
+.panel-instruction{font-size:.8rem;color:var(--slate);max-width:480px;line-height:1.6}
+.stats-row{display:flex;gap:10px;flex-wrap:wrap}
+.stat-pill{background:var(--white);border:1px solid var(--ice);border-radius:10px;padding:8px 16px;font-size:.76rem;color:var(--grey);text-align:center;min-width:70px;font-weight:600}
+.stat-pill span{display:block;font-size:1rem;font-weight:800;color:var(--navy);margin-top:2px;font-family:var(--mono)}
+
+.progress-wrap{height:6px;background:var(--ice);border-radius:50px;margin:16px 0;overflow:hidden}
+.progress-bar{height:100%;border-radius:50px;width:0%;transition:width .3s}
+.panel-a .progress-bar{background:var(--sa)}.panel-b .progress-bar{background:var(--sb)}.panel-c .progress-bar{background:var(--sc)}.panel-d .progress-bar{background:var(--sd)}
+
+.ready-screen{text-align:center;padding:28px 0 12px}
+.ready-title{font-size:1rem;font-weight:800;margin-bottom:8px;color:var(--navy)}
+.ready-desc{font-size:.8rem;color:var(--slate);max-width:400px;margin:0 auto 24px;line-height:1.7}
+.start-btn{padding:13px 40px;border-radius:var(--r-md);border:none;font-size:.92rem;font-weight:800;cursor:pointer;transition:all .2s;color:#fff;font-family:var(--font);box-shadow:0 4px 18px rgba(0,0,0,.15)}
+.panel-a .start-btn{background:var(--sa)}.panel-b .start-btn{background:var(--sb)}.panel-c .start-btn{background:var(--sc)}.panel-d .start-btn{background:var(--sd)}
+.start-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+
+.trial-area{text-align:center;padding:10px 0}
+.stimulus-wrap{min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--white);border:2px solid var(--ice);border-radius:var(--r-lg);margin-bottom:20px;padding:20px}
+.stimulus-word{font-size:clamp(2.4rem,8vw,4rem);font-weight:900;letter-spacing:.08em;text-transform:uppercase;transition:opacity .12s}
+.feedback-msg{min-height:24px;font-size:.88rem;font-weight:700;letter-spacing:.04em;margin-bottom:16px}
+
+.color-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.color-btn{padding:13px 28px;font-size:.92rem;font-weight:800;letter-spacing:.08em;border-radius:var(--r-sm);border:2px solid transparent;cursor:pointer;transition:all .18s;min-width:100px;text-align:center;font-family:var(--font)}
+.color-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.color-btn:active:not(:disabled){transform:scale(.96)}
+
+/* Set A colored buttons */
+.panel-a .cb-red{background:rgba(239,83,80,.1);color:#ef5350;border-color:rgba(239,83,80,.3)}
+.panel-a .cb-red:hover:not(:disabled){background:rgba(239,83,80,.25);border-color:rgba(239,83,80,.6);transform:translateY(-2px)}
+.panel-a .cb-blue{background:rgba(66,165,245,.1);color:#42a5f5;border-color:rgba(66,165,245,.3)}
+.panel-a .cb-blue:hover:not(:disabled){background:rgba(66,165,245,.25);border-color:rgba(66,165,245,.6);transform:translateY(-2px)}
+.panel-a .cb-green{background:rgba(102,187,106,.1);color:#66bb6a;border-color:rgba(102,187,106,.3)}
+.panel-a .cb-green:hover:not(:disabled){background:rgba(102,187,106,.25);border-color:rgba(102,187,106,.6);transform:translateY(-2px)}
+.panel-a .cb-yellow{background:rgba(255,213,79,.1);color:#e6be00;border-color:rgba(255,213,79,.3)}
+.panel-a .cb-yellow:hover:not(:disabled){background:rgba(255,213,79,.25);border-color:rgba(255,213,79,.6);transform:translateY(-2px)}
+
+/* Sets B,C,D neutral buttons */
+.panel-b .color-btn,.panel-c .color-btn,.panel-d .color-btn{background:var(--white);color:var(--ink);border-color:var(--ice)}
+.panel-b .color-btn:hover:not(:disabled),.panel-c .color-btn:hover:not(:disabled),.panel-d .color-btn:hover:not(:disabled){background:var(--offwhite);border-color:var(--blue-l);transform:translateY(-2px)}
+
+.test-nav{display:flex;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--ice)}
+.reset-btn{background:var(--white);border:1.5px solid var(--ice);color:var(--slate);border-radius:var(--r-sm);padding:7px 18px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:var(--font)}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* Results */
+#resultsCard{max-width:900px;width:100%;opacity:0;transform:translateY(30px);transition:all .4s ease;pointer-events:none}
+#resultsCard.show{opacity:1;transform:translateY(0);pointer-events:all}
+.participant-banner{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(26,86,255,.04),rgba(77,122,255,.07));border:1.5px solid rgba(26,86,255,.12);border-radius:var(--r-md);padding:16px 20px;margin-bottom:20px}
+.pb-avatar{width:44px;height:44px;background:var(--blue);border-radius:50%;display:grid;place-items:center;font-size:1.1rem;color:#fff;font-weight:800;flex-shrink:0;box-shadow:0 2px 8px rgba(26,86,255,.2);font-family:var(--font)}
+.pb-info{display:flex;flex-direction:column;gap:2px}
+.pb-name{font-size:.95rem;font-weight:700;color:var(--navy)}
+.pb-meta{font-size:.76rem;color:var(--grey);font-weight:500;display:flex;align-items:center;gap:8px}
+.pb-meta .pb-dot{width:3px;height:3px;background:var(--silver);border-radius:50%}
+
+.results-header{text-align:center;padding:0 20px 28px}
+.results-header h2{font-size:1.7rem;font-weight:900;color:var(--navy);letter-spacing:-.03em;margin-bottom:4px}
+.results-header p{color:var(--slate);font-size:.88rem}
+.rpanel{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:26px;margin-bottom:20px;box-shadow:0 1px 2px rgba(7,14,36,.03);position:relative;overflow:hidden}
+.rpanel::before{content:'';position:absolute;top:0;left:0;width:0;height:0;border-top:36px solid var(--blue);border-right:36px solid transparent;opacity:.04}
+.sec-label{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,var(--blue),var(--blue-l));border-radius:2px}
+.sec-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--ice),transparent)}
+.geo-divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 20px}
+.geo-divider .gd-line{flex:1;height:1px;background:var(--ice)}
+.geo-divider .gd-shape{width:8px;height:8px;background:var(--blue);border-radius:2px;transform:rotate(45deg);opacity:.3}
+
+.raw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.raw-box{background:var(--white);border:1.5px solid var(--ice);border-radius:12px;padding:18px 14px;text-align:center;transition:all .2s}
+.raw-box:hover{border-color:var(--blue-l);box-shadow:0 2px 8px var(--blue-glow)}
+.rb-set{font-size:.66rem;font-weight:800;letter-spacing:.08em;margin-bottom:8px;padding:3px 10px;border-radius:20px;display:inline-block}
+.rb-set.sa{background:rgba(124,111,247,.1);color:var(--sa)}.rb-set.sb{background:rgba(66,165,245,.1);color:var(--sb)}.rb-set.sc{background:rgba(102,187,106,.1);color:var(--sc)}.rb-set.sd{background:rgba(239,83,80,.1);color:var(--sd)}
+.rb-time{font-size:1.8rem;font-weight:900;color:var(--navy);line-height:1;margin-bottom:2px;font-family:var(--mono)}
+.rb-unit{font-size:.68rem;color:var(--grey);margin-bottom:6px}
+.rb-err{font-size:.76rem;font-weight:700;color:var(--red)}
+
+.stroop-effect-bar{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.se-label{font-size:.76rem;font-weight:600;color:var(--slate);min-width:180px;text-align:right}
+.se-bar-wrap{flex:1;height:12px;background:var(--ice);border-radius:50px;overflow:hidden}
+.se-bar-fill{height:100%;border-radius:50px;width:0%;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.se-val{font-size:.78rem;font-weight:800;color:var(--navy);min-width:48px;font-family:var(--mono)}
+
+.interp-box{background:var(--white);border:1.5px solid var(--ice);border-left:4px solid var(--blue);border-radius:var(--r-md);padding:18px 20px;margin-bottom:12px}
+.ib-title{font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:6px}
+.ib-text{font-size:.8rem;color:var(--slate);line-height:1.7}
+
+.restart-wrap{text-align:center;margin-top:16px}
+.disclaimer{background:linear-gradient(135deg,var(--yellow-bg),rgba(255,190,46,.04));border:1px solid rgba(240,184,48,.12);border-left:4px solid var(--yellow);border-radius:0 var(--r-md) var(--r-md) 0;padding:14px 18px;font-size:.76rem;color:#e6c65a;line-height:1.65;margin-bottom:24px}
+
+@media(max-width:640px){.sets-preview{grid-template-columns:1fr 1fr}.info-grid{grid-template-columns:1fr 1fr}.raw-grid{grid-template-columns:1fr 1fr}.se-label{min-width:100px;font-size:.68rem}.tb-badge{display:none}.field-row{grid-template-columns:1fr}.stroop-effect-bar{flex-wrap:wrap;gap:6px}}
+@media print{.topbar,.shapes-layer,.btn,.test-nav{display:none!important}body{background:#fff;color:#161d35}body::after{display:none}.card,.test-panel,.rpanel{box-shadow:none;border:1px solid #ddd;backdrop-filter:none}}
+
+.btn-save{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 2px 8px rgba(94,196,154,.2)}
+.btn-save:hover{background:#4aaf86;transform:translateY(-1px)}
+.btn-save::before{content:'';display:inline-block;width:14px;height:14px;border:2px solid #fff;border-radius:3px;position:relative}
+.btn-save::after{content:'';position:absolute;width:6px;height:3px;border-bottom:2px solid #fff;border-left:2px solid #fff;transform:rotate(-45deg);margin-left:-11px;margin-top:4px}
+
+/* ═══ MOBILE RESPONSIVE ENHANCEMENTS ═══ */
+@media(max-width:600px){
+  body{font-size:14px}
+  .topbar,.tb{padding:10px 14px!important;gap:8px!important}
+  .tb-title,.tb-t{font-size:.85rem!important}
+  .tb-badge{font-size:.5rem!important;padding:3px 8px!important}
+  button,input{font-size:16px!important;-webkit-appearance:none}
+  .main,.wrap,.container{padding-left:14px!important;padding-right:14px!important}
+}
+@media(max-width:400px){
+  .topbar,.tb{flex-wrap:wrap}
+}
+
+/* ═══ FLOWING PROGRESS DOT ═══ */
+.progress-fill,.prog-fill,.cat-fill,.domain-fill{position:relative}
+.progress-fill::after,.prog-fill::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--yellow,#f0b830);border-radius:50%;box-shadow:0 0 12px rgba(240,184,48,.6),0 0 24px rgba(240,184,48,.3);animation:dotPulse 1.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(240,184,48,.5),0 0 16px rgba(240,184,48,.2)}50%{box-shadow:0 0 16px rgba(240,184,48,.8),0 0 32px rgba(240,184,48,.4)}}
+</style>
+</head>
+<body>
+<div class="shapes-layer"><div class="shape sh-c1"></div><div class="shape sh-s1"></div><div class="shape sh-t1"></div><div class="shape sh-c2"></div><div class="shape sh-c3"></div></div>
+<div class="topbar"><a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">ManMulyankan</div><div class="tb-sub">Stroop Color Test</div></div></a>
+  <a href="/" style="margin-left:auto;font-size:.76rem;color:var(--slate);text-decoration:none;font-weight:600;padding:6px 14px;border:1px solid var(--ice,#363840);border-radius:8px;transition:all .2s" onmouseover="this.style.color='var(--blue,#6b8aff)';this.style.borderColor='var(--blue,#6b8aff)'" onmouseout="this.style.color='var(--slate,#9498a4)';this.style.borderColor='var(--ice,#363840)'">All Tests</a><span class="tb-badge" style="margin-left:0">Cognitive Assessment</span></div>
+<div class="main-wrap">
+
+<div id="welcomeScreen" style="padding:48px 0;animation:heroIn .8s ease both">
+  <div class="card center">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> Cognitive Assessment</div>
+    <h2 style="font-size:clamp(1.8rem,4vw,2.4rem);font-weight:900;color:var(--navy);margin-bottom:8px"><span style="position:relative;display:inline-block">Stroop<span style="position:absolute;bottom:-4px;left:0;right:0;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--blue-l))"></span></span> Color Test</h2>
+    <p style="color:var(--slate);font-size:.92rem;margin-bottom:32px;line-height:1.6;max-width:540px;margin-left:auto;margin-right:auto">A validated neuropsychological assessment measuring cognitive flexibility, selective attention, and processing speed across four progressive sets.</p>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-title">Total Sets</div><div class="ic-val">4 Sets</div></div>
+      <div class="info-card"><div class="ic-title">Trials Each</div><div class="ic-val">20 Trials</div></div>
+      <div class="info-card"><div class="ic-title">Est. Duration</div><div class="ic-val">5 - 8 min</div></div>
+      <div class="info-card"><div class="ic-title">Measures</div><div class="ic-val">RT &amp; Accuracy</div></div>
+    </div>
+    <div class="sets-preview">
+      <div class="set-card sa"><div class="set-letter">A</div><div class="set-name">WORD READING</div><div class="set-desc">Read the printed word. Words shown in white ink.</div><span class="conflict-tag no">NO CONFLICT</span></div>
+      <div class="set-card sb"><div class="set-letter">B</div><div class="set-name">COLOR NAMING</div><div class="set-desc">Name the ink color of random letter patches.</div><span class="conflict-tag no">LOW CONFLICT</span></div>
+      <div class="set-card sc"><div class="set-letter">C</div><div class="set-name">INTERFERENCE</div><div class="set-desc">Name the ink color of mismatched color words.</div><span class="conflict-tag yes">HIGH CONFLICT</span></div>
+      <div class="set-card sd"><div class="set-letter">D</div><div class="set-name">INHIBITION</div><div class="set-desc">Name ink color while suppressing word reading.</div><span class="conflict-tag yes">MAX CONFLICT</span></div>
+    </div>
+    <div class="warn-box"><strong>Disclaimer:</strong> This is a digital version for educational and screening purposes only. Results do not constitute a clinical diagnosis.</div>
+    <button class="btn btn-primary" id="beginBtn">Begin Assessment</button>
+  </div>
+</div>
+
+<div class="screen" id="s-participant">
+  <div class="card center">
+    <div class="pi-avatar">&#128100;</div>
+    <h2 class="pi-title">Participant Details</h2>
+    <p class="pi-sub">Please enter your information before starting the assessment.</p>
+    <div class="field-row">
+      <div class="field-group full"><label class="field-label" for="piName">Full Name</label><input type="text" class="field-input" id="piName" placeholder="e.g. John Smith" autocomplete="name" maxlength="16"><div class="field-error" id="piNameErr"></div></div>
+      <div class="field-group"><label class="field-label" for="piAge">Age</label><input type="number" class="field-input" id="piAge" placeholder="e.g. 34" min="5" max="120"><div class="field-error" id="piAgeErr"></div></div>
+    </div>
+    <div class="pi-note"><span class="pi-note-icon">i</span><span>Your information is only used locally for your results report.</span></div>
+    <button class="btn btn-primary" id="piStartBtn">Start Assessment</button>
+  </div>
+</div>
+
+<div id="testArea" class="hidden">
+  <div class="tab-nav">
+    <button class="tab-btn tab-a active" data-tab="A">SET A</button>
+    <button class="tab-btn tab-b" data-tab="B">SET B</button>
+    <button class="tab-btn tab-c" data-tab="C">SET C</button>
+    <button class="tab-btn tab-d" data-tab="D">SET D</button>
+  </div>
+
+  <div class="test-panel panel-a" id="panelA">
+    <div class="panel-header"><div class="ph-left"><div class="panel-tag">SET A — WORD READING</div><div class="panel-title">Read the Word</div><div class="panel-instruction">A word is displayed in <strong>white</strong> ink. Select the button that matches the <strong>written word</strong>.</div></div>
+    <div class="stats-row"><div class="stat-pill">Trial<span id="trialA">0/20</span></div><div class="stat-pill">Correct<span id="correctA">0</span></div><div class="stat-pill">Avg RT<span id="rtA">—</span></div></div></div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressA"></div></div>
+    <div class="ready-screen" id="readyA"><div class="ready-title">Set A — Word Reading</div><div class="ready-desc">You will see a word in <strong>white</strong> ink. Click the button matching the <strong>word you read</strong>. Buttons are color-coded.</div><button class="start-btn" id="startA">START SET A</button></div>
+    <div class="trial-area hidden" id="trialAreaA"><div class="stimulus-wrap"><div class="stimulus-word" id="stimA">—</div></div><div class="feedback-msg" id="feedbackA"></div><div class="color-buttons" id="btnsA"><button class="color-btn cb-red" data-val="RED">RED</button><button class="color-btn cb-blue" data-val="BLUE">BLUE</button><button class="color-btn cb-green" data-val="GREEN">GREEN</button><button class="color-btn cb-yellow" data-val="YELLOW">YELLOW</button></div><button class="reset-btn" id="resetA">Restart Set A</button></div>
+    <div class="test-nav"><button class="btn btn-sm" id="homeA">Home</button><button class="btn btn-sm btn-stop" id="stopA">Stop Test</button></div>
+  </div>
+
+  <div class="test-panel panel-b hidden" id="panelB">
+    <div class="panel-header"><div class="ph-left"><div class="panel-tag">SET B — COLOR NAMING</div><div class="panel-title">Name the Ink Color</div><div class="panel-instruction">A block of <strong>random letters</strong> is shown in color. Select the button matching the <strong>ink color</strong>.</div></div>
+    <div class="stats-row"><div class="stat-pill">Trial<span id="trialB">0/20</span></div><div class="stat-pill">Correct<span id="correctB">0</span></div><div class="stat-pill">Avg RT<span id="rtB">—</span></div></div></div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressB"></div></div>
+    <div class="ready-screen" id="readyB"><div class="ready-title">Set B — Color Naming</div><div class="ready-desc">You will see <strong>random letters</strong> in a color. Click the button matching the <strong>ink color</strong>. Buttons are neutral.</div><button class="start-btn" id="startB">START SET B</button></div>
+    <div class="trial-area hidden" id="trialAreaB"><div class="stimulus-wrap"><div class="stimulus-word" id="stimB">—</div></div><div class="feedback-msg" id="feedbackB"></div><div class="color-buttons" id="btnsB"><button class="color-btn" data-val="RED">RED</button><button class="color-btn" data-val="BLUE">BLUE</button><button class="color-btn" data-val="GREEN">GREEN</button><button class="color-btn" data-val="YELLOW">YELLOW</button></div><button class="reset-btn" id="resetB">Restart Set B</button></div>
+    <div class="test-nav"><button class="btn btn-sm" id="homeB">Home</button><button class="btn btn-sm btn-stop" id="stopB">Stop Test</button></div>
+  </div>
+
+  <div class="test-panel panel-c hidden" id="panelC">
+    <div class="panel-header"><div class="ph-left"><div class="panel-tag">SET C — INTERFERENCE</div><div class="panel-title">Name the Ink Color</div><div class="panel-instruction">A color word in a <strong>mismatched</strong> ink color. Select the button matching the <strong>ink color</strong>, not the word.</div></div>
+    <div class="stats-row"><div class="stat-pill">Trial<span id="trialC">0/20</span></div><div class="stat-pill">Correct<span id="correctC">0</span></div><div class="stat-pill">Avg RT<span id="rtC">—</span></div></div></div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressC"></div></div>
+    <div class="ready-screen" id="readyC"><div class="ready-title">Set C — Interference</div><div class="ready-desc">A color word in a <strong>different</strong> ink color. Name the <strong>ink color</strong> and ignore the word. Buttons are neutral.</div><button class="start-btn" id="startC">START SET C</button></div>
+    <div class="trial-area hidden" id="trialAreaC"><div class="stimulus-wrap"><div class="stimulus-word" id="stimC">—</div></div><div class="feedback-msg" id="feedbackC"></div><div class="color-buttons" id="btnsC"><button class="color-btn" data-val="RED">RED</button><button class="color-btn" data-val="BLUE">BLUE</button><button class="color-btn" data-val="GREEN">GREEN</button><button class="color-btn" data-val="YELLOW">YELLOW</button></div><button class="reset-btn" id="resetC">Restart Set C</button></div>
+    <div class="test-nav"><button class="btn btn-sm" id="homeC">Home</button><button class="btn btn-sm btn-stop" id="stopC">Stop Test</button></div>
+  </div>
+
+  <div class="test-panel panel-d hidden" id="panelD">
+    <div class="panel-header"><div class="ph-left"><div class="panel-tag">SET D — INHIBITION</div><div class="panel-title">Name the Ink Color</div><div class="panel-instruction">Maximum conflict. Name the <strong>ink color</strong> while actively suppressing the urge to read the word.</div></div>
+    <div class="stats-row"><div class="stat-pill">Trial<span id="trialD">0/20</span></div><div class="stat-pill">Correct<span id="correctD">0</span></div><div class="stat-pill">Avg RT<span id="rtD">—</span></div></div></div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressD"></div></div>
+    <div class="ready-screen" id="readyD"><div class="ready-title">Set D — Inhibition</div><div class="ready-desc">Maximum conflict. <strong>Suppress</strong> word reading and name only the <strong>ink color</strong>. Buttons are neutral.</div><button class="start-btn" id="startD">START SET D</button></div>
+    <div class="trial-area hidden" id="trialAreaD"><div class="stimulus-wrap"><div class="stimulus-word" id="stimD">—</div></div><div class="feedback-msg" id="feedbackD"></div><div class="color-buttons" id="btnsD"><button class="color-btn" data-val="RED">RED</button><button class="color-btn" data-val="BLUE">BLUE</button><button class="color-btn" data-val="GREEN">GREEN</button><button class="color-btn" data-val="YELLOW">YELLOW</button></div><button class="reset-btn" id="resetD">Restart Set D</button></div>
+    <div class="test-nav"><button class="btn btn-sm" id="homeD">Home</button><button class="btn btn-sm btn-stop" id="stopD">Stop Test</button></div>
+  </div>
+
+</div><!-- /testArea -->
+
+<div id="resultsCard" class="hidden">
+  <div class="participant-banner"><div class="pb-avatar" id="pbInitial">?</div><div class="pb-info"><div class="pb-name" id="pbName">—</div><div class="pb-meta"><span id="pbAge">—</span><span class="pb-dot"></span><span>Started: </span><span id="pbDate">—</span></div></div></div>
+  <div class="results-header"><h2>Your Stroop Results</h2><p>Full cognitive performance breakdown across all four sets</p></div>
+  <div class="rpanel"><div class="sec-label">Raw Performance — All Sets</div><div class="raw-grid" id="rawGrid"></div></div>
+  <div class="geo-divider"><span class="gd-line"></span><span class="gd-shape"></span><span class="gd-line"></span></div>
+  <div class="rpanel"><div class="sec-label">Stroop Interference Effect</div><div id="stroopBars"></div></div>
+  <div class="geo-divider"><span class="gd-line"></span><span class="gd-shape"></span><span class="gd-line"></span></div>
+  <div class="rpanel"><div class="sec-label">Clinical Interpretation</div><div id="interpBoxes"></div></div>
+  <div 
+  h+='<h3 style="text-align:left;font-size:.82rem;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:28px 0 16px">How to Improve Attention & Inhibition</h3>';
+  h+='<div style="text-align:left;margin-bottom:16px;padding:18px;background:var(--bg);border-radius:10px;border-left:3px solid #f07070">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#f07070;margin-bottom:10px">Selective Attention</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Focused Attention Meditation</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Practice single-point focus meditation to strengthen your ability to sustain attention.</div><a href="https://www.headspace.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">Try Headspace →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Reduce Multitasking</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Single-task for 25-minute blocks (Pomodoro technique) to rebuild attention capacity.</div><a href="https://todoist.com/productivity-methods/pomodoro-technique" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">Pomodoro Guide →</a></div>';
+  h+='</div>';
+  h+='<div style="text-align:left;margin-bottom:16px;padding:18px;background:var(--bg);border-radius:10px;border-left:3px solid #b49dff">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#b49dff;margin-bottom:10px">Inhibitory Control</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Impulse Control Training</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Practice go/no-go tasks and stop-signal games to improve your ability to suppress automatic responses.</div><a href="https://www.cognifit.com/inhibition" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">CogniFit Training →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card,#2a2d35);border-radius:8px;border:1px solid var(--ice,#363840)"><div style="font-size:.82rem;font-weight:700;color:var(--navy,#eaecf0);margin-bottom:3px">Regular Physical Exercise</div><div style="font-size:.75rem;color:var(--slate,#9498a4);line-height:1.5;margin-bottom:4px">Aerobic exercise enhances prefrontal cortex function, which governs inhibitory control.</div><a href="https://www.health.harvard.edu/blog/regular-exercise-changes-brain-improve-memory-thinking-skills-201404097110" target="_blank" rel="noopener" style="font-size:.7rem;color:#6b8aff;text-decoration:none;font-weight:700">Harvard Health →</a></div>';
+  h+='</div>';
+
+class="disclaimer"><strong>Clinical Disclaimer:</strong> This digital Stroop test is for educational and informational purposes only. It is not a substitute for a formal neuropsychological evaluation. Consult a qualified healthcare professional.</div>
+  <div class="restart-wrap"><button class="btn-save" onclick="triggerSave()">Download Report</button> <button class="btn btn-primary" id="retryBtn">Restart Full Assessment</button></div>
+</div>
+
+</div><!-- /main-wrap -->
+<script>
+const COLORS=['RED','BLUE','GREEN','YELLOW'];
+const INK_MAP={RED:'#ef5350',BLUE:'#42a5f5',GREEN:'#66bb6a',YELLOW:'#ffd54f'};
+const TRIALS_PER_SET=20;
+const state={
+  A:{trials:[],current:0,correct:0,rts:[],started:false,done:false},
+  B:{trials:[],current:0,correct:0,rts:[],started:false,done:false},
+  C:{trials:[],current:0,correct:0,rts:[],started:false,done:false},
+  D:{trials:[],current:0,correct:0,rts:[],started:false,done:false}
+};
+let trialStartTime=0,activeSet='A';
+let participantName='',participantAge='',testStartTime=null;
+
+function generateTrialsA(){const t=[];for(let i=0;i<TRIALS_PER_SET;i++){const w=COLORS[Math.floor(Math.random()*COLORS.length)];t.push({word:w,inkColor:'#eaecf0',answer:w})}return t}
+function randLetters(){const c='BCDFGHJKLMNPQRSTVWXZ',v='AEIOU';return c[Math.floor(Math.random()*c.length)]+v[Math.floor(Math.random()*v.length)]+c[Math.floor(Math.random()*c.length)]}
+function generateTrialsB(){const t=[];for(let i=0;i<TRIALS_PER_SET;i++){const ink=COLORS[Math.floor(Math.random()*COLORS.length)];t.push({word:randLetters(),inkColor:INK_MAP[ink],answer:ink})}return t}
+function generateTrialsC(){const t=[];for(let i=0;i<TRIALS_PER_SET;i++){const w=COLORS[Math.floor(Math.random()*COLORS.length)];const opts=COLORS.filter(c=>c!==w);const ink=opts[Math.floor(Math.random()*opts.length)];t.push({word:w,inkColor:INK_MAP[ink],answer:ink})}return t}
+function generateTrialsD(){const t=[];for(let i=0;i<TRIALS_PER_SET;i++){const w=COLORS[Math.floor(Math.random()*COLORS.length)];const opts=COLORS.filter(c=>c!==w);const ink=opts[Math.floor(Math.random()*opts.length)];t.push({word:w,inkColor:INK_MAP[ink],answer:ink})}return t.sort(()=>Math.random()-.5)}
+
+const dom={
+  welcomeScreen:document.getElementById('welcomeScreen'),beginBtn:document.getElementById('beginBtn'),testArea:document.getElementById('testArea'),resultsCard:document.getElementById('resultsCard'),retryBtn:document.getElementById('retryBtn'),
+  tabs:document.querySelectorAll('.tab-btn'),
+  panels:{A:document.getElementById('panelA'),B:document.getElementById('panelB'),C:document.getElementById('panelC'),D:document.getElementById('panelD')},
+  ready:{A:document.getElementById('readyA'),B:document.getElementById('readyB'),C:document.getElementById('readyC'),D:document.getElementById('readyD')},
+  trialArea:{A:document.getElementById('trialAreaA'),B:document.getElementById('trialAreaB'),C:document.getElementById('trialAreaC'),D:document.getElementById('trialAreaD')},
+  stim:{A:document.getElementById('stimA'),B:document.getElementById('stimB'),C:document.getElementById('stimC'),D:document.getElementById('stimD')},
+  feedback:{A:document.getElementById('feedbackA'),B:document.getElementById('feedbackB'),C:document.getElementById('feedbackC'),D:document.getElementById('feedbackD')},
+  progress:{A:document.getElementById('progressA'),B:document.getElementById('progressB'),C:document.getElementById('progressC'),D:document.getElementById('progressD')},
+  trialCount:{A:document.getElementById('trialA'),B:document.getElementById('trialB'),C:document.getElementById('trialC'),D:document.getElementById('trialD')},
+  correctCount:{A:document.getElementById('correctA'),B:document.getElementById('correctB'),C:document.getElementById('correctC'),D:document.getElementById('correctD')},
+  rtDisplay:{A:document.getElementById('rtA'),B:document.getElementById('rtB'),C:document.getElementById('rtC'),D:document.getElementById('rtD')},
+  buttons:{A:document.querySelectorAll('#btnsA .color-btn'),B:document.querySelectorAll('#btnsB .color-btn'),C:document.querySelectorAll('#btnsC .color-btn'),D:document.querySelectorAll('#btnsD .color-btn')},
+  startBtns:{A:document.getElementById('startA'),B:document.getElementById('startB'),C:document.getElementById('startC'),D:document.getElementById('startD')},
+  resetBtns:{A:document.getElementById('resetA'),B:document.getElementById('resetB'),C:document.getElementById('resetC'),D:document.getElementById('resetD')}
+};
+
+function initState(set){const g={A:generateTrialsA,B:generateTrialsB,C:generateTrialsC,D:generateTrialsD};state[set].trials=g[set]();state[set].current=0;state[set].correct=0;state[set].rts=[];state[set].started=false;state[set].done=false}
+function initAllSets(){['A','B','C','D'].forEach(initState)}
+function switchTab(set){activeSet=set;dom.tabs.forEach(b=>{b.classList.remove('active');if(b.dataset.tab===set)b.classList.add('active')});Object.keys(dom.panels).forEach(s=>{if(s===set)dom.panels[s].classList.remove('hidden');else dom.panels[s].classList.add('hidden')})}
+function startSet(set){state[set].started=true;dom.ready[set].classList.add('hidden');dom.trialArea[set].classList.remove('hidden');loadTrial(set)}
+function loadTrial(set){const s=state[set],t=s.trials[s.current];dom.stim[set].textContent=t.word;dom.stim[set].style.color=t.inkColor;dom.feedback[set].textContent='';dom.feedback[set].style.color='';setButtonsDisabled(set,false);updateStats(set);trialStartTime=performance.now()}
+function handleAnswer(set,chosen){const rt=Math.round(performance.now()-trialStartTime),s=state[set],t=s.trials[s.current];setButtonsDisabled(set,true);const correct=(chosen===t.answer);s.rts.push(rt);if(correct)s.correct++;const fb=dom.feedback[set];if(correct){fb.textContent=`Correct \u2014 ${rt} ms`;fb.style.color='#5ec49a'}else{fb.textContent=`Incorrect (Answer: ${t.answer}) \u2014 ${rt} ms`;fb.style.color='#f07070'}updateStats(set);setTimeout(()=>{s.current++;if(s.current>=TRIALS_PER_SET)finishSet(set);else loadTrial(set)},700)}
+function updateStats(set){const s=state[set];dom.trialCount[set].textContent=`${Math.min(s.current+1,TRIALS_PER_SET)}/${TRIALS_PER_SET}`;dom.correctCount[set].textContent=s.correct;if(s.rts.length>0){const avg=Math.round(s.rts.reduce((a,b)=>a+b,0)/s.rts.length);dom.rtDisplay[set].textContent=`${avg} ms`}dom.progress[set].style.width=`${(s.current/TRIALS_PER_SET)*100}%`}
+function finishSet(set){state[set].done=true;dom.progress[set].style.width='100%';dom.tabs.forEach(b=>{if(b.dataset.tab===set)b.classList.add('done')});dom.stim[set].textContent='\u2713';dom.stim[set].style.color='#5ec49a';dom.feedback[set].style.color='#5ec49a';setButtonsDisabled(set,true);const order=['A','B','C','D'];const idx=order.indexOf(set);if(idx<3){const next=order[idx+1];dom.feedback[set].textContent=`Set ${set} complete! Starting Set ${next}...`;setTimeout(()=>{switchTab(next);startSet(next)},1500)}else{dom.feedback[set].textContent='All sets complete!';setTimeout(showResults,1200)}}
+function setButtonsDisabled(set,d){dom.buttons[set].forEach(b=>{b.disabled=d})}
+function resetSet(set){initState(set);dom.stim[set].textContent='\u2014';dom.stim[set].style.color='var(--grey)';dom.feedback[set].textContent='';dom.trialCount[set].textContent=`0/${TRIALS_PER_SET}`;dom.correctCount[set].textContent='0';dom.rtDisplay[set].textContent='\u2014';dom.progress[set].style.width='0%';setButtonsDisabled(set,false);dom.ready[set].classList.remove('hidden');dom.trialArea[set].classList.add('hidden');dom.tabs.forEach(b=>{if(b.dataset.tab===set)b.classList.remove('done')})}
+function avgRT(set){const r=state[set].rts;if(!r.length)return 0;return Math.round(r.reduce((a,b)=>a+b,0)/r.length)}
+
+function fullReset(){dom.resultsCard.classList.add('hidden');dom.resultsCard.classList.remove('show');dom.testArea.classList.add('hidden');dom.welcomeScreen.classList.remove('hidden');document.getElementById('s-participant').classList.remove('active');initAllSets();['A','B','C','D'].forEach(s=>resetSet(s))}
+
+// Welcome -> Participant
+dom.beginBtn.addEventListener('click',()=>{dom.welcomeScreen.classList.add('hidden');document.getElementById('s-participant').classList.add('active');window.scrollTo(0,0)});
+
+// Participant -> Test
+document.getElementById('piStartBtn').addEventListener('click',()=>{
+  const name=document.getElementById('piName').value.trim(),age=document.getElementById('piAge').value.trim();
+  let valid=true;
+  document.getElementById('piName').classList.remove('err');document.getElementById('piAge').classList.remove('err');
+  document.getElementById('piNameErr').textContent='';document.getElementById('piAgeErr').textContent='';
+  if(!name){document.getElementById('piName').classList.add('err');document.getElementById('piNameErr').textContent='Please enter your name';valid=false}
+  else if(name.length>16){document.getElementById('piName').classList.add('err');document.getElementById('piNameErr').textContent='Name must be 16 characters or less';valid=false}
+  if(!age||isNaN(age)||parseInt(age)<5||parseInt(age)>120){document.getElementById('piAge').classList.add('err');document.getElementById('piAgeErr').textContent='Enter a valid age (5\u2013120)';valid=false}
+  if(!valid)return;
+  participantName=name;participantAge=age;testStartTime=new Date();
+  document.getElementById('s-participant').classList.remove('active');
+  initAllSets();dom.testArea.classList.remove('hidden');switchTab('A');window.scrollTo(0,0);
+});
+document.getElementById('piName').addEventListener('focus',function(){this.classList.remove('err');document.getElementById('piNameErr').textContent=''});
+document.getElementById('piAge').addEventListener('focus',function(){this.classList.remove('err');document.getElementById('piAgeErr').textContent=''});
+
+dom.tabs.forEach(b=>{b.addEventListener('click',()=>switchTab(b.dataset.tab))});
+['A','B','C','D'].forEach(set=>{dom.startBtns[set].addEventListener('click',()=>startSet(set))});
+['A','B','C','D'].forEach(set=>{dom.buttons[set].forEach(b=>{b.addEventListener('click',()=>{if(!state[set].started||state[set].done)return;handleAnswer(set,b.dataset.val)})})});
+['A','B','C','D'].forEach(set=>{dom.resetBtns[set].addEventListener('click',()=>resetSet(set))});
+
+// Home buttons
+['A','B','C','D'].forEach(set=>{document.getElementById('home'+set).addEventListener('click',()=>fullReset())});
+// Stop buttons
+['A','B','C','D'].forEach(set=>{document.getElementById('stop'+set).addEventListener('click',()=>{state[set].done=true;setButtonsDisabled(set,true);dom.feedback[set].textContent='Test stopped by participant';dom.feedback[set].style.color='#f03e3e';dom.stim[set].textContent='\u25A0';dom.stim[set].style.color='#f03e3e'})});
+
+dom.retryBtn.addEventListener('click',fullReset);
+
+
+/* ═══ SAVE RESULTS TO SERVER ═══ */
+function saveResultsToServer(testName, resultData){
+  var payload = {
+    participant: { name: participantName||'Unknown', age: parseInt(participantAge)||null },
+    test_type: testName,
+    started_at: testStartTime ? testStartTime.toISOString() : new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    raw_answers: resultData.rawAnswers || resultData.answers || {},
+    scores: resultData,
+    interpretation: resultData.severity || resultData.category || ''
+  };
+  fetch('/api/results', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){return r.json()}).then(function(d){
+    console.log('Results saved to server:', d);
+  }).catch(function(e){
+    console.log('Server save failed (offline mode):', e);
+  });
+}
+
+/* ═══ SAVE RESULTS TO FILE ═══ */
+function saveResultsToFile(testName, resultData){
+  saveResultsToServer(testName, resultData);
+  var name = (participantName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var d = testStartTime || new Date();
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var yy=d.getFullYear();
+  var hh=String(d.getHours()).padStart(2,'0');
+  var mi=String(d.getMinutes()).padStart(2,'0');
+  var ss=String(d.getSeconds()).padStart(2,'0');
+  var dateStr=yy+'-'+mm+'-'+dd;
+  var timeStr=hh+'-'+mi+'-'+ss;
+  var fileName='results/'+testName+'/'+name+'_'+dateStr+'_'+timeStr+'.json';
+  var payload = {
+    meta: {
+      test: testName,
+      participant: participantName||'Unknown',
+      age: participantAge||'--',
+      date: dd+'/'+mm+'/'+yy,
+      time: hh+':'+mi+':'+ss,
+      timestamp: d.toISOString(),
+      filePath: fileName
+    },
+    results: resultData
+  };
+  var json = JSON.stringify(payload, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name+'_'+testName+'_'+dateStr+'_'+timeStr+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+
+
+
+
+/* ═══ HTML REPORT EXPORT ═══ */
+function triggerSave(){
+  // Clone the results section exactly as displayed
+  var resultsEl = document.querySelector('.screen.active') || document.querySelector('#s-results.active') || document.querySelector('.results-view') || document.querySelector('#resultsCard');
+  if(!resultsEl){
+    // Try alternate selectors
+    resultsEl = document.querySelector('#s-results') || document.querySelector('.result-card') || document.querySelector('[class*="result"]');
+  }
+  if(!resultsEl){alert('No results to export');return}
+  
+  // Get all styles from the page
+  var styles='';
+  document.querySelectorAll('style').forEach(function(s){styles+=s.outerHTML});
+  // Get linked fonts
+  var fonts='';
+  document.querySelectorAll('link[href*="font"]').forEach(function(l){fonts+=l.outerHTML});
+  
+  // Build standalone HTML
+  var pName=window.participantName||window._pName||'Participant';
+  var pAge=window.participantAge||window._pAge||'';
+  var testTitle=document.title||'ManMulyankan Assessment';
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">';
+  html+='<title>'+testTitle+' — Results for '+pName+'</title>';
+  html+=fonts;
+  html+=styles;
+  html+='<style>';
+  html+='body{background:#1e2028!important;color:#c8ccd4!important;font-family:"Outfit",sans-serif!important;padding:20px!important;min-height:auto!important}';
+  html+='.topbar,.shapes,.shapes-layer,.progress-wrap,.tb,.search-wrap,.ai-modal-bg{display:none!important}';
+  html+='.screen,.screen.active{display:block!important}';
+  html+='.main,.wrap,.container{max-width:800px!important;margin:0 auto!important;padding:20px!important}';
+  // Print styles
+  html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+  html+='.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button{display:none!important}';
+  html+='.card,.q-card,.result-card,.interp-box{border:1px solid #ddd!important;box-shadow:none!important}';
+  html+='.score-ring-wrap svg circle,.iq-ring svg circle,.domain-fill,.cat-fill{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}}';
+  html+='</style></head><body>';
+  
+  // Header
+  html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
+  html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
+  if(pAge) html+='<span><strong style="color:#6b8aff">Age:</strong> '+pAge+'</span>';
+  html+='<span><strong style="color:#6b8aff">Date:</strong> '+dateStr+'</span>';
+  html+='</div></div>';
+  
+  // Clone results content
+  var clone=resultsEl.cloneNode(true);
+  // Remove buttons from clone
+  clone.querySelectorAll('.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button,[onclick*="reload"],[onclick*="restart"],[onclick*="triggerSave"],[onclick*="Start"]').forEach(function(el){el.remove()});
+  // Remove progress bar from clone
+  clone.querySelectorAll('.progress-wrap,.progress-bar').forEach(function(el){el.remove()});
+  
+  html+='<div class="main" style="padding:0">'+clone.innerHTML+'</div>';
+  
+  // Footer
+  html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
+  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
+  
+  html+='<script src="/game-fx.js"></script>
+</body></html>';
+  
+  // Download as HTML file
+  var safeName=(pName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var testKey=document.title.split('—')[0].trim().replace(/[^a-zA-Z0-9]/g,'_');
+  var d=now;
+  var fileName=safeName+'_'+testKey+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.html';
+  
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+<script>
+const barFills={};
+function showResults(){
+  dom.testArea.classList.add('hidden');dom.resultsCard.classList.remove('hidden');
+  // Populate participant
+  document.getElementById('pbName').textContent=participantName||'\u2014';
+  document.getElementById('pbAge').textContent=participantAge?'Age '+participantAge:'\u2014';
+  if(testStartTime){const d=testStartTime;document.getElementById('pbDate').textContent=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' at '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}else{document.getElementById('pbDate').textContent='\u2014'}
+  const initials=participantName?participantName.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase():'?';
+  document.getElementById('pbInitial').textContent=initials;
+  buildRawGrid();buildStroopBars();buildInterpretation();
+  
+  /* AUTO-SAVE RESULTS */
+  var setResults={};
+  ['A','B','C','D'].forEach(function(s){
+    var st=state[s];
+    var avgRt=st.rts.length>0?Math.round(st.rts.reduce(function(a,b){return a+b},0)/st.rts.length):0;
+    setResults['Set'+s]={correct:st.correct,total:TRIALS_PER_SET,accuracy:Math.round((st.correct/TRIALS_PER_SET)*100),avgRT_ms:avgRt};
+  });
+  var stroopEffect=setResults.SetC.avgRT_ms-setResults.SetB.avgRT_ms;
+  var inhibitionCost=setResults.SetD.avgRT_ms-setResults.SetB.avgRT_ms;
+  saveResultsToFile('stroop_test', {
+    sets: setResults,
+    stroopEffect_ms: stroopEffect,
+    inhibitionCost_ms: inhibitionCost
+  });
+
+  setTimeout(()=>{dom.resultsCard.classList.add('show')},100);
+  setTimeout(()=>{animateStroopBars()},600);
+  window.scrollTo(0,0);
+}
+function buildRawGrid(){const grid=document.getElementById('rawGrid');grid.innerHTML='';const labels={A:'Word Reading',B:'Color Naming',C:'Interference',D:'Inhibition'};['A','B','C','D'].forEach(set=>{const s=state[set],avg=avgRT(set),errors=TRIALS_PER_SET-s.correct,acc=Math.round((s.correct/TRIALS_PER_SET)*100);const box=document.createElement('div');box.className='raw-box';box.innerHTML=`<div class="rb-set ${set.toLowerCase()}">${labels[set]}</div><div class="rb-time">${avg>0?avg:'\u2014'}</div><div class="rb-unit">ms avg response time</div><div style="display:flex;justify-content:center;gap:14px;margin-top:6px;font-size:.76rem;font-weight:700"><span style="color:#5ec49a">${s.correct} correct</span><span style="color:#f07070">${errors} errors</span></div><div style="margin-top:8px;font-size:.72rem;color:var(--grey)">Accuracy: <strong style="color:var(--navy)">${acc}%</strong></div>`;grid.appendChild(box)})}
+function buildStroopBars(){const c=document.getElementById('stroopBars');c.innerHTML='';const rtA=avgRT('A'),rtB=avgRT('B'),rtC=avgRT('C'),rtD=avgRT('D');const se=Math.max(0,rtC-rtB),ic=Math.max(0,rtD-rtB),wa=Math.max(0,rtB-rtA),te=Math.max(0,rtD-rtA);const mx=Math.max(se,ic,wa,te,1);const bars=[{label:'Classic Stroop Effect (Set C \u2212 B)',val:se,color:'#ef5350',desc:`+${se} ms`},{label:'Inhibition Cost (Set D \u2212 B)',val:ic,color:'#ffa726',desc:`+${ic} ms`},{label:'Word Reading Advantage (Set B \u2212 A)',val:wa,color:'#42a5f5',desc:`+${wa} ms`},{label:'Total Interference (Set D \u2212 A)',val:te,color:'#7c6ff7',desc:`+${te} ms`}];bars.forEach((bar,i)=>{const pct=Math.round((bar.val/mx)*100);const row=document.createElement('div');row.className='stroop-effect-bar';row.innerHTML=`<div class="se-label">${bar.label}</div><div class="se-bar-wrap"><div class="se-bar-fill" id="barFill${i}" style="background:${bar.color};width:0%"></div></div><div class="se-val">${bar.desc}</div>`;c.appendChild(row);barFills[i]={el:null,pct}});bars.forEach((_,i)=>{barFills[i].el=document.getElementById(`barFill${i}`)})}
+function animateStroopBars(){Object.values(barFills).forEach((bar,i)=>{if(!bar.el)return;setTimeout(()=>{bar.el.style.width=`${bar.pct}%`},i*120)})}
+function buildInterpretation(){const c=document.getElementById('interpBoxes');c.innerHTML='';const rtA=avgRT('A'),rtB=avgRT('B'),rtC=avgRT('C'),rtD=avgRT('D');const accA=Math.round((state.A.correct/TRIALS_PER_SET)*100),accB=Math.round((state.B.correct/TRIALS_PER_SET)*100),accC=Math.round((state.C.correct/TRIALS_PER_SET)*100),accD=Math.round((state.D.correct/TRIALS_PER_SET)*100);const se=rtC-rtB,ic=rtD-rtB;const interps=[];
+let si='';if(rtA<400)si=`Your baseline word reading speed of <strong>${rtA} ms</strong> is excellent, indicating fast automatic processing.`;else if(rtA<650)si=`Your baseline word reading speed of <strong>${rtA} ms</strong> is within the typical range.`;else si=`Your baseline word reading speed of <strong>${rtA} ms</strong> is slower than average.`;interps.push({title:'Processing Speed (Set A)',text:si,color:'var(--sa)'});
+let ci='';if(rtB<550)ci=`Color naming speed of <strong>${rtB} ms</strong> with <strong>${accB}% accuracy</strong> is fast.`;else if(rtB<800)ci=`Color naming speed of <strong>${rtB} ms</strong> with <strong>${accB}% accuracy</strong> is typical.`;else ci=`Color naming speed of <strong>${rtB} ms</strong> with <strong>${accB}% accuracy</strong> suggests some difficulty.`;interps.push({title:'Color Naming Ability (Set B)',text:ci,color:'var(--sb)'});
+let sti='';if(se<100)sti=`Stroop interference of <strong>${se} ms</strong> \u2014 very low. Exceptional selective attention.`;else if(se<250)sti=`Stroop interference of <strong>${se} ms</strong> \u2014 typical range. Normal cognitive interference.`;else if(se<400)sti=`Stroop interference of <strong>${se} ms</strong> \u2014 moderately elevated.`;else sti=`Stroop interference of <strong>${se} ms</strong> \u2014 significantly elevated.`;interps.push({title:'Stroop Interference (Set C \u2212 B)',text:sti,color:'var(--sc)'});
+let ii='';if(ic<120)ii=`Inhibition cost of <strong>${ic} ms</strong> with <strong>${accD}% accuracy</strong> \u2014 excellent executive control.`;else if(ic<280)ii=`Inhibition cost of <strong>${ic} ms</strong> with <strong>${accD}% accuracy</strong> \u2014 typical.`;else ii=`Inhibition cost of <strong>${ic} ms</strong> with <strong>${accD}% accuracy</strong> \u2014 elevated.`;interps.push({title:'Inhibitory Control (Set D \u2212 B)',text:ii,color:'var(--sd)'});
+const avgAcc=Math.round((accA+accB+accC+accD)/4),avgAll=Math.round((rtA+rtB+rtC+rtD)/4);let sum='';if(avgAcc>=90&&se<250)sum=`Outstanding performance. Average accuracy <strong>${avgAcc}%</strong>, average RT <strong>${avgAll} ms</strong>.`;else if(avgAcc>=75&&se<400)sum=`Solid performance. Average accuracy <strong>${avgAcc}%</strong>, average RT <strong>${avgAll} ms</strong>.`;else sum=`Average accuracy <strong>${avgAcc}%</strong>, average RT <strong>${avgAll} ms</strong>. Some challenges with selective attention or inhibition under conflict.`;interps.push({title:'Overall Cognitive Summary',text:sum,color:'var(--blue)'});
+interps.forEach(item=>{const box=document.createElement('div');box.className='interp-box';box.style.borderLeftColor=item.color;box.innerHTML=`<div class="ib-title">${item.title}</div><div class="ib-text">${item.text}</div>`;c.appendChild(box)})}
+
+
+/* ═══ SAVE RESULTS TO SERVER ═══ */
+function saveResultsToServer(testName, resultData){
+  var payload = {
+    participant: { name: participantName||'Unknown', age: parseInt(participantAge)||null },
+    test_type: testName,
+    started_at: testStartTime ? testStartTime.toISOString() : new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    raw_answers: resultData.rawAnswers || resultData.answers || {},
+    scores: resultData,
+    interpretation: resultData.severity || resultData.category || ''
+  };
+  fetch('/api/results', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){return r.json()}).then(function(d){
+    console.log('Results saved to server:', d);
+  }).catch(function(e){
+    console.log('Server save failed (offline mode):', e);
+  });
+}
+
+/* ═══ SAVE RESULTS TO FILE ═══ */
+function saveResultsToFile(testName, resultData){
+  saveResultsToServer(testName, resultData);
+  var name = (participantName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var d = testStartTime || new Date();
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var yy=d.getFullYear();
+  var hh=String(d.getHours()).padStart(2,'0');
+  var mi=String(d.getMinutes()).padStart(2,'0');
+  var ss=String(d.getSeconds()).padStart(2,'0');
+  var dateStr=yy+'-'+mm+'-'+dd;
+  var timeStr=hh+'-'+mi+'-'+ss;
+  var fileName='results/'+testName+'/'+name+'_'+dateStr+'_'+timeStr+'.json';
+  var payload = {
+    meta: {
+      test: testName,
+      participant: participantName||'Unknown',
+      age: participantAge||'--',
+      date: dd+'/'+mm+'/'+yy,
+      time: hh+':'+mi+':'+ss,
+      timestamp: d.toISOString(),
+      filePath: fileName
+    },
+    results: resultData
+  };
+  var json = JSON.stringify(payload, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name+'_'+testName+'_'+dateStr+'_'+timeStr+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+
+
+
+/* ═══ PDF REPORT GENERATOR ═══ */
+function generatePDF(testName, participant, results) {
+  var scr = document.createElement('script');
+  scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  scr.onload = function() {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    var W = 210, H = 297, M = 18, y = 0;
+    var cW = W - M * 2;
+
+    function setFont(size, style) { doc.setFontSize(size); if(style==='bold') doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal'); }
+    function addLine(x1,y1,x2,y2,color) { doc.setDrawColor(color||'#ddd'); doc.setLineWidth(0.3); doc.line(x1,y1,x2,y2); }
+    function checkPage(need) { if(y+need > H-20) { doc.addPage(); y=20; drawHeader(); } }
+    function drawHeader() {
+      doc.setFillColor('#1a2340'); doc.rect(0,0,W,42,'F');
+      setFont(18,'bold'); doc.setTextColor('#ffffff'); doc.text('ManMulyankan',M,18);
+      setFont(8,'normal'); doc.setTextColor('#8890a4'); doc.text('Cognitive Assessment Platform · manmulyankan.com',M,25);
+      setFont(10,'bold'); doc.setTextColor('#6b8aff'); doc.text(testName.replace(/_/g,' ').toUpperCase()+' REPORT',M,35);
+      y=50;
+    }
+    function drawBar(x, barY, w, pct, color) {
+      doc.setFillColor('#e8e8e8'); doc.roundedRect(x,barY,w,4,2,2,'F');
+      if(pct>0){ doc.setFillColor(color||'#6b8aff'); doc.roundedRect(x,barY,w*(pct/100),4,2,2,'F'); }
+    }
+
+    drawHeader();
+
+    // Participant Info Box
+    doc.setFillColor('#f5f6f8'); doc.roundedRect(M,y,cW,22,3,3,'F');
+    doc.setDrawColor('#ddd'); doc.roundedRect(M,y,cW,22,3,3,'S');
+    setFont(8,'bold'); doc.setTextColor('#333');
+    doc.text('Participant:',M+4,y+7); doc.text('Age:',M+4,y+14); doc.text('Date:',M+80,y+7); doc.text('Time:',M+80,y+14);
+    setFont(8,'normal'); doc.setTextColor('#555');
+    doc.text(participant.name||'-',M+28,y+7);
+    doc.text(String(participant.age||'-'),M+14,y+14);
+    var now=results._date||new Date();
+    if(typeof now==='string') now=new Date(now);
+    doc.text(now.toLocaleDateString('en-GB'),M+92,y+7);
+    doc.text(now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),M+92,y+14);
+    y+=30;
+
+    // ═══ SCORES SECTION ═══
+    if(results.mainScore!==undefined){
+      setFont(12,'bold'); doc.setTextColor('#1a2340'); doc.text('Overall Score',M,y); y+=8;
+      doc.setFillColor('#f0f4ff'); doc.roundedRect(M,y,cW,18,3,3,'F');
+      setFont(22,'bold'); doc.setTextColor('#6b8aff');
+      doc.text(String(results.mainScore),M+cW/2,y+13,{align:'center'});
+      if(results.maxScore){ setFont(9,'normal'); doc.setTextColor('#888'); doc.text('/ '+results.maxScore,M+cW/2+14,y+13); }
+      y+=22;
+      if(results.classification){ setFont(10,'bold'); doc.setTextColor('#333'); doc.text('Classification: '+results.classification,M,y); y+=8; }
+    }
+
+    // ═══ DOMAIN SCORES ═══
+    if(results.domains && typeof results.domains==='object'){
+      y+=4; setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Domain Scores',M,y); y+=8;
+      var dkeys=Object.keys(results.domains);
+      dkeys.forEach(function(k){
+        checkPage(14);
+        var d=results.domains[k];
+        var dName=d.name||k, dScore=d.scaled||d.score||d.pct||0, dMax=d.total||100;
+        var pct=(d.pct!==undefined)?d.pct:(d.scaled?Math.round((d.scaled-55)/90*100):Math.round(d.score/d.total*100));
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(dName,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(dScore)+(d.total?' ('+d.correct+'/'+d.total+')':''),M+cW-30,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-35,Math.min(100,Math.max(0,pct)),d.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ CATEGORY SCORES (for QoL, Depression) ═══
+    if(results.categories && Array.isArray(results.categories)){
+      y+=4; checkPage(12); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Category Breakdown',M,y); y+=8;
+      results.categories.forEach(function(cat){
+        checkPage(14);
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(cat.name,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(cat.score||cat.value||''),M+cW-10,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-15,cat.pct||0,cat.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ INTERPRETATION ═══
+    if(results.interpretation){
+      y+=4; checkPage(20); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Interpretation',M,y); y+=7;
+      setFont(8,'normal'); doc.setTextColor('#444');
+      var lines=doc.splitTextToSize(results.interpretation,cW);
+      lines.forEach(function(l){ checkPage(6); doc.text(l,M,y); y+=5; });
+      y+=4;
+    }
+
+    // ═══ RESPONSES TABLE ═══
+    if(results.responses && Array.isArray(results.responses) && results.responses.length>0){
+      y+=4; checkPage(16);
+      setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Response Details',M,y); y+=8;
+
+      // Table header
+      var colQ=M, colR=M+cW*0.65, colS=M+cW*0.85;
+      doc.setFillColor('#1a2340'); doc.rect(M,y-4,cW,7,'F');
+      setFont(7,'bold'); doc.setTextColor('#fff');
+      doc.text('Question',colQ+2,y);
+      doc.text('Response',colR,y);
+      doc.text('Score',colS,y);
+      y+=6;
+
+      var alt=false;
+      results.responses.forEach(function(r,i){
+        checkPage(10);
+        if(alt){ doc.setFillColor('#f8f9fb'); doc.rect(M,y-4,cW,8,'F'); }
+        alt=!alt;
+        setFont(6.5,'normal'); doc.setTextColor('#333');
+        var qText=(i+1)+'. '+(r.question||r.q||'Q'+(i+1));
+        var qLines=doc.splitTextToSize(qText,cW*0.62);
+        doc.text(qLines[0],colQ+2,y);
+        doc.setTextColor('#555');
+        var rText=String(r.answer||r.response||r.selected||'-');
+        var rLines=doc.splitTextToSize(rText,cW*0.18);
+        doc.text(rLines[0],colR,y);
+        doc.setTextColor('#6b8aff'); setFont(7,'bold');
+        doc.text(String(r.score!==undefined?r.score:'-'),colS+5,y);
+        y+=Math.max(6, qLines.length*4+2);
+      });
+    }
+
+    // ═══ DISCLAIMER ═══
+    y+=6; checkPage(20);
+    addLine(M,y,W-M,y,'#ddd'); y+=6;
+    setFont(7,'normal'); doc.setTextColor('#999');
+    var disc='Disclaimer: This assessment is for educational and screening purposes only. It is not a substitute for professional clinical diagnosis. Results should be interpreted by a qualified healthcare professional.';
+    var dLines=doc.splitTextToSize(disc,cW);
+    dLines.forEach(function(l){ doc.text(l,M,y); y+=4; });
+    y+=4;
+    setFont(6,'normal'); doc.setTextColor('#bbb');
+    doc.text('Generated by ManMulyankan (manmulyankan.com) on '+new Date().toLocaleString('en-GB'),M,y);
+
+    // Save
+    var pName=(participant.name||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+    var dStr=new Date().toISOString().slice(0,10);
+    doc.save(pName+'_'+testName+'_'+dStr+'.pdf');
+  };
+  document.head.appendChild(scr);
+}
+
+
+/* ═══ HTML REPORT EXPORT ═══ */
+function triggerSave(){
+  // Clone the results section exactly as displayed
+  var resultsEl = document.querySelector('.screen.active') || document.querySelector('#s-results.active') || document.querySelector('.results-view') || document.querySelector('#resultsCard');
+  if(!resultsEl){
+    // Try alternate selectors
+    resultsEl = document.querySelector('#s-results') || document.querySelector('.result-card') || document.querySelector('[class*="result"]');
+  }
+  if(!resultsEl){alert('No results to export');return}
+  
+  // Get all styles from the page
+  var styles='';
+  document.querySelectorAll('style').forEach(function(s){styles+=s.outerHTML});
+  // Get linked fonts
+  var fonts='';
+  document.querySelectorAll('link[href*="font"]').forEach(function(l){fonts+=l.outerHTML});
+  
+  // Build standalone HTML
+  var pName=window.participantName||window._pName||'Participant';
+  var pAge=window.participantAge||window._pAge||'';
+  var testTitle=document.title||'ManMulyankan Assessment';
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">';
+  html+='<title>'+testTitle+' — Results for '+pName+'</title>';
+  html+=fonts;
+  html+=styles;
+  html+='<style>';
+  html+='body{background:#1e2028!important;color:#c8ccd4!important;font-family:"Outfit",sans-serif!important;padding:20px!important;min-height:auto!important}';
+  html+='.topbar,.shapes,.shapes-layer,.progress-wrap,.tb,.search-wrap,.ai-modal-bg{display:none!important}';
+  html+='.screen,.screen.active{display:block!important}';
+  html+='.main,.wrap,.container{max-width:800px!important;margin:0 auto!important;padding:20px!important}';
+  // Print styles
+  html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+  html+='.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button{display:none!important}';
+  html+='.card,.q-card,.result-card,.interp-box{border:1px solid #ddd!important;box-shadow:none!important}';
+  html+='.score-ring-wrap svg circle,.iq-ring svg circle,.domain-fill,.cat-fill{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}}';
+  html+='</style></head><body>';
+  
+  // Header
+  html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
+  html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
+  if(pAge) html+='<span><strong style="color:#6b8aff">Age:</strong> '+pAge+'</span>';
+  html+='<span><strong style="color:#6b8aff">Date:</strong> '+dateStr+'</span>';
+  html+='</div></div>';
+  
+  // Clone results content
+  var clone=resultsEl.cloneNode(true);
+  // Remove buttons from clone
+  clone.querySelectorAll('.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button,[onclick*="reload"],[onclick*="restart"],[onclick*="triggerSave"],[onclick*="Start"]').forEach(function(el){el.remove()});
+  // Remove progress bar from clone
+  clone.querySelectorAll('.progress-wrap,.progress-bar').forEach(function(el){el.remove()});
+  
+  html+='<div class="main" style="padding:0">'+clone.innerHTML+'</div>';
+  
+  // Footer
+  html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
+  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
+  
+  html+='<script src="/game-fx.js"></script>
+</body></html>';
+  
+  // Download as HTML file
+  var safeName=(pName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var testKey=document.title.split('—')[0].trim().replace(/[^a-zA-Z0-9]/g,'_');
+  var d=now;
+  var fileName=safeName+'_'+testKey+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.html';
+  
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+<script src="/game-fx.js"></script>
+</body>
+</html>
