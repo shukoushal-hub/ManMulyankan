@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MoCA Adapted Screening (56+) — Man Mulyankan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1e2028;--card:#2a2d35;--ice:#363840;--blue:#6b8aff;--blue-d:#5570d9;--blue-glow:rgba(107,138,255,.1);--navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--yellow:#f0b830;--red:#f07070;--green:#5ec49a;--purple:#b49dff;--cyan:#5bb8f5;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--r:16px;--r-sm:10px}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");background-size:128px 128px}
+.shapes{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.shapes div{position:absolute;opacity:0;animation:si 2s ease forwards}
+.sc1{top:-80px;right:-60px;width:420px;height:420px;border:3px solid rgba(107,138,255,.4);border-radius:50%;animation:si 1.5s .2s ease forwards,dr 25s ease-in-out infinite!important}
+.ss1{bottom:60px;left:-30px;width:180px;height:180px;border:3px solid rgba(240,184,48,.35);transform:rotate(15deg);animation:si 1.5s .5s ease forwards,sp 40s linear infinite!important}
+.st1{top:40%;right:5%;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:120px solid rgba(180,157,255,.25);animation:si 1.5s .8s ease forwards,bb 18s ease-in-out infinite!important}
+@keyframes si{to{opacity:.35}}@keyframes dr{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,20px)}}@keyframes sp{to{transform:rotate(375deg)}}@keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+.topbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(107,138,255,.1)}
+.tb-logo{width:36px;height:36px;background:var(--blue);border-radius:10px;position:relative;overflow:hidden}
+.tb-logo::before{content:'';position:absolute;top:6px;left:6px;width:10px;height:10px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:5px;right:5px;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid rgba(255,255,255,.6)}
+.tb-title{font-size:.95rem;font-weight:800;color:var(--navy)}.tb-sub{font-size:.6rem;color:var(--grey)}
+.tb-badge{font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:50px;background:rgba(180,157,255,.1);color:var(--purple);border:1px solid rgba(180,157,255,.15)}
+.main{position:relative;z-index:10;max-width:760px;margin:0 auto;padding:80px 24px 60px}
+.screen{display:none}.screen.active{display:block}
+/* Welcome */
+.hero{text-align:center;padding:60px 0 40px}
+.hero-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--purple),var(--blue));border-radius:20px;margin:0 auto 20px;display:grid;place-items:center;font-size:2rem;color:#fff;font-weight:900}
+.hero h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:900;color:var(--navy);margin-bottom:8px}
+.hero p{color:var(--slate);font-size:.9rem;line-height:1.7;max-width:560px;margin:0 auto 8px}
+.age-badge{display:inline-block;padding:6px 18px;background:rgba(180,157,255,.1);border:1px solid rgba(180,157,255,.15);border-radius:50px;font-size:.75rem;font-weight:700;color:var(--purple);margin:16px 0 24px}
+.card{background:var(--card);border:1.5px solid var(--ice);border-radius:var(--r);padding:32px;backdrop-filter:blur(12px);margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);margin-bottom:6px}
+.field input{width:100%;padding:14px 18px;border:2px solid var(--ice);border-radius:var(--r-sm);background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.95rem;outline:none;transition:border .2s}
+.field input:focus{border-color:var(--blue)}
+.btn{padding:14px 32px;border:none;border-radius:var(--r-sm);font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px)}
+.btn-full{width:100%}
+.btn-home{padding:8px 16px;background:transparent;color:var(--slate);border:1px solid var(--ice);font-size:.76rem}
+.btn-home:hover{border-color:var(--blue);color:var(--blue)}
+/* Progress */
+.progress-wrap{padding:8px 28px;position:sticky;top:52px;z-index:100;background:rgba(30,32,40,.9);backdrop-filter:blur(12px)}
+.progress-bar{height:4px;background:var(--ice);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));transition:width .4s;border-radius:4px;width:0}
+.progress-text{display:flex;justify-content:space-between;font-size:.68rem;color:var(--grey);font-weight:600;margin-top:6px}
+/* Question */
+.q-card{background:var(--card);border:1.5px solid var(--ice);border-radius:var(--r);padding:28px;margin-bottom:16px}
+.q-category{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;padding:3px 10px;border-radius:50px;display:inline-block;margin-bottom:12px}
+.q-text{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:20px;line-height:1.5}
+.q-hint{font-size:.8rem;color:var(--slate);font-style:italic;margin-bottom:16px}
+.q-options{display:flex;flex-direction:column;gap:10px}
+.q-opt{display:flex;align-items:center;gap:14px;padding:14px 18px;border:2px solid var(--ice);border-radius:var(--r-sm);cursor:pointer;transition:all .2s;font-size:.88rem;color:var(--ink)}
+.q-opt:hover{border-color:var(--blue);background:var(--blue-glow)}
+.q-opt.selected{border-color:var(--purple);background:rgba(180,157,255,.08)}
+.q-opt .dot{width:20px;height:20px;border:2px solid var(--ice);border-radius:50%;flex-shrink:0;display:grid;place-items:center;transition:all .2s}
+.q-opt.selected .dot{border-color:var(--purple);background:var(--purple)}
+.q-opt.selected .dot::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%}
+.q-nav{display:flex;gap:12px;justify-content:space-between;margin-top:20px}
+.btn-nav{padding:10px 24px;border:1.5px solid var(--ice);background:transparent;color:var(--slate);border-radius:var(--r-sm);font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-nav:hover{border-color:var(--blue);color:var(--blue)}
+.btn-nav.next{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-nav.next:hover{background:var(--blue-d)}
+/* Input questions */
+.q-input{width:100%;padding:14px;border:2px solid var(--ice);border-radius:var(--r-sm);background:var(--bg);color:var(--navy);font-family:var(--font);font-size:1rem;outline:none;transition:border .2s}
+.q-input:focus{border-color:var(--purple)}
+.grid-input{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px}
+.grid-btn{padding:12px;border:2px solid var(--ice);border-radius:var(--r-sm);background:var(--bg);color:var(--navy);font-family:var(--mono);font-size:1rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+.grid-btn:hover{border-color:var(--purple)}
+.grid-btn.selected{border-color:var(--purple);background:rgba(180,157,255,.1);color:var(--purple)}
+/* Timer */
+.timer-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 14px;background:rgba(240,184,48,.05);border:1px solid rgba(240,184,48,.15);border-radius:var(--r-sm)}
+.timer-icon{font-size:1rem}
+.timer-text{font-size:.82rem;font-weight:700;color:var(--yellow);font-family:var(--mono)}
+.timer-track{flex:1;height:4px;background:var(--ice);border-radius:4px;overflow:hidden}
+.timer-fill{height:100%;background:var(--yellow);transition:width 1s linear;border-radius:4px}
+/* Results */
+.result-card{background:var(--card);border:1.5px solid var(--ice);border-radius:var(--r);padding:32px;margin-bottom:20px;text-align:center}
+.pb{display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg);border-radius:var(--r-sm);margin-bottom:24px;text-align:left}
+.pb-avatar{width:44px;height:44px;background:linear-gradient(135deg,var(--purple),var(--blue));border-radius:12px;display:grid;place-items:center;font-size:.9rem;font-weight:800;color:#fff}
+.pb-name{font-weight:800;color:var(--navy);font-size:.95rem}
+.pb-meta{font-size:.72rem;color:var(--grey)}
+.iq-ring{width:180px;height:180px;margin:0 auto 20px;position:relative}
+.iq-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.iq-ring .bg{fill:none;stroke:var(--ice);stroke-width:8}
+.iq-ring .fg{fill:none;stroke:url(#iqGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:502;stroke-dashoffset:502;transition:stroke-dashoffset 1.5s ease}
+.iq-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.iq-num .big{font-size:2.8rem;font-weight:900;font-family:var(--mono);color:var(--navy)}
+.iq-num .label{font-size:.65rem;color:var(--grey);font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.iq-class{font-size:1.1rem;font-weight:800;padding:6px 20px;border-radius:50px;display:inline-block;margin-bottom:20px}
+.domain-bar{margin-bottom:14px;text-align:left}
+.domain-meta{display:flex;justify-content:space-between;margin-bottom:4px}
+.domain-name{font-size:.78rem;font-weight:700;color:var(--navy)}
+.domain-val{font-size:.78rem;font-weight:700;font-family:var(--mono);color:var(--slate)}
+.domain-track{height:8px;background:var(--ice);border-radius:4px;overflow:hidden}
+.domain-fill{height:100%;border-radius:4px;transition:width 1.2s ease;width:0}
+.interp{text-align:left;background:var(--bg);border-radius:var(--r-sm);padding:18px;margin-top:20px;font-size:.84rem;line-height:1.7;color:var(--ink)}
+.interp strong{color:var(--navy)}
+.disclaimer{font-size:.72rem;color:var(--grey);text-align:center;padding:16px;border:1px dashed var(--ice);border-radius:var(--r-sm);margin-top:20px;line-height:1.6}
+.btn-save{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;margin-right:8px}
+.btn-save:hover{background:#4aaf86}
+@media(max-width:600px){body{font-size:14px}.main{padding:60px 14px 40px}.topbar{padding:10px 14px}.hero h1{font-size:1.5rem}.card,.q-card,.result-card{padding:20px}.q-opt{padding:12px 14px;font-size:.82rem}.iq-ring{width:150px;height:150px}.iq-num .big{font-size:2.2rem}.grid-input{grid-template-columns:repeat(auto-fill,minmax(50px,1fr))}.q-nav{flex-direction:column}.btn-nav{width:100%;text-align:center}button,input{font-size:16px!important}}
+
+/* ═══ FLOWING PROGRESS DOT ═══ */
+.progress-fill,.prog-fill,.cat-fill,.domain-fill{position:relative}
+.progress-fill::after,.prog-fill::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--yellow,#f0b830);border-radius:50%;box-shadow:0 0 12px rgba(240,184,48,.6),0 0 24px rgba(240,184,48,.3);animation:dotPulse 1.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(240,184,48,.5),0 0 16px rgba(240,184,48,.2)}50%{box-shadow:0 0 16px rgba(240,184,48,.8),0 0 32px rgba(240,184,48,.4)}}
+</style>
+</head>
+<body>
+<div class="shapes"><div class="sc1"></div><div class="ss1"></div><div class="st1"></div></div>
+<div class="topbar">
+  <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">Man Mulyankan</div><div class="tb-sub">Cognitive Screening · MoCA Adapted</div></div></a>
+  <a href="/" class="btn btn-home" style="margin-left:auto">All Tests</a>
+  <span class="tb-badge">Ages 56+ Yrs</span>
+</div>
+
+<div class="progress-wrap" id="progressWrap" style="display:none">
+  <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+  <div class="progress-text"><span id="progText">Question 1 of 50</span><span id="progPct">0%</span></div>
+</div>
+
+<div class="main">
+<!-- WELCOME -->
+<div class="screen active" id="s-welcome">
+  <div class="hero">
+    <div class="hero-icon">MoCA</div>
+    <h1>Cognitive Screening</h1>
+    <div class="age-badge">Designed for Ages 56+ Yrs</div>
+    <p>This adapted screening tool evaluates cognitive abilities across five key domains based on the MoCA framework: Visuospatial/Executive, Naming, Memory, Attention, Language, Abstraction, and Orientation.</p>
+    <p style="color:var(--grey);font-size:.78rem;margin-top:12px">⏱ Approximately 10–15 minutes · 30 questions · Immediate results</p>
+  </div>
+  <div class="card">
+    <div class="field"><label>Participant Name</label><input type="text" id="pName" maxlength="16" placeholder="Enter full name"></div>
+    <div class="field"><label>Age (56–120)</label><input type="number" id="pAge" min="56" max="120" placeholder="Enter age"></div>
+    <div class="field"><label>Gender</label><div style="display:flex;gap:10px;margin-top:6px"><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--card,#2a2d35);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#6b8aff'" class="g-opt"><input type="radio" name="pGender" value="Male" style="accent-color:#6b8aff"> <span style="color:#5bb8f5">♂</span> Male</label><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--card,#2a2d35);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#b49dff'" class="g-opt"><input type="radio" name="pGender" value="Female" style="accent-color:#b49dff"> <span style="color:#f07070">♀</span> Female</label><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--card,#2a2d35);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#5ec49a'" class="g-opt"><input type="radio" name="pGender" value="Other" style="accent-color:#5ec49a"> <span style="color:#f0b830">⚧</span> Other</label></div></div>
+    <button class="btn btn-primary btn-full" onclick="startTest()">Begin Assessment</button>
+  </div>
+</div>
+
+<!-- QUESTIONS -->
+<div class="screen" id="s-test"></div>
+
+<!-- RESULTS -->
+<div class="screen" id="s-results">
+  <svg width="0" height="0"><defs><linearGradient id="iqGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#b49dff"/><stop offset="100%" stop-color="#6b8aff"/></linearGradient></defs></svg>
+</div>
+</div>
+
+<script>
+var participantName='',participantAge=0,participantGender='',testStartTime=null,answers=[],currentQ=0;
+
+/* ═══ WISC-V ADAPTED QUESTIONS ═══ */
+/* 5 Domains × 10 questions each = 50 total */
+var domains = [
+  {key:'ve',name:'Visuospatial / Executive',color:'#b49dff',cat:'VE'},
+  {key:'nm',name:'Naming & Language',color:'#5bb8f5',cat:'NM'},
+  {key:'at',name:'Attention & Calculation',color:'#f0b830',cat:'AT'},
+  {key:'ab',name:'Abstraction & Reasoning',color:'#5ec49a',cat:'AB'},
+  {key:'or',name:'Orientation & Memory',color:'#f07070',cat:'OR'}
+];
+
+var questions = [
+  // ═══ VISUOSPATIAL / EXECUTIVE (6) ═══
+  {d:0,q:'Draw a clock showing 11:10. Which description is correct?',opts:['Numbers evenly spaced, short hand on 11, long hand on 2','Numbers evenly spaced, both hands on 11','Numbers clustered on one side','Short hand on 2, long hand on 11'],a:0},
+  {d:0,q:'Copy a cube: A correct cube drawing should have:',opts:['6 visible faces','All lines parallel only','Two overlapping squares connected by lines','A single square'],a:2},
+  {d:0,q:'Trail Making: Connect 1-A-2-B-3-C-4-D-5-E. What comes after 3?',opts:['4','C','D','B'],a:1},
+  {d:0,q:'Which of these is a correct 3D representation of a cube?',opts:['A flat square','Two overlapping squares with connected corners','A triangle','A circle'],a:1},
+  {d:0,q:'If a clock shows 8:20, approximately what angle do the hour and minute hands make?',opts:['180°','130°','90°','60°'],a:1},
+  {d:0,q:'Which figure can be folded into a box?',opts:['A cross-shaped pattern of 6 squares','A row of 6 squares','A single large square','A triangle'],a:0},
+  // ═══ NAMING & LANGUAGE (6) ═══
+  {d:1,q:'A large animal with a trunk and tusks is called a(n):',opts:['Rhinoceros','Elephant','Hippopotamus','Giraffe'],a:1},
+  {d:1,q:'A large cat with black stripes is a:',opts:['Leopard','Cheetah','Lion','Tiger'],a:3},
+  {d:1,q:'A desert animal with one or two humps is a:',opts:['Llama','Camel','Donkey','Horse'],a:1},
+  {d:1,q:'Which sentence is grammatically correct?',opts:['He go to store yesterday','He went to the store yesterday','He going store yesterday','Him went to store'],a:1},
+  {d:1,q:'Generate as many words starting with "F" as you can. A typical score is:',opts:['3-5 words in 60 seconds','11+ words in 60 seconds','1-2 words','20+ words'],a:1},
+  {d:1,q:'Repeat this sentence: "The cat always hid under the couch when dogs were in the room." The key test is:',opts:['Remembering every word exactly','Getting the general meaning','Saying it faster','Changing the words'],a:0},
+  // ═══ ATTENTION & CALCULATION (6) ═══
+  {d:2,q:'Tap your hand when you hear the letter A: F-B-A-C-M-N-A-A-J-K-L-A-F-A-K. How many As?',opts:['3','4','5','6'],a:2},
+  {d:2,q:'Serial 7s: 100 - 7 = 93 - 7 = 86 - 7 = ?',opts:['78','79','80','81'],a:1},
+  {d:2,q:'Continue Serial 7s: 79 - 7 = ?',opts:['70','71','72','73'],a:2},
+  {d:2,q:'Continue Serial 7s: 72 - 7 = ?',opts:['63','64','65','66'],a:2},
+  {d:2,q:'Read these digits forward: 2-1-8-5-4. Now repeat them backwards:',opts:['4-5-8-1-2','2-1-8-5-4','5-4-8-1-2','4-5-1-8-2'],a:0},
+  {d:2,q:'Read these digits: 7-4-2. Now repeat them forward:',opts:['2-4-7','4-7-2','7-4-2','7-2-4'],a:2},
+  // ═══ ABSTRACTION & REASONING (6) ═══
+  {d:3,q:'How are a train and a bicycle alike?',opts:['Both use fuel','Both are means of transport','Both have engines','Both run on tracks'],a:1},
+  {d:3,q:'How are a watch and a ruler alike?',opts:['Both tell time','Both are measuring instruments','Both are made of metal','Both are electronic'],a:1},
+  {d:3,q:'How are a painting and a poem alike?',opts:['Both use paint','Both are forms of art/creative expression','Both are written','Both hang on walls'],a:1},
+  {d:3,q:'Complete: Pen is to writing as knife is to:',opts:['Sharpening','Cutting','Metal','Kitchen'],a:1},
+  {d:3,q:'What does this proverb mean: "Don\'t count your chickens before they hatch"?',opts:['Chickens are hard to count','Don\'t assume success before it happens','Always count your animals','Chickens take time to grow'],a:1},
+  {d:3,q:'How are anger and joy alike?',opts:['Both are negative','Both are emotions','Both cause crying','Both are physical states'],a:1},
+  // ═══ ORIENTATION & MEMORY (6) ═══
+  {d:4,q:'Which of these is today\'s approximate date?',opts:['February 2026','June 2024','December 2027','March 2023'],a:0},
+  {d:4,q:'What day of the week is it most likely?',opts:['A weekday','Cannot be determined from this test','Only weekends exist','None of these'],a:0},
+  {d:4,q:'You were asked to remember: FACE, VELVET, CHURCH, DAISY, RED. Which was NOT in the list?',opts:['FACE','GREEN','VELVET','CHURCH'],a:1},
+  {d:4,q:'From the same list, which word was a flower?',opts:['FACE','VELVET','CHURCH','DAISY'],a:3},
+  {d:4,q:'From the same list, which word was a colour?',opts:['FACE','VELVET','RED','DAISY'],a:2},
+  {d:4,q:'What is the name of this test you are currently taking?',opts:['Blood pressure test','Man Mulyankan Cognitive Screening','Physical fitness test','Eye examination'],a:1}
+];
+
+function $(id){return document.getElementById(id)}
+function showScreen(s){document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('active')});$(s).classList.add('active');window.scrollTo(0,0)}
+
+function startTest(){
+  var n=$('pName').value.trim(),a=parseInt($('pAge').value);
+  if(!n||n.length<1){alert('Please enter participant name');return}
+  if(!a||a<56||a>120){alert('This test is designed for ages 56–120. Please enter a valid age or choose a different test.');return}
+  participantName=n;participantAge=a;
+  var gEl=document.querySelector('input[name="pGender"]:checked');participantGender=gEl?gEl.value:'Not specified';testStartTime=new Date();
+  answers=new Array(questions.length).fill(-1);currentQ=0;
+  $('progressWrap').style.display='block';
+  if(window.gameState)gameState.total=questions.length;gameState.answered=0;gameState.streak=0;
+  renderQuestion();showScreen('s-test');
+}
+
+function renderQuestion(){
+  var q=questions[currentQ],d=domains[q.d];
+  var pct=Math.round((currentQ/questions.length)*100);
+  $('progFill').style.width=pct+'%';
+  $('progText').textContent='Question '+(currentQ+1)+' of '+questions.length;
+  $('progPct').textContent=pct+'%';
+
+  var h='<div class="q-card">';
+  h+='<span class="q-category" style="background:'+d.color+'15;color:'+d.color+';border:1px solid '+d.color+'25">'+d.name+'</span>';
+  h+='<div class="q-text">'+q.q+'</div>';
+  h+='<div class="q-options">';
+  q.opts.forEach(function(o,i){
+    var sel=answers[currentQ]===i?' selected':'';
+    h+='<div class="q-opt'+sel+'" onclick="selectOpt('+i+')"><div class="dot"></div><span>'+o+'</span></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="q-nav">';
+  if(currentQ>0) h+='<button class="btn-nav" onclick="prevQ()">← Previous</button>';
+  else h+='<div></div>';
+  if(currentQ<questions.length-1) h+='<button class="btn-nav next" onclick="nextQ()">Next →</button>';
+  else h+='<button class="btn-nav next" onclick="finishTest()" style="background:var(--green);border-color:var(--green)">View Results</button>';
+  h+='</div>';
+  var testEl=$('s-test');
+  testEl.style.opacity='0';testEl.style.transform='translateX(20px)';
+  setTimeout(function(){testEl.innerHTML=h;testEl.style.transition='all .3s ease';testEl.style.opacity='1';testEl.style.transform='translateX(0)'},80);
+}
+
+function selectOpt(i){
+  answers[currentQ]=i;
+  document.querySelectorAll('.q-opt').forEach(function(el,idx){el.classList.toggle('selected',idx===i)});
+  /* Track answer for gamification */
+  if(window.onAnswer){var isCorrect=answers[currentQ]===questions[currentQ].a;onAnswer(isCorrect)}
+}
+function nextQ(){
+  if(answers[currentQ]===-1){alert('Please select an answer');return}
+  if(window.sfx)sfx.next();if(window.haptic)haptic('light');
+  var el=$('s-test');el.style.transition='all .2s ease';el.style.opacity='0';el.style.transform='translateX(-30px)';
+  setTimeout(function(){currentQ++;renderQuestion()},200);
+}
+function prevQ(){
+  var el=$('s-test');el.style.transition='all .2s ease';el.style.opacity='0';el.style.transform='translateX(30px)';
+  setTimeout(function(){currentQ--;renderQuestion()},200);
+}
+
+function finishTest(){
+  if(answers.includes(-1)){alert('Please answer all questions before viewing results');return}
+  $('progressWrap').style.display='none';
+  calculateResults();
+}
+
+function calculateResults(){
+  // Score each domain
+  var domainScores={};
+  domains.forEach(function(d,di){
+    var correct=0,total=0;
+    questions.forEach(function(q,qi){
+      if(q.d===di){total++;if(answers[qi]===q.a)correct++}
+    });
+    var rawPct=Math.round((correct/total)*100);
+    // Convert to scaled score (IQ-like: mean=100, SD=15)
+    // rawPct 100% → ~130, 50% → ~100, 0% → ~70
+    var iq=Math.round(rawPct/100*30);
+    iq=Math.min(30,Math.max(0,iq));
+    domainScores[d.key]={name:d.name,color:d.color,correct:correct,total:total,pct:rawPct,scaled:iq};
+  });
+
+  // Full Scale IQ (FSIQ) — weighted average
+  var ks=Object.keys(domainScores);
+  var sum=0;ks.forEach(function(k){sum+=domainScores[k].scaled});
+  var fsiq=Math.round(sum/ks.length);
+
+  // Classification
+  var cls,clsColor,clsBg;
+  if(fsiq>=26){cls='Normal Cognition';clsColor='#5ec49a';clsBg='rgba(94,196,154,.1)'}
+  else if(fsiq>=22){cls='Mild Cognitive Impairment';clsColor='#f0b830';clsBg='rgba(240,184,48,.1)'}
+  else if(fsiq>=17){cls='Moderate Impairment';clsColor='#f07070';clsBg='rgba(240,112,112,.1)'}
+  else{cls='Severe Impairment — Seek Evaluation';clsColor='#f07070';clsBg='rgba(240,112,112,.1)'}
+
+  // Render results
+  var initials=participantName.split(' ').map(function(w){return w[0]}).join('').substring(0,2).toUpperCase();
+  var d=testStartTime;
+  var dateStr=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' at '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+
+  var h='<div class="result-card">';
+  h+='<div class="pb"><div class="pb-avatar">'+initials+'</div><div><div class="pb-name">'+participantName+'</div><div class="pb-meta">Age: '+participantAge+' · '+dateStr+'</div></div></div>';
+  // IQ Ring
+  h+='<div class="iq-ring"><svg viewBox="0 0 180 180"><circle class="bg" cx="90" cy="90" r="80"/><circle class="fg" id="iqRing" cx="90" cy="90" r="80"/></svg><div class="iq-num"><div class="big" id="iqNum">'+fsiq+'</div><div class="label">Estimated FSMoCA</div></div></div>';
+  h+='<div class="iq-class" style="background:'+clsBg+';color:'+clsColor+'">'+cls+'</div>';
+
+  // Domain bars
+  h+='<h3 style="text-align:left;font-size:.82rem;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:24px 0 16px">Domain Scores</h3>';
+  ks.forEach(function(k){
+    var ds=domainScores[k];
+    h+='<div class="domain-bar"><div class="domain-meta"><span class="domain-name" style="color:'+ds.color+'">'+ds.name+'</span><span class="domain-val">'+ds.scaled+' ('+ds.correct+'/'+ds.total+')</span></div><div class="domain-track"><div class="domain-fill" data-w="'+Math.round(ds.scaled/30*100)+'%" style="background:'+ds.color+'"></div></div></div>';
+  });
+
+  // Interpretation
+  h+='<div class="interp"><strong>Interpretation:</strong> Your estimated Full Scale IQ of <strong>'+fsiq+'</strong> falls in the <strong>'+cls+'</strong> range. ';
+  var strongest=ks.reduce(function(a,b){return domainScores[a].scaled>domainScores[b].scaled?a:b});
+  var weakest=ks.reduce(function(a,b){return domainScores[a].scaled<domainScores[b].scaled?a:b});
+  h+='Your strongest domain is <strong>'+domainScores[strongest].name+'</strong> ('+domainScores[strongest].scaled+'), ';
+  h+='and the area with most room for growth is <strong>'+domainScores[weakest].name+'</strong> ('+domainScores[weakest].scaled+').</div>';
+
+  h+='<h3 style="text-align:left;font-size:.82rem;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:28px 0 16px">How to Improve Each Domain</h3>';
+  h+='<div style="text-align:left;margin-bottom:20px;padding:18px;background:var(--bg);border-radius:var(--r-sm);border-left:3px solid #b49dff">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#b49dff;margin-bottom:10px">Visuospatial / Executive</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Drawing Exercises</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Practice clock drawing, geometric shapes, and mazes.</div><a href="https://www.lumosity.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Planning Tasks</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Cook recipes from scratch, organise spaces.</div><a href="https://www.brainhq.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Trail-Making</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Connect-the-dots and alternating sequence exercises.</div><a href="https://www.cognifit.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='</div>';
+  h+='<div style="text-align:left;margin-bottom:20px;padding:18px;background:var(--bg);border-radius:var(--r-sm);border-left:3px solid #5bb8f5">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#5bb8f5;margin-bottom:10px">Naming & Language</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Word Retrieval</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Name objects rapidly, practice category fluency.</div><a href="https://www.asha.org/public/speech/disorders/finding-words/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Read Aloud</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Read aloud daily to maintain fluency.</div><a href="https://www.readingrockets.org/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Social Conversation</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Regular social interaction maintains language skills.</div><a href="https://www.alz.org/help-support/brain_health" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='</div>';
+  h+='<div style="text-align:left;margin-bottom:20px;padding:18px;background:var(--bg);border-radius:var(--r-sm);border-left:3px solid #f0b830">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#f0b830;margin-bottom:10px">Attention & Calculation</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Mental Arithmetic</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Practice mental math — tips, change, serial subtraction.</div><a href="https://www.mathsisfun.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Mindfulness</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Sustained attention through mindfulness exercises.</div><a href="https://www.headspace.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Focus Training</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Single-task and reduce distractions to improve concentration.</div><a href="https://www.verywellmind.com/maintain-focus-improve-concentration-2795016" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='</div>';
+  h+='<div style="text-align:left;margin-bottom:20px;padding:18px;background:var(--bg);border-radius:var(--r-sm);border-left:3px solid #5ec49a">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#5ec49a;margin-bottom:10px">Abstraction & Reasoning</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Analogies</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Practice comparing everyday objects and concepts.</div><a href="https://www.brainzilla.com/logic/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Proverbs</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Read and discuss proverbs to strengthen abstract thinking.</div><a href="https://brilliant.org/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Categorisation</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Sort objects by different criteria — shape, function, origin.</div><a href="https://www.cognifit.com/" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='</div>';
+  h+='<div style="text-align:left;margin-bottom:20px;padding:18px;background:var(--bg);border-radius:var(--r-sm);border-left:3px solid #f07070">';
+  h+='<div style="font-size:.9rem;font-weight:800;color:#f07070;margin-bottom:10px">Orientation & Memory</div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Daily Orientation</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Recall the date, day, location each morning.</div><a href="https://www.alz.org/help-support/brain_health" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Memory Techniques</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Use mnemonics, association, spaced repetition.</div><a href="https://www.verywellmind.com/great-ways-to-improve-your-memory-2795356" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:3px">Stay Active</div><div style="font-size:.75rem;color:var(--slate);line-height:1.5;margin-bottom:4px">Walking 30 min daily protects against cognitive decline.</div><a href="https://www.nia.nih.gov/health/exercise-and-physical-activity" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--blue);text-decoration:none;font-weight:700">Learn more →</a></div>';
+  h+='</div>';
+
+  h+='<div class="disclaimer">⚠ This is an adapted screening tool for educational purposes only. It is not a standardised IQ test and should not be used for clinical diagnosis. A formal MoCA assessment must be administered by a licensed psychologist.</div>';
+
+  h+='<div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn-save" onclick="triggerSave()">Download Report</button><button class="btn btn-primary" onclick="location.reload()">Restart Assessment</button></div>';
+  h+='</div>';
+  $('s-results').innerHTML=h;
+  showScreen('s-results');
+
+  // Animate
+  setTimeout(function(){
+    var ring=$('iqRing');
+    var off=502-(fsiq/30)*502;
+    ring.style.strokeDashoffset=Math.max(0,off);
+    document.querySelectorAll('.domain-fill').forEach(function(el){el.style.width=el.getAttribute('data-w')});
+  },300);
+
+  // Auto-save
+  // Build detailed response data
+  var detailedAnswers=[];
+  questions.forEach(function(q,i){
+    var d=domains[q.d];
+    detailedAnswers.push({question:q.q,answer:q.opts[answers[i]]||'-',correct_answer:q.opts[q.a],score:answers[i]===q.a?1:0,domain:d.name});
+  });
+  saveResultsToServer('moca',{fsiq:fsiq,classification:cls,domains:domainScores,answers:detailedAnswers});
+  saveResultsToFile('moca',{fsiq:fsiq,classification:cls,domains:domainScores,answers:answers.slice()});
+}
+
+
+
+/* ═══ SAVE TO SERVER ═══ */
+function saveResultsToServer(testName,resultData){
+  fetch('/api/results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({participant:{name:participantName,age:participantAge,gender:participantGender},test_type:testName,started_at:testStartTime?testStartTime.toISOString():new Date().toISOString(),completed_at:new Date().toISOString(),raw_answers:resultData.answers||{},scores:resultData,interpretation:resultData.classification||''})}).then(function(r){return r.json()}).then(function(d){console.log('Saved:',d)}).catch(function(e){console.log('Offline:',e)});
+}
+
+/* ═══ SAVE TO FILE ═══ */
+function saveResultsToFile(testName,resultData){
+  var name=(participantName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var d=testStartTime||new Date();
+  var dd=String(d.getDate()).padStart(2,'0'),mm=String(d.getMonth()+1).padStart(2,'0'),yy=d.getFullYear();
+  var hh=String(d.getHours()).padStart(2,'0'),mi=String(d.getMinutes()).padStart(2,'0'),ss=String(d.getSeconds()).padStart(2,'0');
+  var payload={meta:{test:testName,participant:participantName,age:participantAge,date:dd+'/'+mm+'/'+yy,time:hh+':'+mi+':'+ss},results:resultData};
+  var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=name+'_'+testName+'_'+yy+'-'+mm+'-'+dd+'_'+hh+'-'+mi+'-'+ss+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+}
+
+
+
+
+/* ═══ HTML REPORT EXPORT ═══ */
+function triggerSave(){
+  // Clone the results section exactly as displayed
+  var resultsEl = document.querySelector('.screen.active') || document.querySelector('#s-results.active') || document.querySelector('.results-view') || document.querySelector('#resultsCard');
+  if(!resultsEl){
+    // Try alternate selectors
+    resultsEl = document.querySelector('#s-results') || document.querySelector('.result-card') || document.querySelector('[class*="result"]');
+  }
+  if(!resultsEl){alert('No results to export');return}
+  
+  // Get all styles from the page
+  var styles='';
+  document.querySelectorAll('style').forEach(function(s){styles+=s.outerHTML});
+  // Get linked fonts
+  var fonts='';
+  document.querySelectorAll('link[href*="font"]').forEach(function(l){fonts+=l.outerHTML});
+  
+  // Build standalone HTML
+  var pName=window.participantName||window._pName||'Participant';
+  var pAge=window.participantAge||window._pAge||'';
+  var testTitle=document.title||'Man Mulyankan Assessment';
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">';
+  html+='<title>'+testTitle+' — Results for '+pName+'</title>';
+  html+=fonts;
+  html+=styles;
+  html+='<style>';
+  html+='body{background:#1e2028!important;color:#c8ccd4!important;font-family:"Outfit",sans-serif!important;padding:20px!important;min-height:auto!important}';
+  html+='.topbar,.shapes,.shapes-layer,.progress-wrap,.tb,.search-wrap,.ai-modal-bg{display:none!important}';
+  html+='.screen,.screen.active{display:block!important}';
+  html+='.main,.wrap,.container{max-width:800px!important;margin:0 auto!important;padding:20px!important}';
+  // Print styles
+  html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+  html+='.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button{display:none!important}';
+  html+='.card,.q-card,.result-card,.interp-box{border:1px solid #ddd!important;box-shadow:none!important}';
+  html+='.score-ring-wrap svg circle,.iq-ring svg circle,.domain-fill,.cat-fill{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}}';
+  html+='</style></head><body>';
+  
+  // Header
+  html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">Man Mulyankan</div>';
+  html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
+  html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
+  if(pAge) html+='<span><strong style="color:#6b8aff">Age:</strong> '+pAge+'</span>';
+  html+='<span><strong style="color:#6b8aff">Date:</strong> '+dateStr+'</span>';
+  html+='</div></div>';
+  
+  // Clone results content
+  var clone=resultsEl.cloneNode(true);
+  // Remove buttons from clone
+  clone.querySelectorAll('.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button,[onclick*="reload"],[onclick*="restart"],[onclick*="triggerSave"],[onclick*="Start"]').forEach(function(el){el.remove()});
+  // Remove progress bar from clone
+  clone.querySelectorAll('.progress-wrap,.progress-bar').forEach(function(el){el.remove()});
+  
+  html+='<div class="main" style="padding:0">'+clone.innerHTML+'</div>';
+  
+  // Footer
+  html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
+  html+='Generated by Man Mulyankan (manmulyankan.com) on '+dateStr;
+  html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
+  
+  html+='<script src="/game-fx.js"></script>
+</body></html>';
+  
+  // Download as HTML file
+  var safeName=(pName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var testKey=document.title.split('—')[0].trim().replace(/[^a-zA-Z0-9]/g,'_');
+  var d=now;
+  var fileName=safeName+'_'+testKey+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.html';
+  
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+<script src="/game-fx.js"></script>
+</body>
+</html>
