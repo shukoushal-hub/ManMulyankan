@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Trail Making Test — ManMulyankan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#2a2d35;--offwhite:#1e2028;--ice:#363840;
+  --blue:#6b8aff;--blue-d:#5570d9;--blue-l:#8fadff;--blue-glow:rgba(107,138,255,.1);
+  --navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--silver:#4a4d56;
+  --yellow:#f0b830;--yellow-bg:rgba(240,184,48,.08);
+  --red:#f07070;--red-bg:rgba(240,112,112,.08);
+  --green:#5ec49a;--green-bg:rgba(94,196,154,.08);
+  --font:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --r-sm:10px;--r-md:16px;--r-lg:24px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--offwhite);color:var(--ink);min-height:100vh;overflow-x:hidden;padding:0 0 60px}
+
+.shapes-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.shape{position:absolute;opacity:0;animation:shapeIn 2s ease forwards}
+.sh-c1{top:-80px;right:-60px;width:420px;height:420px;border:3px solid rgba(107,138,255,.5);border-radius:50%;animation:shapeIn 1.5s .2s ease forwards,drift 25s ease-in-out infinite}
+.sh-s1{bottom:60px;left:-30px;width:180px;height:180px;border:3px solid rgba(240,184,48,.45);transform:rotate(15deg);animation:shapeIn 1.5s .5s ease forwards,spin-slow 40s linear infinite}
+.sh-t1{top:40%;right:5%;width:0;height:0;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:120px solid rgba(240,112,112,.35);animation:shapeIn 1.5s .8s ease forwards,bob 18s ease-in-out infinite}
+.sh-c2{top:55%;left:3%;width:100px;height:100px;border:2.5px solid rgba(143,173,255,.45);border-radius:50%;animation:shapeIn 1.5s 1s ease forwards,drift 20s ease-in-out infinite reverse}
+.sh-t2{top:8%;left:8%;width:0;height:0;border-left:35px solid transparent;border-right:35px solid transparent;border-bottom:60px solid rgba(240,184,48,.4);animation:shapeIn 1.5s 1.2s ease forwards,bob 22s ease-in-out infinite}
+.sh-s2{top:25%;left:25%;width:50px;height:50px;border:2px solid rgba(107,138,255,.35);transform:rotate(30deg);animation:shapeIn 1.5s 1.4s ease forwards,spin-slow 55s linear infinite reverse}
+.sh-c3{bottom:15%;right:12%;width:160px;height:160px;border:2px dashed rgba(143,173,255,.3);border-radius:50%;animation:shapeIn 1.5s 1s ease forwards,spin-slow 50s linear infinite}
+@keyframes shapeIn{to{opacity:.35}}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,20px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes spin-slow{to{transform:rotate(375deg)}}
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");background-size:128px 128px}
+
+.topbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.92);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:1px solid rgba(107,138,255,.1);box-shadow:0 1px 24px rgba(7,14,36,.04)}
+.tb-logo{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(26,86,255,.3);position:relative;overflow:hidden}
+.tb-logo::before{content:'';position:absolute;top:6px;left:6px;width:10px;height:10px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:5px;right:5px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid rgba(255,255,255,.6)}
+.tb-title{font-size:.95rem;font-weight:800;color:var(--navy);letter-spacing:-.03em}
+.tb-sub{font-size:.66rem;color:var(--grey);font-weight:500;margin-top:1px}
+.tb-badge{margin-left:auto;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);background:linear-gradient(135deg,var(--blue-glow),rgba(26,86,255,.05));border:1px solid rgba(26,86,255,.15);padding:5px 14px;border-radius:50px}
+
+.main-wrap{position:relative;z-index:10;max-width:960px;margin:0 auto;padding:0 20px}
+#welcomeScreen{padding:48px 0 56px;animation:heroIn .8s ease both}
+@keyframes heroIn{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.card{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 1px 1px rgba(7,14,36,.02),0 4px 8px rgba(7,14,36,.03),0 16px 48px rgba(7,14,36,.05)}
+.card::before{content:'';position:absolute;top:0;left:0;width:0;height:0;border-top:48px solid var(--blue);border-right:48px solid transparent;opacity:.06}
+.card::after{content:'';position:absolute;bottom:-30px;right:-30px;width:100px;height:100px;border-radius:50%;border:2px solid var(--yellow);opacity:.06}
+
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--blue);background:var(--white);border:1px solid var(--ice);padding:6px 18px;border-radius:50px;margin-bottom:16px;box-shadow:0 1px 8px rgba(26,86,255,.06)}
+.eyebrow-dot{width:6px;height:6px;background:var(--blue);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+.welcome-card{text-align:center}
+.welcome-card h2{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:900;color:var(--navy);letter-spacing:-.04em;margin-bottom:8px;line-height:1.05}
+.welcome-card h2 span{position:relative;display:inline-block}
+.welcome-card h2 span::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--blue-l))}
+.welcome-card .sub{color:var(--slate);font-size:.92rem;margin-bottom:32px;line-height:1.6}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;text-align:left}
+.info-box{background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-md);padding:20px 22px;transition:all .2s;position:relative;overflow:hidden}
+.info-box::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-top:20px solid var(--blue);border-left:20px solid transparent;opacity:.06}
+.info-box:hover{border-color:var(--blue-l);box-shadow:0 4px 16px var(--blue-glow);transform:translateY(-2px)}
+.info-box h3{font-size:.84rem;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.info-box h3 .mk{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.info-box:first-child h3 .mk{background:var(--blue);border-radius:50%}
+.info-box:last-child h3 .mk{background:var(--yellow);transform:rotate(45deg)}
+.info-box ul{padding-left:0;list-style:none}
+.info-box ul li{font-size:.8rem;color:var(--slate);margin-bottom:4px;padding-left:14px;position:relative;line-height:1.55}
+.info-box ul li::before{content:'';position:absolute;left:0;top:8px;width:4px;height:4px;background:var(--silver);border-radius:50%}
+
+.warn-box{background:linear-gradient(135deg,var(--yellow-bg),rgba(255,190,46,.04));border:1px solid rgba(240,184,48,.12);border-left:4px solid var(--yellow);border-radius:0 var(--r-md) var(--r-md) 0;padding:16px 20px;font-size:.8rem;color:#e6c65a;margin:24px 0;line-height:1.65}
+.warn-box strong{color:#ffd54f}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 36px;border:none;border-radius:var(--r-md);font-size:.92rem;font-weight:700;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);font-family:var(--font);letter-spacing:-.01em;position:relative;overflow:hidden}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 4px rgba(26,86,255,.2),0 8px 24px rgba(26,86,255,.15),4px 4px 0 var(--navy)}
+.btn-primary:hover{background:var(--blue-d);transform:translate(-2px,-2px);box-shadow:0 4px 8px rgba(26,86,255,.25),0 12px 32px rgba(26,86,255,.2),6px 6px 0 var(--navy)}
+.btn-primary:active{transform:translate(0,0);box-shadow:0 1px 2px rgba(26,86,255,.2),2px 2px 0 var(--navy)}
+.btn-primary::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 8px,rgba(255,255,255,.04) 8px,rgba(255,255,255,.04) 16px)}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-sm{padding:7px 18px;font-size:.78rem;font-weight:600;background:var(--white);color:var(--slate);border:1.5px solid var(--ice);border-radius:var(--r-sm);box-shadow:0 1px 4px rgba(7,14,36,.04);cursor:pointer}
+.btn-sm:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-glow)}
+.center{text-align:center}
+
+.screen{display:none}.screen.active{display:block}
+.pi-avatar{width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,var(--blue),var(--blue-l));border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:#fff;box-shadow:0 6px 24px rgba(26,86,255,.2);position:relative}
+.pi-avatar::after{content:'';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border:2px solid var(--yellow);border-radius:3px;transform:rotate(20deg);animation:spin-slow 10s linear infinite}
+.pi-title{font-size:1.3rem;font-weight:800;color:var(--navy);margin-bottom:6px;letter-spacing:-.02em}
+.pi-sub{font-size:.86rem;color:var(--slate);margin-bottom:28px;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;text-align:left}
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-group.full{grid-column:1/-1}
+.field-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:flex;align-items:center;gap:6px}
+.field-label::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:1px;transform:rotate(45deg)}
+.field-input{width:100%;padding:14px 18px;border:2px solid var(--ice);border-radius:var(--r-md);background:var(--white);font-family:var(--font);font-size:.92rem;font-weight:500;color:var(--navy);transition:all .25s;outline:none}
+.field-input::placeholder{color:var(--silver);font-weight:400}
+.field-input:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-glow),0 4px 16px rgba(26,86,255,.08)}
+.field-input.err{border-color:var(--red);box-shadow:0 0 0 4px rgba(240,62,62,.1)}
+.field-error{font-size:.72rem;color:var(--red);font-weight:600;min-height:16px;margin-top:2px}
+.pi-note{font-size:.74rem;color:var(--grey);line-height:1.55;margin-bottom:24px;display:flex;align-items:flex-start;gap:8px}
+.pi-note-icon{width:16px;height:16px;min-width:16px;border-radius:50%;border:1.5px solid var(--silver);display:grid;place-items:center;font-size:.55rem;font-weight:900;color:var(--grey);margin-top:1px}
+
+#partTabs{padding:32px 0 10px}
+.tab-bar{display:flex;gap:8px;margin-bottom:20px}
+.tab{padding:9px 24px;border-radius:var(--r-sm);border:1.5px solid var(--ice);background:var(--white);color:var(--grey);font-weight:700;font-size:.82rem;cursor:default;transition:all .2s;font-family:var(--font)}
+.tab.active{border-color:var(--blue);background:var(--blue-glow);color:var(--blue)}
+.tab.done{border-color:var(--green);background:var(--green-bg);color:#167a4a}
+
+.test-card{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:26px 28px;margin-bottom:20px;box-shadow:0 1px 1px rgba(7,14,36,.02),0 4px 8px rgba(7,14,36,.03),0 16px 48px rgba(7,14,36,.05);position:relative;overflow:hidden}
+.test-card::after{content:'';position:absolute;top:0;left:20px;right:20px;height:3px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,var(--blue),var(--blue-l))}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-header h2{font-size:1rem;font-weight:700;color:var(--navy);letter-spacing:-.015em}
+.stats-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.stat-chip{display:flex;align-items:center;gap:5px;background:var(--white);border:1px solid var(--ice);border-radius:8px;padding:6px 14px;font-size:.8rem;color:var(--slate);font-weight:500}
+.stat-chip span{color:var(--navy);font-weight:700;font-family:var(--mono);font-size:.8rem}
+.timer-val{color:var(--blue)!important}
+.prog-wrap{background:var(--ice);border-radius:50px;height:6px;margin-bottom:14px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-l),var(--yellow));background-size:200% 100%;animation:shimmer 3s ease infinite;border-radius:50px;width:0%;transition:width .35s}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.canvas-wrap{border-radius:var(--r-md);overflow:hidden;background:var(--white);border:2px solid var(--ice)}
+canvas{display:block;width:100%;cursor:crosshair;background:var(--offwhite)}
+.msg{min-height:24px;margin-top:10px;font-size:.84rem;font-weight:600;text-align:center}
+.test-nav{display:flex;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--ice)}
+.btn-stop{background:var(--red-bg)!important;color:var(--red)!important;border-color:rgba(240,62,62,.2)!important}
+.btn-stop:hover{background:var(--red)!important;color:#fff!important;box-shadow:0 2px 8px rgba(240,62,62,.25)}
+
+#resultsCard{padding:36px 0 0;opacity:0;transform:translateY(24px);transition:all .5s ease;pointer-events:none}
+#resultsCard.show{opacity:1;transform:translateY(0);pointer-events:all}
+.participant-banner{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(26,86,255,.04),rgba(77,122,255,.07));border:1.5px solid rgba(26,86,255,.12);border-radius:var(--r-md);padding:16px 20px;margin-bottom:20px}
+.pb-avatar{width:44px;height:44px;background:var(--blue);border-radius:50%;display:grid;place-items:center;font-size:1.1rem;color:#fff;font-weight:800;flex-shrink:0;box-shadow:0 2px 8px rgba(26,86,255,.2);font-family:var(--font)}
+.pb-info{display:flex;flex-direction:column;gap:2px}
+.pb-name{font-size:.95rem;font-weight:700;color:var(--navy)}
+.pb-meta{font-size:.76rem;color:var(--grey);font-weight:500;display:flex;align-items:center;gap:8px}
+.pb-meta .pb-dot{width:3px;height:3px;background:var(--silver);border-radius:50%}
+.results-header{text-align:center;padding:0 20px 28px}
+.results-header h2{font-size:1.7rem;font-weight:900;color:var(--navy);letter-spacing:-.03em;margin-bottom:4px}
+.results-header p{color:var(--slate);font-size:.88rem}
+.overall-score{display:flex;flex-direction:column;align-items:center;margin-bottom:36px}
+.score-ring{width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--blue) var(--pct,0%),var(--ice) 0);display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;box-shadow:0 4px 24px rgba(26,86,255,.12)}
+.score-ring::before{content:'';position:absolute;width:108px;height:108px;border-radius:50%;background:var(--white)}
+.score-ring::after{content:'';position:absolute;top:-6px;left:50%;width:12px;height:12px;background:var(--yellow);border-radius:50%;transform:translateX(-50%);box-shadow:0 2px 8px rgba(255,190,46,.4)}
+.score-num{position:relative;z-index:1;font-size:2.4rem;font-weight:900;color:var(--navy);font-family:var(--mono)}
+.score-cat{font-size:.9rem;color:var(--blue);font-weight:700}
+
+.sec-label{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,var(--blue),var(--blue-l));border-radius:2px}
+.sec-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--ice),transparent)}
+.rpanel{background:rgba(42,45,53,.9);backdrop-filter:blur(12px);border:1px solid rgba(54,56,64,.6);border-radius:var(--r-lg);padding:26px;margin-bottom:20px;box-shadow:0 1px 2px rgba(7,14,36,.03);position:relative;overflow:hidden}
+.rpanel::before{content:'';position:absolute;top:0;left:0;width:0;height:0;border-top:36px solid var(--blue);border-right:36px solid transparent;opacity:.04}
+.raw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.raw-box{background:var(--white);border:1.5px solid var(--ice);border-radius:12px;padding:16px;text-align:center;transition:all .2s}
+.raw-box:hover{border-color:var(--blue-l);box-shadow:0 2px 8px var(--blue-glow)}
+.rb-label{font-size:.62rem;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:4px}
+.rb-val{font-size:1.2rem;font-weight:800;color:var(--navy);font-family:var(--mono)}
+.bd-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.bd-table th{background:var(--offwhite);color:var(--grey);padding:9px 14px;text-align:left;font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1.5px solid var(--ice)}
+.bd-table td{padding:10px 14px;border-bottom:1px solid var(--ice);color:var(--ink);font-weight:500}
+.bd-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:3px 11px;border-radius:50px;font-size:.7rem;font-weight:700}
+.badge-good{background:var(--green-bg);color:#167a4a;border:1.5px solid rgba(18,183,106,.2)}
+.badge-avg{background:var(--yellow-bg);color:#a07d00;border:1.5px solid rgba(255,190,46,.25)}
+.badge-poor{background:var(--red-bg);color:var(--red);border:1.5px solid rgba(240,62,62,.2)}
+.domain-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.domain-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.domain-label{font-size:.8rem;color:var(--slate);font-weight:600}
+.domain-val{font-size:.8rem;color:var(--navy);font-weight:800;font-family:var(--mono)}
+.domain-bar{background:var(--ice);border-radius:50px;height:8px;overflow:hidden}
+.domain-fill{height:100%;border-radius:50px;width:0%;background:linear-gradient(90deg,var(--blue),var(--blue-l));transition:width .7s}
+.ai-panel{background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-md);padding:22px 24px}
+.ai-panel h3{font-size:.84rem;color:var(--blue);margin-bottom:6px;font-weight:700;display:flex;align-items:center;gap:6px}
+.ai-panel h3::before{content:'';width:3px;height:14px;background:var(--blue);border-radius:2px}
+.ai-panel p{font-size:.82rem;color:var(--slate);line-height:1.7;margin-bottom:14px}
+.ai-panel p:last-child{margin-bottom:0}
+.rec-list{background:var(--white);border:1.5px solid var(--ice);border-radius:var(--r-md);padding:20px 24px}
+.rec-list ul{padding-left:18px}
+.rec-list ul li{font-size:.82rem;color:var(--slate);margin-bottom:7px;line-height:1.65}
+.disclaimer{background:linear-gradient(135deg,var(--yellow-bg),rgba(255,190,46,.04));border:1px solid rgba(240,184,48,.12);border-left:4px solid var(--yellow);border-radius:0 var(--r-md) var(--r-md) 0;padding:14px 18px;font-size:.76rem;color:#e6c65a;line-height:1.65;margin-bottom:24px}
+.restart-wrap{text-align:center;margin-top:8px}
+.geo-divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 20px}
+.geo-divider .gd-line{flex:1;height:1px;background:var(--ice)}
+.geo-divider .gd-shape{width:8px;height:8px;background:var(--blue);border-radius:2px;transform:rotate(45deg);opacity:.3}
+.hidden{display:none!important}
+@media(max-width:640px){.info-grid,.domain-grid{grid-template-columns:1fr}.raw-grid{grid-template-columns:1fr 1fr}.test-card{padding:18px 16px}.tb-badge{display:none}.field-row{grid-template-columns:1fr}}
+@media print{.topbar,.shapes-layer,.btn{display:none!important}body{background:#fff;color:#161d35}body::after{display:none}.card,.test-card,.rpanel{box-shadow:none;border:1px solid #ddd;backdrop-filter:none}}
+
+.btn-save{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 2px 8px rgba(94,196,154,.2)}
+.btn-save:hover{background:#4aaf86;transform:translateY(-1px)}
+.btn-save::before{content:'';display:inline-block;width:14px;height:14px;border:2px solid #fff;border-radius:3px;position:relative}
+.btn-save::after{content:'';position:absolute;width:6px;height:3px;border-bottom:2px solid #fff;border-left:2px solid #fff;transform:rotate(-45deg);margin-left:-11px;margin-top:4px}
+
+/* ═══ MOBILE RESPONSIVE ENHANCEMENTS ═══ */
+@media(max-width:600px){
+  body{font-size:14px}
+  .topbar,.tb{padding:10px 14px!important;gap:8px!important}
+  .tb-title,.tb-t{font-size:.85rem!important}
+  .tb-badge{font-size:.5rem!important;padding:3px 8px!important}
+  button,input{font-size:16px!important;-webkit-appearance:none}
+  .main,.wrap,.container{padding-left:14px!important;padding-right:14px!important}
+}
+@media(max-width:400px){
+  .topbar,.tb{flex-wrap:wrap}
+}
+
+/* ═══ FLOWING PROGRESS DOT ═══ */
+.progress-fill,.prog-fill,.cat-fill,.domain-fill{position:relative}
+.progress-fill::after,.prog-fill::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--yellow,#f0b830);border-radius:50%;box-shadow:0 0 12px rgba(240,184,48,.6),0 0 24px rgba(240,184,48,.3);animation:dotPulse 1.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(240,184,48,.5),0 0 16px rgba(240,184,48,.2)}50%{box-shadow:0 0 16px rgba(240,184,48,.8),0 0 32px rgba(240,184,48,.4)}}
+</style>
+</head>
+<body>
+<div class="shapes-layer"><div class="shape sh-c1"></div><div class="shape sh-s1"></div><div class="shape sh-t1"></div><div class="shape sh-c2"></div><div class="shape sh-t2"></div><div class="shape sh-s2"></div><div class="shape sh-c3"></div></div>
+<div class="topbar"><a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">ManMulyankan</div><div class="tb-sub">Trail Making Test &middot; TMT-A &amp; B</div></div></a>
+  <a href="/" style="margin-left:auto;font-size:.76rem;color:var(--slate);text-decoration:none;font-weight:600;padding:6px 14px;border:1px solid var(--ice,#363840);border-radius:8px;transition:all .2s" onmouseover="this.style.color='var(--blue,#6b8aff)';this.style.borderColor='var(--blue,#6b8aff)'" onmouseout="this.style.color='var(--slate,#9498a4)';this.style.borderColor='var(--ice,#363840)'">All Tests</a><span class="tb-badge" style="margin-left:0">Neuropsych Assessment</span></div>
+<div class="main-wrap">
+
+<div id="welcomeScreen">
+  <div class="card welcome-card">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> Cognitive Assessment</div>
+    <h2><span>Trail Making</span> Test</h2>
+    <p class="sub">A clinically validated neuropsychological assessment. Complete both parts for a full cognitive profile.</p>
+    <div class="info-grid">
+      <div class="info-box"><h3><span class="mk"></span> Part A &mdash; Processing Speed</h3><ul><li>Numbers 1&ndash;25 scattered randomly on screen</li><li>Connect them in order: 1 &rarr; 2 &rarr; 3 &rarr; &hellip; &rarr; 25</li><li>All circles look identical &mdash; you must find each one</li><li>Measures: visual search &amp; psychomotor speed</li></ul></div>
+      <div class="info-box"><h3><span class="mk"></span> Part B &mdash; Executive Function</h3><ul><li>Numbers 1&ndash;13 and Letters A&ndash;L mixed on screen</li><li>Alternate: 1 &rarr; A &rarr; 2 &rarr; B &rarr; 3 &rarr; C &rarr; &hellip;</li><li>All circles look identical &mdash; no hints given</li><li>Measures: cognitive flexibility &amp; working memory</li></ul></div>
+    </div>
+    <div class="warn-box"><strong>&#x26A0; Important:</strong> This is a self-administered digital version for educational and screening purposes only. All circles are identical &mdash; you must visually scan to find each target. Results do not constitute a clinical diagnosis.</div>
+    <button class="btn btn-primary" id="beginBtn">Begin Assessment &rarr;</button>
+  </div>
+</div>
+
+<div class="screen" id="s-participant">
+  <div class="card center">
+    <div class="pi-avatar">&#128100;</div>
+    <h2 class="pi-title">Participant Details</h2>
+    <p class="pi-sub">Please enter your information before starting the assessment.</p>
+    <div class="field-row">
+      <div class="field-group full"><label class="field-label" for="piName">Full Name</label><input type="text" class="field-input" id="piName" placeholder="e.g. John Smith" autocomplete="name" maxlength="16"><div class="field-error" id="piNameErr"></div></div>
+      <div class="field-group"><label class="field-label" for="piAge">Age</label><input type="number" class="field-input" id="piAge" placeholder="e.g. 34" min="5" max="120"><div class="field-error" id="piAgeErr"></div></div>
+    </div>
+    <div class="pi-note"><span class="pi-note-icon">i</span><span>Your information is only used locally for your results report.</span></div>
+    <button class="btn btn-primary" id="startBtn">Start Assessment &rarr;</button>
+  </div>
+</div>
+
+<div id="partTabs" class="hidden">
+  <div class="tab-bar"><div class="tab active" id="tabA">Part A &mdash; Numbers</div><div class="tab" id="tabB">Part B &mdash; Numbers &amp; Letters</div></div>
+  <div class="test-card" id="cardA">
+    <div class="card-header"><h2>Part A &middot; Connect: 1 &rarr; 2 &rarr; 3 &rarr; &hellip; &rarr; 25</h2><button class="btn btn-sm" id="resetA">Reset</button></div>
+    <div class="stats-bar"><div class="stat-chip">Time: <span class="timer-val" id="timerA">00:00</span></div><div class="stat-chip">Errors: <span id="errCountA">0</span></div><div class="stat-chip">Progress: <span id="progA">0</span> / 25</div></div>
+    <div class="prog-wrap"><div class="prog-fill" id="fillA"></div></div>
+    <div class="canvas-wrap"><canvas id="canvasA"></canvas></div>
+    <div class="msg" id="msgA"></div>
+    <div class="test-nav"><button class="btn btn-sm" id="homeA">&#x2302; Home</button><button class="btn btn-sm btn-stop" id="stopA">&#x25A0; Stop Test</button><button class="btn btn-sm" id="goToB">Part B &rarr;</button></div>
+  </div>
+  <div class="test-card hidden" id="cardB">
+    <div class="card-header"><h2>Part B &middot; Alternate: 1 &rarr; A &rarr; 2 &rarr; B &rarr; &hellip;</h2><button class="btn btn-sm" id="resetB">Reset</button></div>
+    <div class="stats-bar"><div class="stat-chip">Time: <span class="timer-val" id="timerB">00:00</span></div><div class="stat-chip">Errors: <span id="errCountB">0</span></div><div class="stat-chip">Progress: <span id="progB">0</span> / 25</div></div>
+    <div class="prog-wrap"><div class="prog-fill" id="fillB"></div></div>
+    <div class="canvas-wrap"><canvas id="canvasB"></canvas></div>
+    <div class="msg" id="msgB"></div>
+    <div class="test-nav"><button class="btn btn-sm" id="homeB">&#x2302; Home</button><button class="btn btn-sm btn-stop" id="stopB">&#x25A0; Stop Test</button><button class="btn btn-sm" id="goToA">&larr; Part A</button></div>
+  </div>
+</div>
+
+<div id="resultsCard" class="hidden">
+  <div class="participant-banner"><div class="pb-avatar" id="pbInitial">?</div><div class="pb-info"><div class="pb-name" id="pbName">&mdash;</div><div class="pb-meta"><span id="pbAge">&mdash;</span><span class="pb-dot"></span><span>Started: </span><span id="pbDate">&mdash;</span></div></div></div>
+  <div class="results-header"><h2>Your Cognitive Profile</h2><p>Based on your Trail Making Test performance</p></div>
+  <div class="overall-score"><div class="score-ring" id="scoreRing"><div class="score-num" id="overallScore">--</div></div><div class="score-cat" id="overallCat">--</div></div>
+  <div class="rpanel"><div class="sec-label">Raw Performance Data</div><div class="raw-grid"><div class="raw-box"><div class="rb-label">Part A Time</div><div class="rb-val" id="rTimeA">--</div></div><div class="raw-box"><div class="rb-label">Part B Time</div><div class="rb-val" id="rTimeB">--</div></div><div class="raw-box"><div class="rb-label">Part A Errors</div><div class="rb-val" id="rErrA">--</div></div><div class="raw-box"><div class="rb-label">Part B Errors</div><div class="rb-val" id="rErrB">--</div></div><div class="raw-box"><div class="rb-label">B/A Ratio</div><div class="rb-val" id="rRatio">--</div></div><div class="raw-box"><div class="rb-label">Flexibility</div><div class="rb-val" id="rFlex">--</div></div></div></div>
+  <div class="geo-divider"><span class="gd-line"></span><span class="gd-shape"></span><span class="gd-line"></span></div>
+  <div class="rpanel"><div class="sec-label">Score Breakdown</div><table class="bd-table"><thead><tr><th>Metric</th><th>Score</th><th>Rating</th></tr></thead><tbody><tr><td>Part A &mdash; Processing Speed</td><td id="bdSpeedA">--</td><td><span class="badge" id="bdSpeedABadge">--</span></td></tr><tr><td>Part B &mdash; Processing Speed</td><td id="bdSpeedB">--</td><td><span class="badge" id="bdSpeedBBadge">--</span></td></tr><tr><td>Part A &mdash; Accuracy</td><td id="bdAccA">--</td><td><span class="badge" id="bdAccABadge">--</span></td></tr><tr><td>Part B &mdash; Accuracy</td><td id="bdAccB">--</td><td><span class="badge" id="bdAccBBadge">--</span></td></tr><tr><td>Cognitive Flexibility (B/A Ratio)</td><td id="bdFlex">--</td><td><span class="badge" id="bdFlexBadge">--</span></td></tr></tbody></table></div>
+  <div class="geo-divider"><span class="gd-line"></span><span class="gd-shape"></span><span class="gd-line"></span></div>
+  <div class="rpanel"><div class="sec-label">Cognitive Domain Profile</div><div class="domain-grid"><div class="domain-item"><div class="domain-top"><span class="domain-label">Attention</span><span class="domain-val" id="scoreAttn">--</span></div><div class="domain-bar"><div class="domain-fill" id="barAttn"></div></div></div><div class="domain-item"><div class="domain-top"><span class="domain-label">Processing Speed</span><span class="domain-val" id="scoreSpeed">--</span></div><div class="domain-bar"><div class="domain-fill" id="barSpeed"></div></div></div><div class="domain-item"><div class="domain-top"><span class="domain-label">Cognitive Flexibility</span><span class="domain-val" id="scoreFlex">--</span></div><div class="domain-bar"><div class="domain-fill" id="barFlex"></div></div></div><div class="domain-item"><div class="domain-top"><span class="domain-label">Working Memory</span><span class="domain-val" id="scoreMem">--</span></div><div class="domain-bar"><div class="domain-fill" id="barMem"></div></div></div><div class="domain-item"><div class="domain-top"><span class="domain-label">Executive Function</span><span class="domain-val" id="scoreExec">--</span></div><div class="domain-bar"><div class="domain-fill" id="barExec"></div></div></div></div></div>
+  <div class="geo-divider"><span class="gd-line"></span><span class="gd-shape"></span><span class="gd-line"></span></div>
+  <div class="rpanel"><div class="sec-label">AI Interpretation</div><div class="ai-panel"><h3>Overall Performance Summary</h3><p id="aiIntro"></p><h3>Part A Analysis</h3><p id="aiPartA"></p><h3>Part B Analysis</h3><p id="aiPartB"></p><h3>Cognitive Flexibility Analysis</h3><p id="aiRatio"></p></div></div>
+  <div class="rpanel"><div class="sec-label">Recommendations</div><div class="rec-list"><ul id="aiRecommendList"></ul></div></div>
+  <!-- Improvement Resources -->
+  <div style="margin-bottom:20px">
+    <h3 style="font-size:.82rem;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">How to Improve</h3>
+    <div style="margin-bottom:14px;padding:16px;background:var(--bg);border-radius:10px;border-left:3px solid #5bb8f5">
+      <div style="font-size:.88rem;font-weight:800;color:#5bb8f5;margin-bottom:8px">Processing Speed (Part A)</div>
+      <div style="margin-bottom:8px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><strong style="font-size:.82rem;color:var(--navy)">Timed Activities</strong><br><span style="font-size:.75rem;color:var(--slate)">Practice speed reading, rapid number scanning, and typing exercises to boost visuomotor speed.</span><br><a href="https://www.typingclub.com/" target="_blank" style="font-size:.72rem;color:var(--blue);text-decoration:none;font-weight:700">TypingClub (Free) →</a></div>
+      <div style="padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><strong style="font-size:.82rem;color:var(--navy)">Aerobic Exercise</strong><br><span style="font-size:.75rem;color:var(--slate)">Regular cardio exercise is the single most effective way to improve cognitive processing speed.</span><br><a href="https://www.health.harvard.edu/blog/regular-exercise-changes-brain-improve-memory-thinking-skills-201404097110" target="_blank" style="font-size:.72rem;color:var(--blue);text-decoration:none;font-weight:700">Harvard Health →</a></div>
+    </div>
+    <div style="margin-bottom:14px;padding:16px;background:var(--bg);border-radius:10px;border-left:3px solid #b49dff">
+      <div style="font-size:.88rem;font-weight:800;color:#b49dff;margin-bottom:8px">Executive Function (Part B)</div>
+      <div style="margin-bottom:8px;padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><strong style="font-size:.82rem;color:var(--navy)">Task Switching Practice</strong><br><span style="font-size:.75rem;color:var(--slate)">Practice alternating between two tasks quickly — this strengthens cognitive flexibility.</span><br><a href="https://www.cognifit.com/cognitive-flexibility" target="_blank" style="font-size:.72rem;color:var(--blue);text-decoration:none;font-weight:700">CogniFit Training →</a></div>
+      <div style="padding:10px 12px;background:var(--card);border-radius:8px;border:1px solid var(--ice)"><strong style="font-size:.82rem;color:var(--navy)">Strategy Games</strong><br><span style="font-size:.75rem;color:var(--slate)">Chess, Sudoku, and strategy games require planning and mental flexibility.</span><br><a href="https://www.chess.com/" target="_blank" style="font-size:.72rem;color:var(--blue);text-decoration:none;font-weight:700">Chess.com (Free) →</a></div>
+    </div>
+  </div>
+
+  <div class="disclaimer"><strong>&#x26A0; Clinical Disclaimer:</strong> This digital TMT is for educational and informational purposes only. It is not a substitute for a formal neuropsychological evaluation. Scores may be influenced by screen size, input device, and digital familiarity. Consult a qualified healthcare professional.</div>
+  <div class="restart-wrap"><button class="btn-save" onclick="triggerSave()">Download Report</button> <button class="btn btn-primary" id="restartBtn">Restart Full Assessment</button></div>
+</div>
+</div>
+<script>
+const STATE={partA:{time:0,errors:0,done:false,interval:null,started:false},partB:{time:0,errors:0,done:false,interval:null,started:false}};
+const seqA=Array.from({length:25},(_,i)=>String(i+1));
+const seqB=['1','A','2','B','3','C','4','D','5','E','6','F','7','G','8','H','9','I','10','J','11','K','12','L','13'];
+let circlesA=[],circlesB=[],linesA=[],linesB=[],nextA=0,nextB=0;
+let participantName='',participantAge='',testStartTime=null;
+
+function initCanvas(id){const c=document.getElementById(id),w=c.parentElement;c.width=w.clientWidth||900;c.height=480;return c}
+function getRad(c){return Math.min(c.width,c.height)*0.038}
+function placeCircles(seq,canvas){const rad=getRad(canvas),pad=rad+10,w=canvas.width,h=canvas.height,placed=[];for(let i=0;i<seq.length;i++){let x,y,tries=0,ok=false;while(!ok&&tries<2000){x=pad+Math.random()*(w-pad*2);y=pad+Math.random()*(h-pad*2);ok=placed.every(p=>Math.hypot(p.x-x,p.y-y)>=rad*2.6);tries++}placed.push({label:seq[i],x,y,visited:false})}return placed}
+
+function drawCanvas(canvasId,circles,lines,rad){
+  const canvas=document.getElementById(canvasId),ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle='rgba(107,138,255,0.05)';ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}
+  for(let y=0;y<canvas.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}
+  ctx.lineWidth=2.5;ctx.strokeStyle='#6b8aff';
+  for(const ln of lines){ctx.beginPath();ctx.moveTo(ln.x1,ln.y1);ctx.lineTo(ln.x2,ln.y2);ctx.stroke()}
+  for(const c of circles){
+    ctx.beginPath();ctx.arc(c.x,c.y,rad,0,Math.PI*2);
+    if(c.visited){ctx.fillStyle='rgba(94,196,154,0.12)';ctx.strokeStyle='#5ec49a';ctx.lineWidth=2.5}
+    else{ctx.fillStyle='#2a2d35';ctx.strokeStyle='#4a4d56';ctx.lineWidth=2}
+    ctx.fill();ctx.stroke();
+    ctx.fillStyle=c.visited?'#5ec49a':'#c8ccd4';
+    ctx.font=`bold ${Math.round(rad*0.72)}px Outfit,sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c.label,c.x,c.y);
+  }
+}
+
+function fmtTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function startTimer(part){const st=STATE[part];if(st.started)return;st.started=true;const tid=part==='partA'?'timerA':'timerB';st.interval=setInterval(()=>{st.time++;document.getElementById(tid).textContent=fmtTime(st.time)},1000)}
+function stopTimer(part){clearInterval(STATE[part].interval)}
+
+function handleClick(e,part){
+  const isA=part==='partA',canvas=document.getElementById(isA?'canvasA':'canvasB'),circles=isA?circlesA:circlesB,lines=isA?linesA:linesB,seq=isA?seqA:seqB,st=STATE[part];
+  const msgEl=document.getElementById(isA?'msgA':'msgB'),progEl=document.getElementById(isA?'progA':'progB'),errEl=document.getElementById(isA?'errCountA':'errCountB'),fillEl=document.getElementById(isA?'fillA':'fillB'),nextIdx=isA?nextA:nextB;
+  if(st.done)return;
+  const rect=canvas.getBoundingClientRect(),sx=canvas.width/rect.width,sy=canvas.height/rect.height,mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy,rad=getRad(canvas);
+  startTimer(part);
+  let hit=null;for(const c of circles){if(!c.visited&&Math.hypot(c.x-mx,c.y-my)<=rad*1.1){hit=c;break}}
+  if(!hit)return;
+  if(hit.label===seq[nextIdx]){
+    if(nextIdx>0){const prev=circles.find(c=>c.label===seq[nextIdx-1]);if(prev)lines.push({x1:prev.x,y1:prev.y,x2:hit.x,y2:hit.y})}
+    hit.visited=true;const nn=nextIdx+1;if(isA)nextA=nn;else nextB=nn;
+    progEl.textContent=nn;fillEl.style.width=`${(nn/seq.length)*100}%`;
+    msgEl.style.color='#5ec49a';msgEl.textContent=nn<seq.length?`\u2713 Correct! Find: ${seq[nn]}`:'';
+    drawCanvas(isA?'canvasA':'canvasB',circles,lines,rad);
+    if(nn===seq.length){stopTimer(part);st.done=true;msgEl.textContent=`\u2705 Part ${isA?'A':'B'} Complete! Time: ${fmtTime(st.time)}`;
+      if(isA){setTimeout(()=>{document.getElementById('cardA').classList.add('hidden');document.getElementById('cardB').classList.remove('hidden');document.getElementById('tabA').classList.remove('active');document.getElementById('tabA').classList.add('done');document.getElementById('tabB').classList.add('active');initPartB()},1200)}
+      else{setTimeout(showResults,1200)}
+    }
+  }else{st.errors++;errEl.textContent=st.errors;msgEl.style.color='#f07070';msgEl.textContent='\u2717 Incorrect \u2014 keep searching!';setTimeout(()=>{msgEl.textContent=''},1000)}
+}
+
+function setupCanvas(cid,circles,lines,part){const c=document.getElementById(cid),r=getRad(c);drawCanvas(cid,circles,lines,r);c.onclick=(e)=>handleClick(e,part)}
+function initPartA(){const c=initCanvas('canvasA');circlesA=placeCircles(seqA,c);linesA=[];nextA=0;STATE.partA={time:0,errors:0,done:false,interval:null,started:false};document.getElementById('timerA').textContent='00:00';document.getElementById('errCountA').textContent='0';document.getElementById('progA').textContent='0';document.getElementById('fillA').style.width='0%';document.getElementById('msgA').textContent='';setupCanvas('canvasA',circlesA,linesA,'partA')}
+function initPartB(){const c=initCanvas('canvasB');circlesB=placeCircles(seqB,c);linesB=[];nextB=0;STATE.partB={time:0,errors:0,done:false,interval:null,started:false};document.getElementById('timerB').textContent='00:00';document.getElementById('errCountB').textContent='0';document.getElementById('progB').textContent='0';document.getElementById('fillB').style.width='0%';document.getElementById('msgB').textContent='';setupCanvas('canvasB',circlesB,linesB,'partB')}
+
+function badge(score){if(score>=75)return['badge-good','Above Average'];if(score>=50)return['badge-avg','Average'];return['badge-poor','Below Average']}
+function calcScore(t,e,g,a){let s=100;if(t<=g)s=100;else if(t<=a)s=75-((t-g)/(a-g))*25;else s=Math.max(0,50-((t-a)/a)*50);s-=e*4;return Math.round(Math.max(0,Math.min(100,s)))}
+
+function showResults(){
+  const tA=STATE.partA.time,tB=STATE.partB.time,eA=STATE.partA.errors,eB=STATE.partB.errors;
+  document.getElementById('rTimeA').textContent=fmtTime(tA);document.getElementById('rTimeB').textContent=fmtTime(tB);
+  document.getElementById('rErrA').textContent=eA;document.getElementById('rErrB').textContent=eB;
+  const ratio=tA>0?(tB/tA).toFixed(2):'--';document.getElementById('rRatio').textContent=ratio;
+  const sSpeedA=calcScore(tA,eA,60,90),sSpeedB=calcScore(tB,eB,120,180),sAccA=Math.max(0,100-eA*8),sAccB=Math.max(0,100-eB*8);
+  const ratioNum=tA>0?tB/tA:4;let sFlex;if(ratioNum<=2)sFlex=100;else if(ratioNum<=3)sFlex=85;else if(ratioNum<=4)sFlex=65;else if(ratioNum<=5)sFlex=45;else sFlex=25;
+  document.getElementById('rFlex').textContent=`${sFlex}/100`;
+  const fill=(id,val,bid)=>{document.getElementById(id).textContent=`${val}/100`;const[cls,lbl]=badge(val);const el=document.getElementById(bid);el.textContent=lbl;el.className=`badge ${cls}`};
+  fill('bdSpeedA',sSpeedA,'bdSpeedABadge');fill('bdSpeedB',sSpeedB,'bdSpeedBBadge');fill('bdAccA',sAccA,'bdAccABadge');fill('bdAccB',sAccB,'bdAccBBadge');fill('bdFlex',sFlex,'bdFlexBadge');
+  const attn=Math.round((sAccA+sAccB)/2),speed=Math.round((sSpeedA+sSpeedB)/2),flex=sFlex,mem=Math.round((sSpeedB+sFlex)/2),exec=Math.round((flex+sSpeedB+sAccB)/3),overall=Math.round((attn+speed+flex+mem+exec)/5);
+  const setD=(sid,bid,v)=>{document.getElementById(sid).textContent=`${v}/100`;setTimeout(()=>{document.getElementById(bid).style.width=`${v}%`},300)};
+  setD('scoreAttn','barAttn',attn);setD('scoreSpeed','barSpeed',speed);setD('scoreFlex','barFlex',flex);setD('scoreMem','barMem',mem);setD('scoreExec','barExec',exec);
+  document.getElementById('overallScore').textContent=overall;document.getElementById('scoreRing').style.setProperty('--pct',`${overall}%`);
+  const[,catLbl]=badge(overall);document.getElementById('overallCat').textContent=catLbl;
+  
+  /* AUTO-SAVE RESULTS */
+  saveResultsToFile('trail_making', {
+    partA: {time_seconds: tA, time_formatted: fmtTime(tA), errors: eA, speedScore: sSpeedA, accuracyScore: sAccA},
+    partB: {time_seconds: tB, time_formatted: fmtTime(tB), errors: eB, speedScore: sSpeedB, accuracyScore: sAccB},
+    ratioBA: ratio,
+    cognitiveFlexibility: sFlex,
+    domainScores: {attention: attn, speed: speed, flexibility: flex, memory: mem, executive: exec},
+    overallScore: overall,
+    category: catLbl
+  });
+
+  const catA=sSpeedA>=75?'above average':sSpeedA>=50?'average':'below average';
+  const catB=sSpeedB>=75?'above average':sSpeedB>=50?'average':'below average';
+  const catF=sFlex>=75?'strong':sFlex>=50?'adequate':'limited';
+  document.getElementById('aiIntro').textContent=`Your overall cognitive performance score is ${overall}/100, placing you in the ${catLbl.toLowerCase()} range. This reflects a combined measure of visual search speed, psychomotor accuracy, sustained attention, and executive flexibility.`;
+  document.getElementById('aiPartA').textContent=`You completed Part A in ${fmtTime(tA)} with ${eA} error${eA!==1?'s':''}, yielding a processing speed score of ${sSpeedA}/100 \u2014 ${catA}. Part A primarily assesses psychomotor speed and basic visual scanning. `+(sSpeedA>=75?'Your performance indicates efficient visuomotor processing and intact basic attention.':sSpeedA>=50?'Your performance is within normal limits, with minor opportunity to improve scanning efficiency.':'This result may suggest slower visuomotor processing. Fatigue, unfamiliarity with digital input, or attention difficulties can all contribute.');
+  document.getElementById('aiPartB').textContent=`You completed Part B in ${fmtTime(tB)} with ${eB} error${eB!==1?'s':''}, yielding a score of ${sSpeedB}/100 \u2014 ${catB}. Part B requires simultaneous alternation between two stimulus sets, placing demands on working memory and cognitive set-shifting. `+(sSpeedB>=75?'Your performance indicates efficient executive functioning and well-preserved cognitive flexibility.':sSpeedB>=50?'Your performance is acceptable, though the increased difficulty of Part B is reflected in the score.':'This may point to challenges with executive functioning or dual-task coordination. This is a common finding and should be interpreted in clinical context.');
+  document.getElementById('aiRatio').textContent=`Your B/A time ratio is ${ratio}, representing ${catF} cognitive flexibility. A ratio between 2.0 and 3.0 is considered typical in most normative studies. `+(ratioNum<=3?'Your ratio falls within or near the normal range, suggesting intact set-shifting ability.':ratioNum<=4.5?'A slightly elevated ratio may indicate mild executive slowing, which can be normal under fatigue or distraction.':'A high ratio suggests that the additional cognitive demand of Part B substantially slowed your performance, which may warrant further evaluation in a clinical context.');
+  const recs=[];
+  if(sSpeedA<50)recs.push('Consider cognitive training exercises targeting visuomotor speed, such as timed symbol-matching tasks.');
+  if(sSpeedB<50)recs.push('Practice dual-task exercises \u2014 for example, alternating number and letter sequences verbally \u2014 to strengthen executive processing.');
+  if(eA>3)recs.push('Work on sustained attention strategies: minimize distractions during tasks and practice mindfulness-based attention exercises.');
+  if(eB>3)recs.push('Reduce impulsive responding by slowing down during complex sequential tasks. Accuracy is more diagnostically meaningful than speed.');
+  if(sFlex<50)recs.push('Engage in set-shifting activities such as task-switching games or cognitive flexibility training apps.');
+  if(overall>=75)recs.push('Your performance is strong. Continue mentally stimulating activities to maintain cognitive reserve.');
+  if(recs.length===0)recs.push('Your performance is within normal limits across all domains. Maintain regular mental and physical activity for long-term brain health.');
+  const ul=document.getElementById('aiRecommendList');ul.innerHTML='';
+  recs.forEach(r=>{const li=document.createElement('li');li.textContent=r;ul.appendChild(li)});
+
+  document.getElementById('pbName').textContent=participantName||'\u2014';
+  document.getElementById('pbAge').textContent=participantAge?'Age '+participantAge:'\u2014';
+  if(testStartTime){const d=testStartTime;document.getElementById('pbDate').textContent=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' at '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}else{document.getElementById('pbDate').textContent='\u2014'}
+  const initials=participantName?participantName.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase():'?';
+  document.getElementById('pbInitial').textContent=initials;
+  document.getElementById('partTabs').classList.add('hidden');
+  const rc=document.getElementById('resultsCard');rc.classList.remove('hidden');setTimeout(()=>rc.classList.add('show'),50);window.scrollTo(0,0);
+}
+
+function fullReset(){
+  stopTimer('partA');stopTimer('partB');nextA=0;nextB=0;circlesA=[];circlesB=[];linesA=[];linesB=[];
+  document.getElementById('tabA').className='tab active';document.getElementById('tabB').className='tab';
+  document.getElementById('cardA').classList.remove('hidden');document.getElementById('cardB').classList.add('hidden');
+  const rc=document.getElementById('resultsCard');rc.classList.remove('show');rc.classList.add('hidden');
+  document.getElementById('welcomeScreen').classList.remove('hidden');document.getElementById('partTabs').classList.add('hidden');
+  document.getElementById('s-participant').classList.remove('active');
+}
+
+document.getElementById('beginBtn').addEventListener('click',()=>{document.getElementById('welcomeScreen').classList.add('hidden');document.getElementById('s-participant').classList.add('active');window.scrollTo(0,0)});
+
+document.getElementById('startBtn').addEventListener('click',()=>{
+  const name=document.getElementById('piName').value.trim(),age=document.getElementById('piAge').value.trim();
+  let valid=true;
+  document.getElementById('piName').classList.remove('err');document.getElementById('piAge').classList.remove('err');
+  document.getElementById('piNameErr').textContent='';document.getElementById('piAgeErr').textContent='';
+  if(!name){document.getElementById('piName').classList.add('err');document.getElementById('piNameErr').textContent='Please enter your name';valid=false}
+  else if(name.length>16){document.getElementById('piName').classList.add('err');document.getElementById('piNameErr').textContent='Name must be 16 characters or less';valid=false}
+  if(!age||isNaN(age)||parseInt(age)<5||parseInt(age)>120){document.getElementById('piAge').classList.add('err');document.getElementById('piAgeErr').textContent='Enter a valid age (5\u2013120)';valid=false}
+  if(!valid)return;
+  participantName=name;participantAge=age;testStartTime=new Date();
+  document.getElementById('s-participant').classList.remove('active');
+  document.getElementById('partTabs').classList.remove('hidden');initPartA();window.scrollTo(0,0);
+});
+
+document.getElementById('piName').addEventListener('focus',function(){this.classList.remove('err');document.getElementById('piNameErr').textContent=''});
+document.getElementById('piAge').addEventListener('focus',function(){this.classList.remove('err');document.getElementById('piAgeErr').textContent=''});
+document.getElementById('resetA').addEventListener('click',()=>{stopTimer('partA');initPartA()});
+document.getElementById('resetB').addEventListener('click',()=>{stopTimer('partB');initPartB()});
+document.getElementById('restartBtn').addEventListener('click',fullReset);
+
+document.getElementById('homeA').addEventListener('click',()=>{stopTimer('partA');fullReset()});
+document.getElementById('homeB').addEventListener('click',()=>{stopTimer('partB');fullReset()});
+document.getElementById('stopA').addEventListener('click',()=>{stopTimer('partA');STATE.partA.done=true;document.getElementById('msgA').style.color='#f03e3e';document.getElementById('msgA').textContent='\u25A0 Test stopped by participant'});
+document.getElementById('stopB').addEventListener('click',()=>{stopTimer('partB');STATE.partB.done=true;document.getElementById('msgB').style.color='#f03e3e';document.getElementById('msgB').textContent='\u25A0 Test stopped by participant'});
+document.getElementById('goToB').addEventListener('click',()=>{
+  document.getElementById('cardA').classList.add('hidden');
+  document.getElementById('cardB').classList.remove('hidden');
+  document.getElementById('tabA').classList.remove('active');
+  document.getElementById('tabB').classList.add('active');
+  if(!STATE.partB.started)initPartB();
+  setupCanvas('canvasB',circlesB,linesB,'partB');
+});
+document.getElementById('goToA').addEventListener('click',()=>{
+  document.getElementById('cardB').classList.add('hidden');
+  document.getElementById('cardA').classList.remove('hidden');
+  document.getElementById('tabB').classList.remove('active');
+  document.getElementById('tabA').classList.add('active');
+  setupCanvas('canvasA',circlesA,linesA,'partA');
+});
+window.addEventListener('resize',()=>{if(!STATE.partA.done&&!document.getElementById('cardA').classList.contains('hidden'))initPartA();if(!STATE.partB.done&&!document.getElementById('cardB').classList.contains('hidden'))initPartB()});
+
+
+/* ═══ SAVE RESULTS TO SERVER ═══ */
+function saveResultsToServer(testName, resultData){
+  var payload = {
+    participant: { name: participantName||'Unknown', age: parseInt(participantAge)||null },
+    test_type: testName,
+    started_at: testStartTime ? testStartTime.toISOString() : new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    raw_answers: resultData.rawAnswers || resultData.answers || {},
+    scores: resultData,
+    interpretation: resultData.severity || resultData.category || ''
+  };
+  fetch('/api/results', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){return r.json()}).then(function(d){
+    console.log('Results saved to server:', d);
+  }).catch(function(e){
+    console.log('Server save failed (offline mode):', e);
+  });
+}
+
+/* ═══ SAVE RESULTS TO FILE ═══ */
+function saveResultsToFile(testName, resultData){
+  saveResultsToServer(testName, resultData);
+  var name = (participantName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var d = testStartTime || new Date();
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var yy=d.getFullYear();
+  var hh=String(d.getHours()).padStart(2,'0');
+  var mi=String(d.getMinutes()).padStart(2,'0');
+  var ss=String(d.getSeconds()).padStart(2,'0');
+  var dateStr=yy+'-'+mm+'-'+dd;
+  var timeStr=hh+'-'+mi+'-'+ss;
+  var fileName='results/'+testName+'/'+name+'_'+dateStr+'_'+timeStr+'.json';
+  var payload = {
+    meta: {
+      test: testName,
+      participant: participantName||'Unknown',
+      age: participantAge||'--',
+      date: dd+'/'+mm+'/'+yy,
+      time: hh+':'+mi+':'+ss,
+      timestamp: d.toISOString(),
+      filePath: fileName
+    },
+    results: resultData
+  };
+  var json = JSON.stringify(payload, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name+'_'+testName+'_'+dateStr+'_'+timeStr+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+
+
+
+
+
+
+/* ═══ HTML REPORT EXPORT ═══ */
+function triggerSave(){
+  // Clone the results section exactly as displayed
+  var resultsEl = document.querySelector('.screen.active') || document.querySelector('#s-results.active') || document.querySelector('.results-view') || document.querySelector('#resultsCard');
+  if(!resultsEl){
+    // Try alternate selectors
+    resultsEl = document.querySelector('#s-results') || document.querySelector('.result-card') || document.querySelector('[class*="result"]');
+  }
+  if(!resultsEl){alert('No results to export');return}
+  
+  // Get all styles from the page
+  var styles='';
+  document.querySelectorAll('style').forEach(function(s){styles+=s.outerHTML});
+  // Get linked fonts
+  var fonts='';
+  document.querySelectorAll('link[href*="font"]').forEach(function(l){fonts+=l.outerHTML});
+  
+  // Build standalone HTML
+  var pName=window.participantName||window._pName||'Participant';
+  var pAge=window.participantAge||window._pAge||'';
+  var testTitle=document.title||'ManMulyankan Assessment';
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">';
+  html+='<title>'+testTitle+' — Results for '+pName+'</title>';
+  html+=fonts;
+  html+=styles;
+  html+='<style>';
+  html+='body{background:#1e2028!important;color:#c8ccd4!important;font-family:"Outfit",sans-serif!important;padding:20px!important;min-height:auto!important}';
+  html+='.topbar,.shapes,.shapes-layer,.progress-wrap,.tb,.search-wrap,.ai-modal-bg{display:none!important}';
+  html+='.screen,.screen.active{display:block!important}';
+  html+='.main,.wrap,.container{max-width:800px!important;margin:0 auto!important;padding:20px!important}';
+  // Print styles
+  html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+  html+='.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button{display:none!important}';
+  html+='.card,.q-card,.result-card,.interp-box{border:1px solid #ddd!important;box-shadow:none!important}';
+  html+='.score-ring-wrap svg circle,.iq-ring svg circle,.domain-fill,.cat-fill{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}}';
+  html+='</style></head><body>';
+  
+  // Header
+  html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
+  html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
+  if(pAge) html+='<span><strong style="color:#6b8aff">Age:</strong> '+pAge+'</span>';
+  html+='<span><strong style="color:#6b8aff">Date:</strong> '+dateStr+'</span>';
+  html+='</div></div>';
+  
+  // Clone results content
+  var clone=resultsEl.cloneNode(true);
+  // Remove buttons from clone
+  clone.querySelectorAll('.btn,.btn-save,.btn-primary,.btn-nav,.restart-btn,.results-footer button,[onclick*="reload"],[onclick*="restart"],[onclick*="triggerSave"],[onclick*="Start"]').forEach(function(el){el.remove()});
+  // Remove progress bar from clone
+  clone.querySelectorAll('.progress-wrap,.progress-bar').forEach(function(el){el.remove()});
+  
+  html+='<div class="main" style="padding:0">'+clone.innerHTML+'</div>';
+  
+  // Footer
+  html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
+  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
+  
+  html+='<scr'+'ipt src="/game-fx.js"></scr'+'ipt>
+</body></html>';
+  
+  // Download as HTML file
+  var safeName=(pName||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+  var testKey=document.title.split('—')[0].trim().replace(/[^a-zA-Z0-9]/g,'_');
+  var d=now;
+  var fileName=safeName+'_'+testKey+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.html';
+  
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+</script>
+<script src="/game-fx.js"></script>
+</body>
+</html>

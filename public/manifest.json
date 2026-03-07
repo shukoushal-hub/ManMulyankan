@@ -1,0 +1,112 @@
+{
+  "name": "ManMulyankan — Cognitive Assessment Platform",
+  "short_name": "ManMulyankan",
+  "description": "Free standardised digital cognitive and psychological assessment tools for clinicians, researchers, mental health professionals, and the general public.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#111218",
+  "theme_color": "#6b8aff",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["health", "medical", "education"],
+  "iarc_rating_id": "",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ManMulyankan Homepage"
+    },
+    {
+      "src": "/icons/screenshot-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ManMulyankan Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Depression Screening (BDI)",
+      "short_name": "BDI",
+      "url": "/test/depression_screening",
+      "description": "21-item depression severity assessment",
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "IQ Screening (WISC-V)",
+      "short_name": "IQ Test",
+      "url": "/test/wisc_v",
+      "description": "Intelligence screening for ages 5-16",
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Trail Making Test",
+      "short_name": "TMT",
+      "url": "/test/trail_making",
+      "description": "Executive function assessment",
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "MoCA Screening",
+      "short_name": "MoCA",
+      "url": "/test/moca",
+      "description": "Cognitive screening for ages 56+",
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
+    }
+  ]
+}

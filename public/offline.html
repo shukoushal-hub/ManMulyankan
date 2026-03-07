@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ManMulyankan — Offline</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#111218;color:#c0c4d0;min-height:100vh;display:grid;place-items:center;text-align:center;padding:24px}
+.offline-card{max-width:420px}
+.offline-icon{width:100px;height:100px;margin:0 auto 24px;background:linear-gradient(135deg,#6b8aff,#b49dff);border-radius:24px;display:grid;place-items:center;font-size:2.5rem;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+h1{font-size:1.8rem;font-weight:900;color:#eaecf0;margin-bottom:12px}
+p{font-size:.95rem;line-height:1.7;color:#8990a4;margin-bottom:24px}
+.retry-btn{padding:14px 32px;background:linear-gradient(135deg,#6b8aff,#5570d9);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .25s}
+.retry-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(107,138,255,.4)}
+.cached-tests{margin-top:32px;text-align:left}
+.cached-tests h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:#5c6278;margin-bottom:12px}
+.cached-test{display:block;padding:12px 16px;background:#1e2130;border:1.5px solid #2a2e3e;border-radius:10px;margin-bottom:8px;color:#eaecf0;text-decoration:none;font-weight:600;font-size:.88rem;transition:all .2s}
+.cached-test:hover{border-color:#6b8aff;transform:translateX(4px)}
+</style>
+</head>
+<body>
+<div class="offline-card">
+  <div class="offline-icon">📡</div>
+  <h1>You're Offline</h1>
+  <p>No internet connection detected. Previously visited tests may still be available below. Your results will sync automatically when you're back online.</p>
+  <button class="retry-btn" onclick="location.reload()">Try Again</button>
+  <div class="cached-tests" id="cachedTests">
+    <h3>Cached Tests (Available Offline)</h3>
+  </div>
+</div>
+<script>
+// Show which tests are cached
+if('caches' in window){
+  caches.open('manmulyankan-static-v2.0').then(function(cache){
+    cache.keys().then(function(keys){
+      var container=document.getElementById('cachedTests');
+      var tests=keys.filter(function(r){return r.url.includes('/test/')});
+      if(tests.length===0){
+        container.innerHTML+='<p style="color:#5c6278;font-size:.82rem">No tests cached yet. Visit tests while online to make them available offline.</p>';
+        return;
+      }
+      tests.forEach(function(r){
+        var url=new URL(r.url);
+        var name=url.pathname.split('/').pop().replace(/_/g,' ').replace(/\b\w/g,function(l){return l.toUpperCase()});
+        var a=document.createElement('a');
+        a.href=url.pathname;
+        a.className='cached-test';
+        a.textContent=name;
+        container.appendChild(a);
+      });
+    });
+  });
+}
+</script>
+</body>
+</html>

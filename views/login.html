@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Login — ManMulyankan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#1e2028;color:#c8ccd4;min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{background:#2a2d35;border:1.5px solid #363840;border-radius:20px;padding:48px 40px;width:100%;max-width:420px;text-align:center}
+.logo{width:56px;height:56px;background:#6b8aff;border-radius:14px;margin:0 auto 20px;position:relative;overflow:hidden}
+.logo::before{content:'';position:absolute;top:10px;left:10px;width:14px;height:14px;border:2.5px solid rgba(255,255,255,.7);border-radius:50%}
+.logo::after{content:'';position:absolute;bottom:8px;right:8px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid rgba(255,255,255,.6)}
+h1{font-size:1.4rem;font-weight:800;color:#eaecf0;margin-bottom:6px}
+.sub{font-size:.86rem;color:#70747e;margin-bottom:32px}
+.field{text-align:left;margin-bottom:18px}
+.field label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#70747e;margin-bottom:6px}
+.field input{width:100%;padding:14px 18px;border:2px solid #363840;border-radius:12px;background:#2a2d35;color:#eaecf0;font-family:'Outfit',sans-serif;font-size:.95rem;outline:none;transition:border .2s}
+.field input:focus{border-color:#6b8aff;box-shadow:0 0 0 4px rgba(107,138,255,.1)}
+.btn{width:100%;padding:14px;background:#6b8aff;color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;margin-top:8px}
+.btn:hover{background:#5570d9;transform:translateY(-1px)}
+.error{background:rgba(240,112,112,.1);border:1px solid rgba(240,112,112,.2);color:#f07070;padding:10px;border-radius:8px;font-size:.82rem;font-weight:600;margin-bottom:16px;display:none}
+.back{display:inline-block;margin-top:20px;color:#70747e;font-size:.82rem;text-decoration:none}
+.back:hover{color:#6b8aff}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"></div>
+  <h1>Admin Login</h1>
+  <p class="sub">ManMulyankan Administration Panel</p>
+  <div class="error" id="err"></div>
+  <form id="loginForm">
+    <div class="field"><label>Username</label><input type="text" id="user" autocomplete="username" required></div>
+    <div class="field"><label>Password</label><input type="password" id="pass" autocomplete="current-password" required></div>
+    <button type="submit" class="btn">Sign In</button>
+  </form>
+  <a href="/" class="back">Back to Assessments</a>
+</div>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var err = document.getElementById('err');
+  err.style.display = 'none';
+  try {
+    var res = await fetch('/admin/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: document.getElementById('user').value, password: document.getElementById('pass').value})
+    });
+    var data = await res.json();
+    if (data.success) { window.location.href = '/admin'; }
+    else { err.textContent = data.error || 'Login failed'; err.style.display = 'block'; }
+  } catch(e) { err.textContent = 'Connection error'; err.style.display = 'block'; }
+});
+</script>
+</body>
+</html>
